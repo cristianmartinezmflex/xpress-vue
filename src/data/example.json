@@ -1,0 +1,32 @@
+﻿{
+  "tabs": [
+    {
+      "title": "Basic",
+      "columns": [
+        {
+          "sections": [
+            {
+              "title": "titulo 1",
+              "controls": [
+                { "id": "remote_computer_name", "type": "text", "title": "Remote Computer Name", "default": "" },
+                { "id": "enable_data_protect", "type": "boolean", "title": "Enable Data Protect", "default": true },
+                { "id": "port", "type": "number", "title": "Port", "default": 80 },
+                { "id": "page_size", "type": "number_spinner", "title": "Page Size", "default": 17, "validations": [{ "type": "required", "error": "must specify a value" }, { "type": "min_max", "min": 50, "max": 100, "error": "Must be between 50 and 100" }] },
+                { "id": "sync_type_select", "type": "select", "title": "Sync Type (select)", "values": [{ "text": "OpenAccess", "value": 17 }, { "text": "DataConduit", "value": 18 }], "default": 17 },
+                { "id": "sync_type_radio", "type": "radio", "title": "Sync Type (radio)", "values": [{ "text": "OpenAccess", "value": 17 }, { "text": "DataConduit", "value": 18 }], "default": 17 },
+                { "id": "btn_bar_1", "type": "button_bar", "buttons": [{ "id": "btn_testconnect", "title": "Test Connect", "onClick": "testConnect" }, { "id": "btn_defaults", "title": "Defaults", "onClick": "setDefaults" }] }
+              ]
+            },
+            {
+              "title": "titulo 2",
+              "controls": [
+                { "id": "user_mappings", "type": "keyvalue", "title": "Customer User Mappings", "key_title": "Source Columns", "key_header": "Source Field", "value_title": "Destination Columns", "value_header": "XPressEntry Field", "default": [{ "key": "Data3", "value": "SOMEXPEUDF (UDF24)" }, { "key": "Data5", "value": "XPE UDF 2 (UDF25)" }] }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    { "title": "Advanced" }
+  ]
+}
