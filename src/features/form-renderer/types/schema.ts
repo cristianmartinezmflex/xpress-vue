@@ -1,8 +1,26 @@
-export interface DisabledCondition {
-  id: string
-  op: 'eq' | 'neq'
+// --- Dynamic conditions ---
+
+export interface HasValueCondition {
+  type: 'hasValue'
+  field: string
+  pattern?: string  // optional regex — if provided, field value must match
+}
+
+export interface EqualsCondition {
+  type: 'equals'
+  field: string
   value: any
 }
+
+export type DynamicCondition = HasValueCondition | EqualsCondition
+
+// enable/display can be:
+//   true | false          → static
+//   DynamicCondition      → evaluated at runtime against form state
+export type EnableProp  = boolean | DynamicCondition
+export type DisplayProp = boolean | DynamicCondition
+
+// --- Schema types ---
 
 export interface Validation {
   type: 'required' | 'regex' | 'min_max'
@@ -51,13 +69,15 @@ export interface Control {
   key_header?: string
   value_title?: string
   value_header?: string
-  disabled_when?: DisabledCondition
+  enable?: EnableProp
+  display?: DisplayProp
 }
 
 export interface Section {
   title?: string
   controls: Control[]
-  disabled_when?: DisabledCondition
+  enable?: EnableProp
+  display?: DisplayProp
 }
 
 export interface Column {

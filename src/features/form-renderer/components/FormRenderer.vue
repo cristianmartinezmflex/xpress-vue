@@ -88,7 +88,8 @@ function onUpdateState(id: string, value: any) {
           :controls="section.controls"
           :state="state"
           :errors="errors"
-          :disabled-when="section.disabled_when"
+          :enable="section.enable"
+          :display="section.display"
           @update:state="onUpdateState"
           @action="(id, handler) => emit('action', id, handler)"
         />

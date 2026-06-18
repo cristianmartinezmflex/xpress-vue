@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Control, DisabledCondition } from '../types/schema'
-import { evaluateDisabled } from '../composables/useDisabled'
+import type { Control, EnableProp, DisplayProp } from '../types/schema'
+import { evaluateEnable, evaluateDisplay } from '../composables/useDisabled'
 import ControlText from './controls/ControlText.vue'
 import ControlPassword from './controls/ControlPassword.vue'
 import ControlBoolean from './controls/ControlBoolean.vue'
@@ -17,7 +17,8 @@ const props = defineProps<{
   controls: Control[]
   state: Record<string, any>
   errors: Readonly<Record<string, string>>
-  disabledWhen?: DisabledCondition
+  enable?: EnableProp
+  display?: DisplayProp
 }>()
 
 const emit = defineEmits<{
@@ -25,27 +26,34 @@ const emit = defineEmits<{
   action: [id: string, handler: string]
 }>()
 
-const sectionDisabled = computed(() => evaluateDisabled(props.disabledWhen, props.state))
+const sectionEnabled  = computed(() => evaluateEnable(props.enable, props.state))
+const sectionVisible  = computed(() => evaluateDisplay(props.display, props.state))
 
-function isControlDisabled(control: Control): boolean {
-  return sectionDisabled.value || evaluateDisabled(control.disabled_when, props.state)
+function isControlEnabled(control: Control): boolean {
+  return sectionEnabled.value && evaluateEnable(control.enable, props.state)
+}
+
+function isControlVisible(control: Control): boolean {
+  return evaluateDisplay(control.display, props.state)
 }
 </script>
 
 <template>
   <div
+    v-show="sectionVisible"
     class="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden transition-opacity"
-    :class="sectionDisabled ? 'opacity-50' : ''"
+    :class="!sectionEnabled ? 'opacity-50' : ''"
   >
     <div v-if="title" class="px-4 py-2 bg-gray-50 border-b border-gray-200">
       <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">{{ title }}</h3>
     </div>
-    <div class="p-4 flex flex-col gap-4" :class="sectionDisabled ? 'pointer-events-none select-none' : ''">
+    <div class="p-4 flex flex-col gap-4" :class="!sectionEnabled ? 'pointer-events-none select-none' : ''">
       <template v-for="control in controls" :key="control.id">
 
         <div
+          v-show="isControlVisible(control)"
           class="transition-opacity"
-          :class="isControlDisabled(control) && !sectionDisabled ? 'opacity-50 pointer-events-none select-none' : ''"
+          :class="!isControlEnabled(control) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : ''"
         >
           <ControlPassword
             v-if="control.type === 'password'"
