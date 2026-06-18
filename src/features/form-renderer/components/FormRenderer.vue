@@ -21,15 +21,21 @@ const allSections = computed(() =>
   currentTab.value.columns?.flatMap((col) => col.sections) ?? [],
 )
 
+const isFooterSection = (s: { title?: string }) => !s.title || s.title.trim() === ''
+
 const sections = computed(() =>
   allSections.value.map((s) => ({
     ...s,
-    controls: s.controls.filter((c) => c.type !== 'button_bar'),
+    controls: isFooterSection(s)
+      ? s.controls.filter((c) => c.type !== 'button_bar')
+      : s.controls,
   })).filter((s) => s.controls.length > 0),
 )
 
 const buttonBarControls = computed<Control[]>(() =>
-  allSections.value.flatMap((s) => s.controls.filter((c) => c.type === 'button_bar')),
+  allSections.value
+    .filter((s) => isFooterSection(s))
+    .flatMap((s) => s.controls.filter((c) => c.type === 'button_bar')),
 )
 
 const { state, errors, validate } = useFormState(props.schema)
@@ -82,6 +88,7 @@ function onUpdateState(id: string, value: any) {
           :controls="section.controls"
           :state="state"
           :errors="errors"
+          :disabled-when="section.disabled_when"
           @update:state="onUpdateState"
           @action="(id, handler) => emit('action', id, handler)"
         />

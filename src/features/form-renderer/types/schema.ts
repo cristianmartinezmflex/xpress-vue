@@ -1,3 +1,9 @@
+export interface DisabledCondition {
+  id: string
+  op: 'eq' | 'neq'
+  value: any
+}
+
 export interface Validation {
   type: 'required' | 'regex' | 'min_max'
   pattern?: string
@@ -24,6 +30,7 @@ export interface KeyValuePair {
 
 export type ControlType =
   | 'text'
+  | 'password'
   | 'boolean'
   | 'number'
   | 'number_spinner'
@@ -44,11 +51,13 @@ export interface Control {
   key_header?: string
   value_title?: string
   value_header?: string
+  disabled_when?: DisabledCondition
 }
 
 export interface Section {
   title?: string
   controls: Control[]
+  disabled_when?: DisabledCondition
 }
 
 export interface Column {

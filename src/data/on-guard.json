@@ -1,0 +1,420 @@
+{
+  "tabs": [
+    {
+      "title": "Basic",
+      "columns": [
+        {
+          "sections": [
+            {
+              "title": "Sync Type",
+              "controls": [
+                {
+                  "id": "sync_type",
+                  "type": "radio",
+                  "title": "",
+                  "values": [
+                    { "text": "OpenAccess",  "value": "OpenAccess"  },
+                    { "text": "DataConduit", "value": "DataConduit" }
+                  ],
+                  "default": "OpenAccess"
+                },
+                { "id": "remote_computer_name",  "type": "text",     "title": "Remote Computer Name", "default": "onguard83.ad.telaeris.com" },
+                { "id": "username",               "type": "text",     "title": "Username",             "default": "nathaniel" },
+                { "id": "password",               "type": "password", "title": "Password",             "default": "" },
+                { "id": "enable_data_protect",    "type": "boolean",  "title": "Enable Data Protect",  "default": false }
+              ]
+            },
+            {
+              "title": "DataConduit",
+              "disabled_when": { "id": "sync_type", "op": "neq", "value": "DataConduit" },
+              "controls": [
+                { "id": "use_dataconduit_explicit_login",   "type": "boolean", "title": "Use DataConduit Explicit Login",          "default": false },
+                { "id": "remote_computer_namespace",        "type": "text",    "title": "Remote Computer Namespace (DataConduit Only)", "default": "root\\onguard" },
+                { "id": "full_namespace",                   "type": "text",    "title": "Full Namespace",                         "default": "" },
+                { "id": "large_user_data_set",              "type": "boolean", "title": "Large User Data Set",                    "default": false },
+                {
+                  "id": "large_data_step_size",
+                  "type": "number_spinner",
+                  "title": "Large Data Step Size",
+                  "default": 20000,
+                  "validations": [{ "type": "min_max", "min": 1, "max": 999999, "error": "Must be between 1 and 999999" }]
+                },
+                {
+                  "id": "large_data_failure_count",
+                  "type": "number_spinner",
+                  "title": "Large Data Failure Count",
+                  "default": 3,
+                  "validations": [{ "type": "min_max", "min": 0, "max": 100, "error": "Must be between 0 and 100" }]
+                }
+              ]
+            },
+            {
+              "title": "Open Access",
+              "disabled_when": { "id": "sync_type", "op": "neq", "value": "OpenAccess" },
+              "controls": [
+                {
+                  "id": "page_size",
+                  "type": "number_spinner",
+                  "title": "Page Size",
+                  "default": 100,
+                  "validations": [{ "type": "required", "error": "Required" }, { "type": "min_max", "min": 1, "max": 10000, "error": "Must be between 1 and 10000" }]
+                },
+                {
+                  "id": "thread_size",
+                  "type": "number_spinner",
+                  "title": "Thread Size",
+                  "default": 5,
+                  "validations": [{ "type": "required", "error": "Required" }, { "type": "min_max", "min": 1, "max": 64, "error": "Must be between 1 and 64" }]
+                },
+                { "id": "check_heartbeat", "type": "boolean", "title": "Check Heartbeat", "default": true },
+                {
+                  "id": "picture_query_size",
+                  "type": "number_spinner",
+                  "title": "Picture Query Size",
+                  "default": 100,
+                  "validations": [{ "type": "min_max", "min": 1, "max": 10000, "error": "Must be between 1 and 10000" }]
+                },
+                {
+                  "id": "port",
+                  "type": "number_spinner",
+                  "title": "Port",
+                  "default": 8080,
+                  "validations": [{ "type": "required", "error": "Required" }, { "type": "min_max", "min": 1, "max": 65535, "error": "Must be between 1 and 65535" }]
+                },
+                {
+                  "id": "directory",
+                  "type": "select",
+                  "title": "Directory",
+                  "values": [
+                    { "text": "AD.TELAERIS.COM",  "value": "AD.TELAERIS.COM"  },
+                    { "text": "WORKGROUP",         "value": "WORKGROUP"        },
+                    { "text": "LOCAL",             "value": "LOCAL"            }
+                  ],
+                  "default": "AD.TELAERIS.COM"
+                },
+                { "id": "legacy_api",             "type": "boolean", "title": "Legacy API",             "default": false },
+                { "id": "trace_software_events",  "type": "boolean", "title": "Trace Software Events",  "default": false },
+                {
+                  "id": "request_timeout_seconds",
+                  "type": "number_spinner",
+                  "title": "Request Timeout (Seconds)",
+                  "default": 30,
+                  "validations": [{ "type": "min_max", "min": 1, "max": 300, "error": "Must be between 1 and 300" }]
+                }
+              ]
+            },
+            {
+              "title": "Open Access Subscription",
+              "controls": [
+                { "id": "default_subscription_description", "type": "text", "title": "Default Subscription Description", "default": "XPressEntry Watcher" },
+                {
+                  "id": "btn_bar_subscription",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_check_subscriptions",   "title": "Check XPressEntry Subscriptions", "onClick": "checkSubscriptions"  },
+                    { "id": "btn_delete_subscription",   "title": "Delete Current Subscription",     "onClick": "deleteSubscription"  }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "Software Events",
+              "controls": [
+                { "id": "subscribe_to_software_events",            "type": "boolean",        "title": "Subscribe to Software Events",            "default": true  },
+                { "id": "enable_activity_software_events",         "type": "boolean",        "title": "Enable Activity Software Events",         "default": true  },
+                { "id": "enable_badge_person_software_events",     "type": "boolean",        "title": "Enable Badge and Person Software Events", "default": true  },
+                { "id": "delete_software_events_upon_processing",  "type": "boolean",        "title": "Delete Software Events Upon Processing",  "default": true  },
+                { "id": "asynchronous_event_handling", "type": "boolean", "title": "Asynchronous Event Handling", "default": false, "disabled_when": { "id": "subscribe_to_software_events", "op": "eq", "value": false } },
+                {
+                  "id": "days_before_software_event_removal",
+                  "type": "number_spinner",
+                  "title": "Days Before Software Event Removal",
+                  "default": 1,
+                  "validations": [{ "type": "min_max", "min": 0, "max": 365, "error": "Must be between 0 and 365" }]
+                },
+                {
+                  "id": "retry_count",
+                  "type": "number_spinner",
+                  "title": "Retry Count",
+                  "default": 3,
+                  "validations": [{ "type": "min_max", "min": 0, "max": 99, "error": "Must be between 0 and 99" }]
+                }
+              ]
+            },
+            {
+              "title": "Activity / Occupancy",
+              "controls": [
+                { "id": "download_onguard_activities",        "type": "boolean",        "title": "Download OnGuard Activities",        "default": false },
+                { "id": "ignore_last_dm_sync_hours",          "type": "boolean",        "title": "Ignore Last DM Sync Hours",          "default": false },
+                {
+                  "id": "download_activity_hours",
+                  "type": "number_spinner",
+                  "title": "Download Activity # Hours",
+                  "default": 16,
+                  "validations": [{ "type": "min_max", "min": 1, "max": 720, "error": "Must be between 1 and 720" }]
+                },
+                { "id": "download_onguard_occupancy",         "type": "boolean",        "title": "Download OnGuard Occupancy",         "default": true  },
+                { "id": "ignore_empty_reader_area",           "type": "boolean",        "title": "Ignore Empty Reader Area",           "default": true  },
+                { "id": "use_onguard_hazard_safe_areas",      "type": "boolean",        "title": "Use OnGuard Hazard/Safe Areas",      "default": true  },
+                { "id": "dont_send_access_grant_or_deny",     "type": "boolean",        "title": "Don't Send Access Grant Or Deny",    "default": false },
+                { "id": "subscribe_to_soft_apb_events",       "type": "boolean",        "title": "Subscribe to Soft APB Events",       "default": false },
+                { "id": "subscribe_to_access_denied_events",  "type": "boolean",        "title": "Subscribe to Access Denied Events",  "default": false },
+                { "id": "send_activities_via_device_translator", "type": "boolean",     "title": "Send Activities via Device Translator", "default": false }
+              ]
+            },
+            {
+              "title": "Cardholders / Visitors",
+              "controls": [
+                { "id": "cardholders_only_no_visitors",         "type": "boolean",        "title": "Cardholders Only. No Visitors",       "default": false },
+                { "id": "sync_user_phone_number",               "type": "boolean",        "title": "Sync User Phone Number",              "default": false },
+                { "id": "sync_user_email",                      "type": "boolean",        "title": "Sync User Email",                     "default": false },
+                { "id": "sync_employee_id",                     "type": "boolean",        "title": "Sync Employee ID",                    "default": true  },
+                { "id": "deactivate_badges_by_date_time",       "type": "boolean",        "title": "Deactivate Badges by Date/Time",      "default": true  },
+                { "id": "filter_cardholders_with_active_badges","type": "boolean",        "title": "Filter Cardholders with Active Badges","default": false },
+                { "id": "filter_cardholders_by_expired_date",   "type": "boolean",        "title": "Filter Cardholders by Expired Date",  "default": false },
+                {
+                  "id": "pull_users_with_expired_date_within",
+                  "type": "number_spinner",
+                  "title": "Pull users with Expired Date Within",
+                  "default": 365,
+                  "validations": [{ "type": "min_max", "min": 0, "max": 9999, "error": "Must be between 0 and 9999" }],
+                  "disabled_when": { "id": "filter_cardholders_by_expired_date", "op": "eq", "value": false }
+                },
+                { "id": "apply_filter_to_visitors", "type": "boolean", "title": "Apply Filter to Visitors", "default": false, "disabled_when": { "id": "filter_cardholders_by_expired_date", "op": "eq", "value": false } }
+              ]
+            },
+            {
+              "title": "",
+              "controls": [
+                {
+                  "id": "btn_bar_basic",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "testConnect" },
+                    { "id": "btn_defaults",     "title": "Defaults",     "onClick": "setDefaults" },
+                    { "id": "btn_ok",           "title": "OK",           "onClick": "save"        }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Advanced",
+      "columns": [
+        {
+          "sections": [
+            {
+              "title": "Visitors",
+              "controls": [
+                { "id": "send_visitors_to_onguard",          "type": "boolean", "title": "Send XPressEntry Visitors to OnGuard", "default": false },
+                { "id": "visitor_id_field",                  "type": "text",    "title": "Visitor ID Field",                     "default": "" },
+                { "id": "visitor_company_field",             "type": "text",    "title": "Visitor Company Field",                "default": "" },
+                { "id": "visit_default_host_cardholder_id",  "type": "text",    "title": "Visit Default Host Cardholder ID",     "default": "" }
+              ]
+            },
+            {
+              "title": "Watch List",
+              "controls": [
+                { "id": "watch_list_field", "type": "text", "title": "Watch List Field", "default": "" },
+                { "id": "watch_list_table", "type": "text", "title": "Watch List Table", "default": "" }
+              ]
+            },
+            {
+              "title": "Login Activity",
+              "controls": [
+                { "id": "send_login_activities_as_dataconduit_events", "type": "boolean", "title": "Send Login Activities as DataConduit Events", "default": false },
+                { "id": "dataconduit_source",           "type": "text", "title": "DataConduIT Source",          "default": "" },
+                { "id": "dataconduit_prefix_for_door",  "type": "text", "title": "DataConduIT Prefix for Door", "default": "" }
+              ]
+            },
+            {
+              "title": "Segments",
+              "controls": [
+                { "id": "segments_list",         "type": "text",    "title": "Segments",          "default": "" },
+                {
+                  "id": "btn_bar_segments",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_update_segment_list", "title": "Update Segment list", "onClick": "updateSegmentList" }
+                  ]
+                },
+                { "id": "segment_cardholders",   "type": "boolean", "title": "Segment Cardholders",   "default": false },
+                { "id": "segment_readers",        "type": "boolean", "title": "Segment Readers",        "default": false },
+                { "id": "segment_visitors",       "type": "boolean", "title": "Segment Visitors",       "default": false },
+                { "id": "segment_access_levels",  "type": "boolean", "title": "Segment Access Levels",  "default": false }
+              ]
+            },
+            {
+              "title": "Fingerprint",
+              "controls": [
+                { "id": "sync_fingerprints_from_onguard", "type": "boolean", "title": "Sync Fingerprints from OnGuard", "default": false },
+                { "id": "fingerprint_type_ids",           "type": "text",    "title": "Fingerprint Type IDs",           "default": "" }
+              ]
+            },
+            {
+              "title": "Companies",
+              "controls": [
+                { "id": "companies_custom_list", "type": "text", "title": "Companies Custom List", "default": "" },
+                { "id": "companies_custom_ref",  "type": "text", "title": "Companies Custom Ref",  "default": "" },
+                { "id": "department",            "type": "text", "title": "Department",             "default": "DEPT" }
+              ]
+            },
+            {
+              "title": "General",
+              "controls": [
+                { "id": "enable_occupancy_debug",  "type": "boolean", "title": "Enable Occupancy Debug",  "default": false },
+                { "id": "enable_record_deletion",  "type": "boolean", "title": "Enable Record Deletion",  "default": true  },
+                {
+                  "id": "safety_delete_threshold",
+                  "type": "number_spinner",
+                  "title": "Safety Delete Threshold",
+                  "default": 0,
+                  "validations": [{ "type": "min_max", "min": 0, "max": 9999, "error": "Must be between 0 and 9999" }]
+                },
+                { "id": "badge_invalid_override", "type": "text", "title": "Badge Invalid Override", "default": "" }
+              ]
+            },
+            {
+              "title": "Badge Types",
+              "controls": [
+                { "id": "badge_type_employee",  "type": "boolean", "title": "Employee",  "default": false },
+                { "id": "badge_type_visitor",   "type": "boolean", "title": "Visitor",   "default": false },
+                { "id": "badge_type_temporary", "type": "boolean", "title": "Temporary", "default": false },
+                { "id": "badge_type_vehicle",   "type": "boolean", "title": "Vehicle",   "default": false },
+                { "id": "exclude_selected_badges", "type": "boolean", "title": "Exclude Selected Badges", "default": false }
+              ]
+            },
+            {
+              "title": "Alarm Activity",
+              "controls": [
+                { "id": "logical_source_name",             "type": "text", "title": "Logical Source Name",             "default": "" },
+                { "id": "logical_device_prefix_for_reader","type": "text", "title": "Logical Device Prefix for Reader", "default": "" },
+                {
+                  "id": "btn_bar_alarm",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_create_logical_source", "title": "Create Logical Source and Readers", "onClick": "createLogicalSource" }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "Custom Access Level Assignments",
+              "controls": [
+                { "id": "enable_assignments_by_training_status", "type": "boolean", "title": "Enable Assignments by Training Status", "default": false }
+              ]
+            },
+            {
+              "title": "Panel Filter (Readers)",
+              "controls": [
+                { "id": "panel_placeholder_panel", "type": "boolean", "title": "PLACEHOLDER PANEL", "default": false },
+                { "id": "panel_newtestp",          "type": "boolean", "title": "NEWTESTP",          "default": false },
+                { "id": "panel_xpressentry",       "type": "boolean", "title": "XPressEntry",       "default": false },
+                { "id": "panel_xpe",               "type": "boolean", "title": "XPE",               "default": false },
+                { "id": "panel_ivanxpressentry",   "type": "boolean", "title": "IvanXPressEntry",   "default": false },
+                { "id": "panel_xpe_commsvr2",      "type": "boolean", "title": "XPE-COMMSVR2",      "default": false },
+                {
+                  "id": "btn_bar_panel",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_update_panel_list", "title": "Update Panel List", "onClick": "updatePanelList" }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "User Gender Sync",
+              "controls": [
+                { "id": "enable_user_gender_sync", "type": "boolean", "title": "Enable User Gender Sync", "default": false },
+                { "id": "user_gender_field",        "type": "text",    "title": "User Gender Field",        "default": "" },
+                { "id": "field_value_male",         "type": "text",    "title": "Field Value - Male",       "default": "" },
+                { "id": "field_value_female",       "type": "text",    "title": "Field Value - Female",     "default": "" }
+              ]
+            },
+            {
+              "title": "Vehicle Badge Types",
+              "controls": [
+                { "id": "enable_vehicles_from_badge_types", "type": "boolean", "title": "Enable Vehicles from Badge Types", "default": false },
+                { "id": "vehicle_badge_employee",  "type": "boolean", "title": "Employee",  "default": false },
+                { "id": "vehicle_badge_visitor",   "type": "boolean", "title": "Visitor",   "default": false },
+                { "id": "vehicle_badge_temporary", "type": "boolean", "title": "Temporary", "default": false },
+                { "id": "vehicle_badge_vehicle",   "type": "boolean", "title": "Vehicle",   "default": false },
+                { "id": "license_plate_field", "type": "text", "title": "License Plate Field", "default": "SSNO"    },
+                { "id": "vehicle_id_field",    "type": "text", "title": "Vehicle ID Field",    "default": "MIDNAME" },
+                { "id": "vehicle_type_field",  "type": "text", "title": "Vehicle Type Field",  "default": "ADDRESS" },
+                { "id": "company_field",       "type": "text", "title": "Company Field",       "default": "DEPT"    }
+              ]
+            },
+            {
+              "title": "",
+              "controls": [
+                {
+                  "id": "btn_bar_advanced",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_test_connect_adv", "title": "Test Connect", "onClick": "testConnect" },
+                    { "id": "btn_defaults_adv",     "title": "Defaults",     "onClick": "setDefaults" },
+                    { "id": "btn_ok_adv",           "title": "OK",           "onClick": "save"        }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Custom Mapping",
+      "columns": [
+        {
+          "sections": [
+            {
+              "title": "",
+              "controls": [
+                {
+                  "id": "custom_mapping",
+                  "type": "keyvalue",
+                  "title": "",
+                  "key_title": "Source Columns",
+                  "key_header": "Source Field",
+                  "value_title": "Destination Columns",
+                  "value_header": "XPressEntry Field",
+                  "default": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Badge Custom Mapping",
+      "columns": [
+        {
+          "sections": [
+            {
+              "title": "",
+              "controls": [
+                {
+                  "id": "badge_custom_mapping",
+                  "type": "keyvalue",
+                  "title": "",
+                  "key_title": "Source Columns",
+                  "key_header": "Source Field",
+                  "value_title": "Destination Columns",
+                  "value_header": "XPressEntry Field",
+                  "default": [
+                    { "key": "BDFABC", "value": "badge_field_data_1" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
