@@ -15,7 +15,7 @@
                   "default": ""
                 },
                 {
-                  "id": "port",
+                  "id": "server_port",
                   "type": "number_spinner",
                   "title": "Port",
                   "default": 8000,
@@ -25,7 +25,7 @@
                   ]
                 },
                 {
-                  "id": "username",
+                  "id": "user_name",
                   "type": "text",
                   "title": "User Name",
                   "default": ""
@@ -37,7 +37,7 @@
                   "default": ""
                 },
                 {
-                  "id": "server_timezone",
+                  "id": "timezoneinfo",
                   "type": "select",
                   "title": "Server Timezone",
                   "values": [
@@ -65,7 +65,7 @@
                   ]
                 },
                 {
-                  "id": "delay_for_api_ms",
+                  "id": "api_delay",
                   "type": "number_spinner",
                   "title": "Delay for API (MS)",
                   "default": 10,
@@ -75,7 +75,7 @@
                   ]
                 },
                 {
-                  "id": "data_change_check_interval",
+                  "id": "data_check_interval",
                   "type": "number_spinner",
                   "title": "Data Change Check Interval (s)",
                   "default": 30,
@@ -89,33 +89,30 @@
             {
               "title": "Options",
               "controls": [
-                { "id": "use_ssl",                            "type": "boolean", "title": "Use SSL",                                "default": false },
-                { "id": "create_doors",                       "type": "boolean", "title": "Create Doors",                           "default": false },
-                { "id": "validate_ssl_cert",                  "type": "boolean", "title": "Validate SSL Cert",                      "default": false },
-                { "id": "download_pictures",                  "type": "boolean", "title": "Download Pictures",                      "default": true  },
-                { "id": "verbose_api_data",                   "type": "boolean", "title": "Verbose API Data",                       "default": false },
-                { "id": "pull_customers_as_companies",        "type": "boolean", "title": "Pull Customers As Companies",            "default": false },
-                { "id": "ignore_badge_invalidation",          "type": "boolean", "title": "Ignore Badge Invalidation",              "default": false },
-                { "id": "compare_set_user_end_date",          "type": "boolean", "title": "Compare and set User End Date",          "default": false },
-                { "id": "use_api_enable_cardholder",          "type": "boolean", "title": "Use API to Enable Cardholder in Galaxy", "default": false },
-                { "id": "use_reader_timezone_send_activity",  "type": "boolean", "title": "Use Reader Timezone to Send Activity",   "default": false }
+                { "id": "use_ssl",                   "type": "boolean", "title": "Use SSL",                                "default": false },
+                { "id": "create_doors",              "type": "boolean", "title": "Create Doors",                           "default": false },
+                { "id": "validate_ssl",              "type": "boolean", "title": "Validate SSL Cert",                      "default": false },
+                { "id": "download_pictures",         "type": "boolean", "title": "Download Pictures",                      "default": true  },
+                { "id": "verbose_api_data",          "type": "boolean", "title": "Verbose API Data",                       "default": false },
+                { "id": "pull_companies",            "type": "boolean", "title": "Pull Customers As Companies",            "default": false },
+                { "id": "ignore_badge_invalidation", "type": "boolean", "title": "Ignore Badge Invalidation",              "default": false },
+                { "id": "compare_user_end_dates",    "type": "boolean", "title": "Compare and set User End Date",          "default": false },
+                { "id": "use_enable_cardholder_api", "type": "boolean", "title": "Use API to Enable Cardholder in Galaxy", "default": false },
+                { "id": "use_reader_timezone",       "type": "boolean", "title": "Use Reader Timezone to Send Activity",   "default": false }
               ]
             },
             {
               "title": "Custom User Mappings",
               "controls": [
                 {
-                  "id": "custom_user_mappings",
+                  "id": "user_custom_fields",
                   "type": "keyvalue",
                   "title": "",
                   "key_title": "Source Columns",
                   "key_header": "Source Field",
                   "value_title": "Destination Columns",
                   "value_header": "XPressEntry Field",
-                  "default": [
-                    { "key": "Data3", "value": "SOMEXPEUDF (UDF24)" },
-                    { "key": "Data5", "value": "XPE UDF 2 (UDF25)" }
-                  ]
+                  "default": []
                 }
               ]
             },

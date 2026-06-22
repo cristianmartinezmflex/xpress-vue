@@ -5,7 +5,10 @@ import { useFormState } from '../composables/useFormState'
 import FormSection from './FormSection.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
 
-const props = defineProps<{ schema: FormSchema }>()
+const props = defineProps<{
+  schema: FormSchema
+  initialValues?: Record<string, any>
+}>()
 const emit = defineEmits<{ action: [id: string, handler: string] }>()
 
 const activeTab = ref(0)
@@ -38,7 +41,9 @@ const buttonBarControls = computed<Control[]>(() =>
     .flatMap((s) => s.controls.filter((c) => c.type === 'button_bar')),
 )
 
-const { state, errors, validate } = useFormState(props.schema)
+const { state, errors, validate } = useFormState(props.schema, props.initialValues)
+
+defineExpose({ state })
 
 const controlMap = computed<Record<string, Control>>(() => {
   const map: Record<string, Control> = {}

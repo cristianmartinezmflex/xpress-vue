@@ -25,13 +25,13 @@
                   "default": "OpenAccess"
                 },
                 {
-                  "id": "remote_computer_name",
+                  "id": "remote_name",
                   "type": "text",
                   "title": "Remote Computer Name",
                   "default": "onguard83.ad.telaeris.com"
                 },
                 {
-                  "id": "username",
+                  "id": "user",
                   "type": "text",
                   "title": "Username",
                   "default": "nathaniel"
@@ -59,25 +59,25 @@
               },
               "controls": [
                 {
-                  "id": "use_dataconduit_explicit_login",
+                  "id": "use_login",
                   "type": "boolean",
                   "title": "Use DataConduit Explicit Login",
                   "default": false
                 },
                 {
-                  "id": "remote_computer_namespace",
+                  "id": "remote_namespace",
                   "type": "text",
                   "title": "Remote Computer Namespace (DataConduit Only)",
                   "default": "root\\onguard"
                 },
                 {
-                  "id": "full_namespace",
+                  "id": "namespace",
                   "type": "text",
                   "title": "Full Namespace",
                   "default": ""
                 },
                 {
-                  "id": "large_user_data_set",
+                  "id": "large_user_table",
                   "type": "boolean",
                   "title": "Large User Data Set",
                   "default": false
@@ -97,7 +97,7 @@
                   ],
                   "enable": {
                     "type": "equals",
-                    "field": "large_user_data_set",
+                    "field": "large_user_table",
                     "value": true
                   }
                 },
@@ -116,7 +116,7 @@
                   ],
                   "enable": {
                     "type": "equals",
-                    "field": "large_user_data_set",
+                    "field": "large_user_table",
                     "value": true
                   }
                 }
@@ -149,7 +149,7 @@
                   ]
                 },
                 {
-                  "id": "thread_size",
+                  "id": "thread_count",
                   "type": "number_spinner",
                   "title": "Thread Size",
                   "default": 5,
@@ -187,7 +187,7 @@
                   ]
                 },
                 {
-                  "id": "port",
+                  "id": "open_access_port",
                   "type": "number_spinner",
                   "title": "Port",
                   "default": 8080,
@@ -205,7 +205,7 @@
                   ]
                 },
                 {
-                  "id": "directory",
+                  "id": "open_access_directory_name",
                   "type": "select",
                   "title": "Directory",
                   "values": [
@@ -231,13 +231,13 @@
                   "default": false
                 },
                 {
-                  "id": "trace_software_events",
+                  "id": "trace_software_events_openaccess",
                   "type": "boolean",
                   "title": "Trace Software Events",
                   "default": false
                 },
                 {
-                  "id": "request_timeout_seconds",
+                  "id": "request_timeout",
                   "type": "number_spinner",
                   "title": "Request Timeout (Seconds)",
                   "default": 30,
@@ -256,7 +256,7 @@
               "title": "Open Access Subscription",
               "controls": [
                 {
-                  "id": "default_subscription_description",
+                  "id": "subscription_description",
                   "type": "text",
                   "title": "Default Subscription Description",
                   "default": "XPressEntry Watcher"
@@ -283,19 +283,19 @@
               "title": "Software Events",
               "controls": [
                 {
-                  "id": "subscribe_to_software_events",
+                  "id": "software_events",
                   "type": "boolean",
                   "title": "Subscribe to Software Events",
                   "default": true
                 },
                 {
-                  "id": "enable_activity_software_events",
+                  "id": "activity_software_events",
                   "type": "boolean",
                   "title": "Enable Activity Software Events",
                   "default": true
                 },
                 {
-                  "id": "enable_badge_person_software_events",
+                  "id": "badge_and_person_software_events",
                   "type": "boolean",
                   "title": "Enable Badge and Person Software Events",
                   "default": true
@@ -307,7 +307,7 @@
                   "default": true
                 },
                 {
-                  "id": "asynchronous_event_handling",
+                  "id": "async_event_handling",
                   "type": "boolean",
                   "title": "Asynchronous Event Handling",
                   "default": false,
@@ -318,7 +318,7 @@
                   }
                 },
                 {
-                  "id": "days_before_software_event_removal",
+                  "id": "days_between_software_event_cleanup",
                   "type": "number_spinner",
                   "title": "Days Before Software Event Removal",
                   "default": 1,
@@ -337,7 +337,7 @@
                   }
                 },
                 {
-                  "id": "retry_count",
+                  "id": "software_event_retry_count",
                   "type": "number_spinner",
                   "title": "Retry Count",
                   "default": 3,
@@ -356,7 +356,7 @@
               "title": "Activity / Occupancy",
               "controls": [
                 {
-                  "id": "download_onguard_activities",
+                  "id": "get_activities",
                   "type": "boolean",
                   "title": "Download OnGuard Activities",
                   "default": false
@@ -368,7 +368,7 @@
                   "default": false
                 },
                 {
-                  "id": "download_activity_hours",
+                  "id": "download_activity_timer",
                   "type": "number_spinner",
                   "title": "Download Activity # Hours",
                   "default": 16,
@@ -382,19 +382,19 @@
                   ]
                 },
                 {
-                  "id": "download_onguard_occupancy",
+                  "id": "get_occupancies",
                   "type": "boolean",
                   "title": "Download OnGuard Occupancy",
                   "default": true
                 },
                 {
-                  "id": "ignore_empty_reader_area",
+                  "id": "ignore_empty_area",
                   "type": "boolean",
                   "title": "Ignore Empty Reader Area",
                   "default": true
                 },
                 {
-                  "id": "use_onguard_hazard_safe_areas",
+                  "id": "onguard_hazard_safe_areas",
                   "type": "boolean",
                   "title": "Use OnGuard Hazard/Safe Areas",
                   "default": true
@@ -412,7 +412,7 @@
                   "default": false
                 },
                 {
-                  "id": "subscribe_to_access_denied_events",
+                  "id": "access_denied_events",
                   "type": "boolean",
                   "title": "Subscribe to Access Denied Events",
                   "default": false
@@ -429,13 +429,13 @@
               "title": "Cardholders / Visitors",
               "controls": [
                 {
-                  "id": "cardholders_only_no_visitors",
+                  "id": "cardholders_no_visitors",
                   "type": "boolean",
                   "title": "Cardholders Only. No Visitors",
                   "default": false
                 },
                 {
-                  "id": "sync_user_phone_number",
+                  "id": "sync_user_phone_no",
                   "type": "boolean",
                   "title": "Sync User Phone Number",
                   "default": false
@@ -453,25 +453,25 @@
                   "default": true
                 },
                 {
-                  "id": "deactivate_badges_by_date_time",
+                  "id": "badge_deactivation",
                   "type": "boolean",
                   "title": "Deactivate Badges by Date/Time",
                   "default": true
                 },
                 {
-                  "id": "filter_cardholders_with_active_badges",
+                  "id": "only_cardholders_with_badges",
                   "type": "boolean",
                   "title": "Filter Cardholders with Active Badges",
                   "default": false
                 },
                 {
-                  "id": "filter_cardholders_by_expired_date",
+                  "id": "filter_active_cardholders",
                   "type": "boolean",
                   "title": "Filter Cardholders by Expired Date",
                   "default": false
                 },
                 {
-                  "id": "pull_users_with_expired_date_within",
+                  "id": "filter_active_cardholders_days",
                   "type": "number_spinner",
                   "title": "Pull users with Expired Date Within",
                   "default": 365,
@@ -485,18 +485,18 @@
                   ],
                   "enable": {
                     "type": "equals",
-                    "field": "filter_cardholders_by_expired_date",
+                    "field": "filter_active_cardholders",
                     "value": true
                   }
                 },
                 {
-                  "id": "apply_filter_to_visitors",
+                  "id": "filter_apply_visitors",
                   "type": "boolean",
                   "title": "Apply Filter to Visitors",
                   "default": false,
                   "enable": {
                     "type": "equals",
-                    "field": "cardholders_only_no_visitors",
+                    "field": "cardholders_no_visitors",
                     "value": false
                   }
                 }
@@ -541,7 +541,7 @@
               "title": "Visitors",
               "controls": [
                 {
-                  "id": "send_visitors_to_onguard",
+                  "id": "send_visitors",
                   "type": "boolean",
                   "title": "Send XPressEntry Visitors to OnGuard",
                   "default": false
@@ -559,7 +559,7 @@
                   "default": ""
                 },
                 {
-                  "id": "visit_default_host_cardholder_id",
+                  "id": "visit_host_id",
                   "type": "text",
                   "title": "Visit Default Host Cardholder ID",
                   "default": ""
@@ -587,19 +587,19 @@
               "title": "Login Activity",
               "controls": [
                 {
-                  "id": "send_login_activities_as_dataconduit_events",
+                  "id": "send_login_activities",
                   "type": "boolean",
                   "title": "Send Login Activities as DataConduit Events",
                   "default": false
                 },
                 {
-                  "id": "dataconduit_source",
+                  "id": "dataconduit_source_name",
                   "type": "text",
                   "title": "DataConduIT Source",
                   "default": ""
                 },
                 {
-                  "id": "dataconduit_prefix_for_door",
+                  "id": "dataconduit_door_prefix",
                   "type": "text",
                   "title": "DataConduIT Prefix for Door",
                   "default": ""
@@ -627,25 +627,25 @@
                   ]
                 },
                 {
-                  "id": "segment_cardholders",
+                  "id": "cardholder_segment",
                   "type": "boolean",
                   "title": "Segment Cardholders",
                   "default": false
                 },
                 {
-                  "id": "segment_readers",
+                  "id": "reader_segment",
                   "type": "boolean",
                   "title": "Segment Readers",
                   "default": false
                 },
                 {
-                  "id": "segment_visitors",
+                  "id": "visitor_segment",
                   "type": "boolean",
                   "title": "Segment Visitors",
                   "default": false
                 },
                 {
-                  "id": "segment_access_levels",
+                  "id": "accesslevel_segment",
                   "type": "boolean",
                   "title": "Segment Access Levels",
                   "default": false
@@ -768,7 +768,7 @@
               "title": "Alarm Activity",
               "controls": [
                 {
-                  "id": "logical_source_name",
+                  "id": "alarm_logical_source_name",
                   "type": "text",
                   "title": "Logical Source Name",
                   "default": ""
@@ -859,41 +859,41 @@
               "title": "User Gender Sync",
               "controls": [
                 {
-                  "id": "enable_user_gender_sync",
+                  "id": "enable_user_gender_mappings",
                   "type": "boolean",
                   "title": "Enable User Gender Sync",
                   "default": false
                 },
                 {
-                  "id": "user_gender_field",
+                  "id": "gender_field",
                   "type": "text",
                   "title": "User Gender Field",
                   "default": "",
                   "enable": {
                     "type": "equals",
-                    "field": "enable_user_gender_sync",
+                    "field": "enable_user_gender_mappings",
                     "value": true
                   }
                 },
                 {
-                  "id": "field_value_male",
+                  "id": "value_male",
                   "type": "text",
                   "title": "Field Value - Male",
                   "default": "",
                   "enable": {
                     "type": "equals",
-                    "field": "enable_user_gender_sync",
+                    "field": "enable_user_gender_mappings",
                     "value": true
                   }
                 },
                 {
-                  "id": "field_value_female",
+                  "id": "value_female",
                   "type": "text",
                   "title": "Field Value - Female",
                   "default": "",
                   "enable": {
                     "type": "equals",
-                    "field": "enable_user_gender_sync",
+                    "field": "enable_user_gender_mappings",
                     "value": true
                   }
                 }
@@ -903,7 +903,7 @@
               "title": "Vehicle Badge Types",
               "controls": [
                 {
-                  "id": "enable_vehicles_from_badge_types",
+                  "id": "enable_vehicle_mappings",
                   "type": "boolean",
                   "title": "Enable Vehicles from Badge Types",
                   "default": false
@@ -915,7 +915,7 @@
                   "default": false,
                   "enable": {
                     "type": "equals",
-                    "field": "enable_vehicles_from_badge_types",
+                    "field": "enable_vehicle_mappings",
                     "value": true
                   }
                 },
@@ -926,7 +926,7 @@
                   "default": false,
                   "enable": {
                     "type": "equals",
-                    "field": "enable_vehicles_from_badge_types",
+                    "field": "enable_vehicle_mappings",
                     "value": true
                   }
                 },
@@ -937,7 +937,7 @@
                   "default": false,
                   "enable": {
                     "type": "equals",
-                    "field": "enable_vehicles_from_badge_types",
+                    "field": "enable_vehicle_mappings",
                     "value": true
                   }
                 },
@@ -948,18 +948,18 @@
                   "default": false,
                   "enable": {
                     "type": "equals",
-                    "field": "enable_vehicles_from_badge_types",
+                    "field": "enable_vehicle_mappings",
                     "value": true
                   }
                 },
                 {
-                  "id": "license_plate_field",
+                  "id": "vehicle_lic_plate_field",
                   "type": "text",
                   "title": "License Plate Field",
                   "default": "SSNO",
                   "enable": {
                     "type": "equals",
-                    "field": "enable_vehicles_from_badge_types",
+                    "field": "enable_vehicle_mappings",
                     "value": true
                   }
                 },
@@ -970,7 +970,7 @@
                   "default": "MIDNAME",
                   "enable": {
                     "type": "equals",
-                    "field": "enable_vehicles_from_badge_types",
+                    "field": "enable_vehicle_mappings",
                     "value": true
                   }
                 },
@@ -981,18 +981,18 @@
                   "default": "ADDRESS",
                   "enable": {
                     "type": "equals",
-                    "field": "enable_vehicles_from_badge_types",
+                    "field": "enable_vehicle_mappings",
                     "value": true
                   }
                 },
                 {
-                  "id": "company_field",
+                  "id": "vehicle_company_name",
                   "type": "text",
                   "title": "Company Field",
                   "default": "DEPT",
                   "enable": {
                     "type": "equals",
-                    "field": "enable_vehicles_from_badge_types",
+                    "field": "enable_vehicle_mappings",
                     "value": true
                   }
                 }
@@ -1037,7 +1037,7 @@
               "title": "",
               "controls": [
                 {
-                  "id": "custom_mapping",
+                  "id": "custom_mappings",
                   "type": "keyvalue",
                   "title": "",
                   "key_title": "Source Columns",
@@ -1061,7 +1061,7 @@
               "title": "",
               "controls": [
                 {
-                  "id": "badge_custom_mapping",
+                  "id": "customBadgeFields",
                   "type": "keyvalue",
                   "title": "",
                   "key_title": "Source Columns",
