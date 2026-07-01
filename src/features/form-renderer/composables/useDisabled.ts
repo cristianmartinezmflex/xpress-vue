@@ -1,6 +1,6 @@
 import type { EnableProp, DisplayProp, DynamicCondition } from '../types/schema'
 
-function evaluateCondition(cond: DynamicCondition, state: Record<string, any>): boolean {
+function evaluateObjectCondition(cond: DynamicCondition, state: Record<string, any>): boolean {
   const val = state[cond.field]
 
   if (cond.type === 'hasValue') {
@@ -16,6 +16,44 @@ function evaluateCondition(cond: DynamicCondition, state: Record<string, any>): 
   return true
 }
 
+// Evaluates an expression like "field == true", "field != 'DataConduit'", "count >= 5"
+// against the form state. String values must be wrapped in single quotes in the expression.
+function evaluateExpression(expr: string, state: Record<string, any>): boolean {
+  const match = expr.match(/^(\S+)\s*(==|!=|>=|<=|>|<|=)\s*(?:'([^']*)'|(\S+))$/)
+  if (!match) throw new Error(`[useDisabled] Invalid expression: "${expr}"`)
+
+  const [, field, operator, strValue, rawValue] = match
+  const isString = strValue !== undefined
+
+  const actual = state[field]
+
+  let value: any
+  if (isString) {
+    value = strValue
+  } else if (rawValue === 'true') {
+    value = true
+  } else if (rawValue === 'false') {
+    value = false
+  } else if (rawValue === 'null') {
+    value = null
+  } else {
+    value = parseFloat(rawValue)
+  }
+
+  const a = isString || typeof value === 'boolean' || value === null ? actual : parseFloat(String(actual))
+
+  switch (operator) {
+    case '=':
+    case '==': return a == value
+    case '!=':  return a != value
+    case '>':   return a >  value
+    case '>=':  return a >= value
+    case '<':   return a <  value
+    case '<=':  return a <= value
+    default: throw new Error(`[useDisabled] Unknown operator: "${operator}"`)
+  }
+}
+
 // Returns true when the element should be ENABLED (interactive)
 export function evaluateEnable(
   prop: EnableProp | undefined,
@@ -23,7 +61,8 @@ export function evaluateEnable(
 ): boolean {
   if (prop === undefined) return true
   if (typeof prop === 'boolean') return prop
-  return evaluateCondition(prop, state)
+  if (typeof prop === 'string') return evaluateExpression(prop, state)
+  return evaluateObjectCondition(prop, state)
 }
 
 // Returns true when the element should be VISIBLE
@@ -33,5 +72,6 @@ export function evaluateDisplay(
 ): boolean {
   if (prop === undefined) return true
   if (typeof prop === 'boolean') return prop
-  return evaluateCondition(prop, state)
+  if (typeof prop === 'string') return evaluateExpression(prop, state)
+  return evaluateObjectCondition(prop, state)
 }

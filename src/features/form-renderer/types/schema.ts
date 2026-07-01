@@ -16,9 +16,10 @@ export type DynamicCondition = HasValueCondition | EqualsCondition
 
 // enable/display can be:
 //   true | false          → static
-//   DynamicCondition      → evaluated at runtime against form state
-export type EnableProp  = boolean | DynamicCondition
-export type DisplayProp = boolean | DynamicCondition
+//   string                → expression evaluated against form state, e.g. "field == true"
+//   DynamicCondition      → legacy object format, evaluated at runtime against form state
+export type EnableProp  = boolean | string | DynamicCondition
+export type DisplayProp = boolean | string | DynamicCondition
 
 // --- Schema types ---
 

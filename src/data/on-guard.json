@@ -52,11 +52,7 @@
             },
             {
               "title": "DataConduit",
-              "enable": {
-                "type": "equals",
-                "field": "sync_type",
-                "value": "DataConduit"
-              },
+              "enable": "sync_type == 'DataConduit'",
               "controls": [
                 {
                   "id": "use_login",
@@ -95,11 +91,7 @@
                       "error": "Must be between 1 and 999999"
                     }
                   ],
-                  "enable": {
-                    "type": "equals",
-                    "field": "large_user_table",
-                    "value": true
-                  }
+                  "enable": "large_user_table == true"
                 },
                 {
                   "id": "large_data_failure_count",
@@ -114,21 +106,13 @@
                       "error": "Must be between 0 and 100"
                     }
                   ],
-                  "enable": {
-                    "type": "equals",
-                    "field": "large_user_table",
-                    "value": true
-                  }
+                  "enable": "large_user_table == true"
                 }
               ]
             },
             {
               "title": "Open Access",
-              "enable": {
-                "type": "equals",
-                "field": "sync_type",
-                "value": "OpenAccess"
-              },
+              "enable": "sync_type == 'OpenAccess'",
               "controls": [
                 {
                   "id": "page_size",
@@ -311,11 +295,7 @@
                   "type": "boolean",
                   "title": "Asynchronous Event Handling",
                   "default": false,
-                  "enable": {
-                    "type": "equals",
-                    "field": "sync_type",
-                    "value": "DataConduit"
-                  }
+                  "enable": "sync_type == 'DataConduit'"
                 },
                 {
                   "id": "days_between_software_event_cleanup",
@@ -330,11 +310,7 @@
                       "error": "Must be between 0 and 365"
                     }
                   ],
-                  "enable": {
-                    "type": "equals",
-                    "field": "delete_software_events_upon_processing",
-                    "value": false
-                  }
+                  "enable": "delete_software_events_upon_processing == false"
                 },
                 {
                   "id": "software_event_retry_count",
@@ -483,22 +459,14 @@
                       "error": "Must be between 0 and 9999"
                     }
                   ],
-                  "enable": {
-                    "type": "equals",
-                    "field": "filter_active_cardholders",
-                    "value": true
-                  }
+                  "enable": "filter_active_cardholders == true"
                 },
                 {
                   "id": "filter_apply_visitors",
                   "type": "boolean",
                   "title": "Apply Filter to Visitors",
                   "default": false,
-                  "enable": {
-                    "type": "equals",
-                    "field": "cardholders_no_visitors",
-                    "value": false
-                  }
+                  "enable": "cardholders_no_visitors == false"
                 }
               ]
             },
@@ -869,33 +837,21 @@
                   "type": "text",
                   "title": "User Gender Field",
                   "default": "",
-                  "enable": {
-                    "type": "equals",
-                    "field": "enable_user_gender_mappings",
-                    "value": true
-                  }
+                  "enable": "enable_user_gender_mappings == true"
                 },
                 {
                   "id": "value_male",
                   "type": "text",
                   "title": "Field Value - Male",
                   "default": "",
-                  "enable": {
-                    "type": "equals",
-                    "field": "enable_user_gender_mappings",
-                    "value": true
-                  }
+                  "enable": "enable_user_gender_mappings == true"
                 },
                 {
                   "id": "value_female",
                   "type": "text",
                   "title": "Field Value - Female",
                   "default": "",
-                  "enable": {
-                    "type": "equals",
-                    "field": "enable_user_gender_mappings",
-                    "value": true
-                  }
+                  "enable": "enable_user_gender_mappings == true"
                 }
               ]
             },
@@ -913,88 +869,56 @@
                   "type": "boolean",
                   "title": "Employee",
                   "default": false,
-                  "enable": {
-                    "type": "equals",
-                    "field": "enable_vehicle_mappings",
-                    "value": true
-                  }
+                  "enable": "enable_vehicle_mappings == true"
                 },
                 {
                   "id": "vehicle_badge_visitor",
                   "type": "boolean",
                   "title": "Visitor",
                   "default": false,
-                  "enable": {
-                    "type": "equals",
-                    "field": "enable_vehicle_mappings",
-                    "value": true
-                  }
+                  "enable": "enable_vehicle_mappings == true"
                 },
                 {
                   "id": "vehicle_badge_temporary",
                   "type": "boolean",
                   "title": "Temporary",
                   "default": false,
-                  "enable": {
-                    "type": "equals",
-                    "field": "enable_vehicle_mappings",
-                    "value": true
-                  }
+                  "enable": "enable_vehicle_mappings == true"
                 },
                 {
                   "id": "vehicle_badge_vehicle",
                   "type": "boolean",
                   "title": "Vehicle",
                   "default": false,
-                  "enable": {
-                    "type": "equals",
-                    "field": "enable_vehicle_mappings",
-                    "value": true
-                  }
+                  "enable": "enable_vehicle_mappings == true"
                 },
                 {
                   "id": "vehicle_lic_plate_field",
                   "type": "text",
                   "title": "License Plate Field",
                   "default": "SSNO",
-                  "enable": {
-                    "type": "equals",
-                    "field": "enable_vehicle_mappings",
-                    "value": true
-                  }
+                  "enable": "enable_vehicle_mappings == true"
                 },
                 {
                   "id": "vehicle_id_field",
                   "type": "text",
                   "title": "Vehicle ID Field",
                   "default": "MIDNAME",
-                  "enable": {
-                    "type": "equals",
-                    "field": "enable_vehicle_mappings",
-                    "value": true
-                  }
+                  "enable": "enable_vehicle_mappings == true"
                 },
                 {
                   "id": "vehicle_type_field",
                   "type": "text",
                   "title": "Vehicle Type Field",
                   "default": "ADDRESS",
-                  "enable": {
-                    "type": "equals",
-                    "field": "enable_vehicle_mappings",
-                    "value": true
-                  }
+                  "enable": "enable_vehicle_mappings == true"
                 },
                 {
                   "id": "vehicle_company_name",
                   "type": "text",
                   "title": "Company Field",
                   "default": "DEPT",
-                  "enable": {
-                    "type": "equals",
-                    "field": "enable_vehicle_mappings",
-                    "value": true
-                  }
+                  "enable": "enable_vehicle_mappings == true"
                 }
               ]
             },
