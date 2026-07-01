@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import type { FormSchema, Control } from '../types/schema'
 import { useFormState } from '../composables/useFormState'
+import { evaluateEnable } from '../composables/useDisabled'
 import FormSection from './FormSection.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
 
@@ -14,6 +15,7 @@ const emit = defineEmits<{ action: [id: string, handler: string] }>()
 const activeTab = ref(0)
 const visibleTabs = computed(() =>
   props.schema.tabs.filter((tab) =>
+    evaluateEnable(tab.enable, state) &&
     tab.columns?.some((col) => col.sections?.some((s) => s.controls?.length > 0))
   ),
 )
@@ -105,6 +107,7 @@ function onUpdateState(id: string, value: any) {
             v-for="ctrl in buttonBarControls"
             :key="ctrl.id"
             :buttons="ctrl.buttons ?? []"
+            :state="state"
             @action="(id, handler) => emit('action', id, handler)"
           />
         </div>

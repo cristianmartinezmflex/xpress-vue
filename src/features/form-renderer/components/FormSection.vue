@@ -116,6 +116,7 @@ function isControlVisible(control: Control): boolean {
           <ControlButtonBar
             v-else-if="control.type === 'button_bar'"
             :buttons="control.buttons ?? []"
+            :state="state"
             @action="(id, handler) => emit('action', id, handler)"
           />
 

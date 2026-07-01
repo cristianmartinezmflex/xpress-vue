@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import type { Button } from '../../types/schema'
+import { evaluateEnable } from '../../composables/useDisabled'
 
-defineProps<{ buttons: Button[] }>()
+const props = defineProps<{
+  buttons: Button[]
+  state?: Record<string, any>
+}>()
 const emit = defineEmits<{ action: [id: string, handler: string] }>()
+
+function isButtonEnabled(btn: Button): boolean {
+  return evaluateEnable(btn.enable, props.state ?? {})
+}
 </script>
 
 <template>
@@ -11,7 +19,11 @@ const emit = defineEmits<{ action: [id: string, handler: string] }>()
       v-for="btn in buttons"
       :key="btn.id"
       type="button"
-      class="cursor-pointer px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 transition"
+      class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 transition"
+      :class="isButtonEnabled(btn)
+        ? 'cursor-pointer hover:bg-gray-50'
+        : 'opacity-50 cursor-not-allowed pointer-events-none'"
+      :disabled="!isButtonEnabled(btn)"
       @click="emit('action', btn.id, btn.onClick)"
     >
       {{ btn.title }}

@@ -40,6 +40,7 @@ export interface Button {
   id: string
   title: string
   onClick: string
+  enable?: EnableProp
 }
 
 export interface KeyValuePair {
@@ -88,6 +89,7 @@ export interface Column {
 export interface Tab {
   title: string
   columns?: Column[]
+  enable?: EnableProp
 }
 
 export interface FormSchema {
