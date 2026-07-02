@@ -40,7 +40,8 @@ export async function dm_shared_save({ guid, state, serviceBase }: ActionContext
 // ─── Sync (fire & forget) ─────────────────────────────────────────────────────
 
 export async function dm_shared_runFullSync({ guid, serviceBase }: ActionContext): Promise<void> {
-  const res = await fetch(`${serviceBase}/api/data-managers/sync`, {
+  if (!guid) { alert('No GUID provided — cannot run sync.'); return }
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync`, {
     method: 'POST',
     headers: JSON_HEADERS,
     body: syncBody(guid, 'FULL_SYNC'),
@@ -49,7 +50,8 @@ export async function dm_shared_runFullSync({ guid, serviceBase }: ActionContext
 }
 
 export async function dm_shared_runPartialSync({ guid, serviceBase }: ActionContext): Promise<void> {
-  const res = await fetch(`${serviceBase}/api/data-managers/sync`, {
+  if (!guid) { alert('No GUID provided — cannot run sync.'); return }
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync`, {
     method: 'POST',
     headers: JSON_HEADERS,
     body: syncBody(guid, 'PARTIAL_SYNC'),
@@ -58,7 +60,8 @@ export async function dm_shared_runPartialSync({ guid, serviceBase }: ActionCont
 }
 
 export async function dm_shared_runCustomSync({ guid, serviceBase }: ActionContext): Promise<void> {
-  const res = await fetch(`${serviceBase}/api/data-managers/sync`, {
+  if (!guid) { alert('No GUID provided — cannot run sync.'); return }
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync`, {
     method: 'POST',
     headers: JSON_HEADERS,
     body: syncBody(guid, 'CUSTOM_SYNC'),
@@ -69,7 +72,8 @@ export async function dm_shared_runCustomSync({ guid, serviceBase }: ActionConte
 // ─── Sync (wait for result) ───────────────────────────────────────────────────
 
 export async function dm_shared_runFullSyncForResult({ guid, serviceBase }: ActionContext): Promise<void> {
-  const res = await fetch(`${serviceBase}/api/data-managers/sync-result`, {
+  if (!guid) { alert('No GUID provided — cannot run sync.'); return }
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync-result`, {
     method: 'POST',
     headers: JSON_HEADERS,
     body: syncBody(guid, 'FULL_SYNC'),
@@ -80,7 +84,8 @@ export async function dm_shared_runFullSyncForResult({ guid, serviceBase }: Acti
 }
 
 export async function dm_shared_runPartialSyncForResult({ guid, serviceBase }: ActionContext): Promise<void> {
-  const res = await fetch(`${serviceBase}/api/data-managers/sync-result`, {
+  if (!guid) { alert('No GUID provided — cannot run sync.'); return }
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync-result`, {
     method: 'POST',
     headers: JSON_HEADERS,
     body: syncBody(guid, 'PARTIAL_SYNC'),
