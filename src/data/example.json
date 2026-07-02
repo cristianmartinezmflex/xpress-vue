@@ -83,7 +83,7 @@
                     {
                       "id": "btn_testconnect",
                       "title": "Test Connect",
-                      "onClick": "testConnect"
+                      "onClick": "dm_shared_testConnection"
                     },
                     {
                       "id": "btn_defaults",

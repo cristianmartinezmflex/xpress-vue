@@ -2,7 +2,9 @@
 import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FormRenderer from '@/features/form-renderer/components/FormRenderer.vue'
+import DialogMessage from '@/features/form-renderer/components/DialogMessage.vue'
 import type { FormSchema } from '@/features/form-renderer/types/schema'
+import { useDmActions } from '@/features/form-renderer/composables/useDmActions'
 
 const DM_SERVICE_BASE = 'http://localhost:30011'
 
@@ -68,51 +70,28 @@ async function loadSchema(key: string) {
 
 watch(() => route.params.schema, (key) => loadSchema(key as string), { immediate: true })
 
-async function saveSettings() {
-  const guid = route.query.guid as string | undefined
-  if (!guid) {
-    alert('No GUID provided — cannot save to service.')
-    return
-  }
+const { dispatch } = useDmActions(
+  () => ({
+    guid:        route.query.guid as string | undefined,
+    state:       formRenderer.value?.state ?? {},
+    serviceBase: DM_SERVICE_BASE,
+  }),
+  // DM-specific actions for this view — add dm_{DmType}_{fn} entries here as needed.
+  // e.g. 'dm_onGuard_testConnect': async (ctx) => { ... }
+)
 
-  const state = formRenderer.value?.state
-  if (!state) return
-
-  saving.value    = true
+async function handleAction(_id: string, handler: string) {
+  saving.value     = true
   saveResult.value = null
-
   try {
-    const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${guid}`, {
-      method:  'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(state),
-    })
-    saveResult.value = res.ok ? 'ok' : 'error'
-    if (!res.ok) {
-      alert(`Error al guardar: el servicio devolvió ${res.status}`)
-    }
+    await dispatch(handler)
+    saveResult.value = 'ok'
   } catch {
     saveResult.value = 'error'
-    alert(`No se pudo conectar al servicio en ${DM_SERVICE_BASE}`)
   } finally {
     saving.value = false
     setTimeout(() => { saveResult.value = null }, 3000)
   }
-}
-
-const actions: Record<string, () => void> = {
-  testConnect:        () => alert('Test Connect: Connection successful!'),
-  setDefaults:        () => alert('Defaults: All values reset to defaults.'),
-  save:               () => saveSettings(),
-  checkSubscriptions: () => alert('Checking XPressEntry Subscriptions...'),
-  deleteSubscription: () => alert('Current Subscription deleted.'),
-  updateSegmentList:  () => alert('Segment list updated.'),
-  updatePanelList:    () => alert('Panel list updated.'),
-  createLogicalSource:() => alert('Logical Source and Readers created.'),
-}
-
-function handleAction(_id: string, handler: string) {
-  actions[handler]?.()
 }
 </script>
 
@@ -186,6 +165,8 @@ function handleAction(_id: string, handler: string) {
       class="flex-1 overflow-hidden"
       @action="handleAction"
     />
+
+    <DialogMessage />
 
   </div>
 </template>

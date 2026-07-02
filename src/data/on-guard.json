@@ -480,7 +480,7 @@
                     {
                       "id": "btn_test_connect",
                       "title": "Test Connect",
-                      "onClick": "testConnect"
+                      "onClick": "dm_shared_testConnection"
                     },
                     {
                       "id": "btn_defaults",
@@ -490,7 +490,7 @@
                     {
                       "id": "btn_ok",
                       "title": "OK",
-                      "onClick": "save"
+                      "onClick": "dm_shared_save"
                     }
                   ]
                 }
@@ -932,7 +932,7 @@
                     {
                       "id": "btn_test_connect_adv",
                       "title": "Test Connect",
-                      "onClick": "testConnect"
+                      "onClick": "dm_shared_testConnection"
                     },
                     {
                       "id": "btn_defaults_adv",
@@ -942,7 +942,7 @@
                     {
                       "id": "btn_ok_adv",
                       "title": "OK",
-                      "onClick": "save"
+                      "onClick": "dm_shared_save"
                     }
                   ]
                 }
