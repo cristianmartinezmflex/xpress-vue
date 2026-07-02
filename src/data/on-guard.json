@@ -1,6 +1,45 @@
 {
   "tabs": [
     {
+      "title": "Sync",
+      "columns": [
+        {
+          "sections": [
+            {
+              "title": "Sync Operations",
+              "controls": [
+                {
+                  "id": "sync_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    {
+                      "id": "btn_partial_sync",
+                      "title": "Partial Sync Now",
+                      "onClick": "dm_shared_runPartialSync"
+                    },
+                    {
+                      "id": "btn_full_sync",
+                      "title": "Full Sync Now",
+                      "onClick": "dm_shared_runFullSync"
+                    },
+                    {
+                      "id": "btn_custom_sync",
+                      "title": "Custom Sync Now",
+                      "onClick": "dm_shared_runCustomSync"
+                    }
+                  ]
+                },
+                {
+                  "id": "sync_log",
+                  "type": "log_view"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "Basic",
       "columns": [
         {

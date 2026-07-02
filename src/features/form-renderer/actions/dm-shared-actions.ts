@@ -8,9 +8,11 @@
 import { useDialog } from '../composables/useDialog'
 
 export interface ActionContext {
-  guid: string | undefined
-  state: Record<string, any>
+  guid:        string | undefined
+  state:       Record<string, any>
   serviceBase: string
+  schemaKey?:  string
+  navigate?:   (path: string) => void
 }
 
 export type ActionFn = (ctx: ActionContext) => void | Promise<void>
@@ -53,6 +55,15 @@ export async function dm_shared_runPartialSync({ guid, serviceBase }: ActionCont
     body: syncBody(guid, 'PARTIAL_SYNC'),
   })
   if (!res.ok) alert(`Error al iniciar partial sync: el servicio devolvió ${res.status}`)
+}
+
+export async function dm_shared_runCustomSync({ guid, serviceBase }: ActionContext): Promise<void> {
+  const res = await fetch(`${serviceBase}/api/data-managers/sync`, {
+    method: 'POST',
+    headers: JSON_HEADERS,
+    body: syncBody(guid, 'CUSTOM_SYNC'),
+  })
+  if (!res.ok) alert(`Error al iniciar custom sync: el servicio devolvió ${res.status}`)
 }
 
 // ─── Sync (wait for result) ───────────────────────────────────────────────────
@@ -99,6 +110,15 @@ export async function dm_shared_cancelSync({ guid, serviceBase }: ActionContext)
     body: syncBody(guid, 'FULL_SYNC'),
   })
   if (!res.ok) alert(`Error al cancelar sync: el servicio devolvió ${res.status}`)
+}
+
+// ─── Navigation ───────────────────────────────────────────────────────────────
+
+export function dm_shared_setupDataManager({ guid, schemaKey, navigate }: ActionContext): void {
+  if (!guid || !schemaKey) return
+  const path = `/form/${schemaKey}?guid=${guid}`
+  if (navigate) navigate(path)
+  else window.location.href = path
 }
 
 // ─── Test Connection ──────────────────────────────────────────────────────────

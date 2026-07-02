@@ -11,6 +11,7 @@ import ControlSelect from './controls/ControlSelect.vue'
 import ControlRadio from './controls/ControlRadio.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
 import ControlKeyValue from './controls/ControlKeyValue.vue'
+import ControlLogView  from './controls/ControlLogView.vue'
 
 const props = defineProps<{
   title?: string
@@ -19,6 +20,8 @@ const props = defineProps<{
   errors: Readonly<Record<string, string>>
   enable?: EnableProp
   display?: DisplayProp
+  guid?:        string
+  serviceBase?: string
 }>()
 
 const emit = defineEmits<{
@@ -118,6 +121,12 @@ function isControlVisible(control: Control): boolean {
             :buttons="control.buttons ?? []"
             :state="state"
             @action="(id, handler) => emit('action', id, handler)"
+          />
+
+          <ControlLogView
+            v-else-if="control.type === 'log_view'"
+            :guid="guid"
+            :service-base="serviceBase"
           />
 
           <ControlKeyValue

@@ -58,6 +58,7 @@ export type ControlType =
   | 'radio'
   | 'button_bar'
   | 'keyvalue'
+  | 'log_view'
 
 export interface Control {
   id: string

@@ -7,23 +7,27 @@ import FormSection from './FormSection.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
 
 const props = defineProps<{
-  schema: FormSchema
+  schema:         FormSchema
   initialValues?: Record<string, any>
+  guid?:          string
+  serviceBase?:   string
 }>()
 const emit = defineEmits<{ action: [id: string, handler: string] }>()
 
 const activeTab = ref(0)
+
 const visibleTabs = computed(() =>
   props.schema.tabs.filter((tab) =>
     evaluateEnable(tab.enable, state) &&
     tab.columns?.some((col) => col.sections?.some((s) => s.controls?.length > 0))
   ),
 )
-const showTabs = computed(() => visibleTabs.value.length > 1)
+
+const showTabs   = computed(() => visibleTabs.value.length > 1)
 const currentTab = computed(() => visibleTabs.value[activeTab.value])
 
 const allSections = computed(() =>
-  currentTab.value.columns?.flatMap((col) => col.sections) ?? [],
+  currentTab.value?.columns?.flatMap((col) => col.sections) ?? [],
 )
 
 const isFooterSection = (s: { title?: string }) => !s.title || s.title.trim() === ''
@@ -75,7 +79,7 @@ function onUpdateState(id: string, value: any) {
         v-for="(tab, idx) in visibleTabs"
         :key="tab.title"
         type="button"
-        class="px-5 py-3 text-sm font-medium border-b-2 transition"
+        class="px-5 py-3 text-sm font-medium border-b-2 transition cursor-pointer"
         :class="activeTab === idx
           ? 'border-blue-500 text-blue-600'
           : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
@@ -85,7 +89,7 @@ function onUpdateState(id: string, value: any) {
       </button>
     </div>
 
-    <!-- Content -->
+    <!-- Tab content -->
     <div class="flex-1 overflow-y-auto p-6">
       <div v-if="allSections.length" class="flex flex-col gap-4 max-w-2xl mx-auto">
         <FormSection
@@ -97,11 +101,12 @@ function onUpdateState(id: string, value: any) {
           :errors="errors"
           :enable="section.enable"
           :display="section.display"
+          :guid="guid"
+          :service-base="serviceBase"
           @update:state="onUpdateState"
           @action="(id, handler) => emit('action', id, handler)"
         />
 
-        <!-- Button bar always at the bottom -->
         <div v-if="buttonBarControls.length" class="flex justify-end pt-2">
           <ControlButtonBar
             v-for="ctrl in buttonBarControls"

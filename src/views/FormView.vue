@@ -75,6 +75,8 @@ const { dispatch } = useDmActions(
     guid:        route.query.guid as string | undefined,
     state:       formRenderer.value?.state ?? {},
     serviceBase: DM_SERVICE_BASE,
+    schemaKey:   route.params.schema as string,
+    navigate:    (path: string) => router.push(path),
   }),
   // DM-specific actions for this view — add dm_{DmType}_{fn} entries here as needed.
   // e.g. 'dm_onGuard_testConnect': async (ctx) => { ... }
@@ -162,6 +164,8 @@ async function handleAction(_id: string, handler: string) {
       ref="formRenderer"
       :schema="schema"
       :initial-values="dmValues"
+      :guid="route.query.guid as string | undefined"
+      :service-base="DM_SERVICE_BASE"
       class="flex-1 overflow-hidden"
       @action="handleAction"
     />
