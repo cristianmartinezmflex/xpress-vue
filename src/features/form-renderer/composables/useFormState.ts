@@ -38,6 +38,14 @@ export function useFormState(schema: FormSchema, initialValues?: Record<string, 
   const errors = reactive<Record<string, string>>({})
 
   function initState() {
+    // Seed state with ALL values from the backend so fields not in the schema
+    // (e.g. open_access_login, namespace, password) are preserved when the
+    // form is saved or used to test the connection.
+    if (initialValues) {
+      Object.assign(state, initialValues)
+    }
+
+    // Override with schema-aware values: apply type coercion and schema defaults.
     schema.tabs.forEach((tab) => {
       tab.columns?.forEach((col) => {
         col.sections.forEach((section) => {
@@ -45,7 +53,6 @@ export function useFormState(schema: FormSchema, initialValues?: Record<string, 
             if (!control.id) return
 
             if (initialValues && control.id in initialValues) {
-              // API value takes precedence over the schema default.
               state[control.id] = coerceValue(initialValues[control.id], control)
             } else if (control.default !== undefined) {
               state[control.id] = control.default

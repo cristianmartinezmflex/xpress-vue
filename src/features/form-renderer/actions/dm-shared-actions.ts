@@ -5,7 +5,8 @@
 //
 // To add a new shared action: export a new async function following the same pattern.
 
-import { useDialog } from '../composables/useDialog'
+import { useDialog }           from '../composables/useDialog'
+import { useCustomSyncDialog } from '../composables/useCustomSyncDialog'
 
 export interface ActionContext {
   guid:        string | undefined
@@ -59,12 +60,17 @@ export async function dm_shared_runPartialSync({ guid, serviceBase }: ActionCont
   if (!res.ok) alert(`Error al iniciar partial sync: el servicio devolvió ${res.status}`)
 }
 
-export async function dm_shared_runCustomSync({ guid, serviceBase }: ActionContext): Promise<void> {
+export async function dm_shared_runCustomSync({ guid, state, serviceBase }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided — cannot run sync.'); return }
+  const body = JSON.stringify({
+    dmGuid:              guid,
+    syncType:            'CUSTOM_SYNC',
+    customSyncSettings:  state['custom_sync_settings'] ?? null,
+  })
   const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync`, {
     method: 'POST',
     headers: JSON_HEADERS,
-    body: syncBody(guid, 'CUSTOM_SYNC'),
+    body,
   })
   if (!res.ok) alert(`Error al iniciar custom sync: el servicio devolvió ${res.status}`)
 }
@@ -156,6 +162,23 @@ export async function dm_shared_testConnection({ guid, state, serviceBase }: Act
       message: result?.error ?? `Service returned ${res.status}.`,
     })
   }
+}
+
+// ─── Custom Sync Editor ──────────────────────────────────────────────────────
+
+export function dm_shared_editCustomSync({ guid, state, serviceBase }: ActionContext): void {
+  const currentJson = state['custom_sync_settings'] as string | undefined
+  useCustomSyncDialog().show(currentJson, async (tables) => {
+    const json = JSON.stringify(tables)
+    state['custom_sync_settings'] = json
+    if (guid) {
+      await fetch(`${serviceBase}/api/data-managers/${guid}`, {
+        method: 'PUT',
+        headers: JSON_HEADERS,
+        body: JSON.stringify(state),
+      })
+    }
+  })
 }
 
 // ─── Activity ─────────────────────────────────────────────────────────────────

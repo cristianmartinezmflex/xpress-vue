@@ -2,7 +2,8 @@
 import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FormRenderer from '@/features/form-renderer/components/FormRenderer.vue'
-import DialogMessage from '@/features/form-renderer/components/DialogMessage.vue'
+import DialogMessage    from '@/features/form-renderer/components/DialogMessage.vue'
+import CustomSyncDialog from '@/features/form-renderer/components/CustomSyncDialog.vue'
 import type { FormSchema } from '@/features/form-renderer/types/schema'
 import { useDmActions } from '@/features/form-renderer/composables/useDmActions'
 
@@ -171,6 +172,7 @@ async function handleAction(_id: string, handler: string) {
     />
 
     <DialogMessage />
+    <CustomSyncDialog />
 
   </div>
 </template>

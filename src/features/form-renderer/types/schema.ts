@@ -36,11 +36,18 @@ export interface SelectOption {
   value?: string | number
 }
 
-export interface Button {
-  id: string
-  title: string
+export interface ContextMenuItem {
+  label:   string
   onClick: string
-  enable?: EnableProp
+}
+
+export interface Button {
+  id:               string
+  title:            string
+  onClick:          string
+  tooltip?:         string
+  rightClickMenu?:  ContextMenuItem[]
+  enable?:          EnableProp
 }
 
 export interface KeyValuePair {
