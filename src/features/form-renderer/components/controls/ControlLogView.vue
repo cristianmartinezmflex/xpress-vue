@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { useDmLogStream } from '../../composables/useDmLogStream'
-import type { DmLogEntry }  from '../../composables/useDmLogStream'
+import { useCentrifugo } from '../../composables/useCentrifugo'
+import type { DmLogEntry } from '../../composables/useCentrifugo'
 
 const props = defineProps<{
   guid?:        string
@@ -15,18 +15,15 @@ const autoScroll = ref(true)
 let stopStream: (() => void) | null = null
 
 onMounted(() => {
-  stopStream = useDmLogStream(
-    props.serviceBase ?? 'http://localhost:30011',
-    props.guid,
-    entry => {
-      logs.value.push(entry)
-      if (autoScroll.value) {
-        nextTick(() => {
-          if (logEl.value) logEl.value.scrollTop = logEl.value.scrollHeight
-        })
-      }
+  const { subscribe } = useCentrifugo()
+  stopStream = subscribe(props.guid, entry => {
+    logs.value.push(entry)
+    if (autoScroll.value) {
+      nextTick(() => {
+        if (logEl.value) logEl.value.scrollTop = logEl.value.scrollHeight
+      })
     }
-  )
+  })
 })
 
 onUnmounted(() => stopStream?.())
