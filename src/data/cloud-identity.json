@@ -61,10 +61,10 @@
           "columns": [
             {
               "controls": [
-                { "id": "api_url",      "type": "text",     "title": "API URL",      "default": "https://api.cloud-identity.example.com" },
-                { "id": "tenant_id",    "type": "text",     "title": "Tenant ID",    "default": "" },
-                { "id": "client_id",    "type": "text",     "title": "Client ID",    "default": "" },
-                { "id": "client_secret","type": "password", "title": "Client Secret","default": "" }
+                { "id": "api_url",       "type": "text",     "title": "API URL",       "default": "https://api.cloud-identity.example.com" },
+                { "id": "tenant_id",     "type": "text",     "title": "Tenant ID",     "default": "" },
+                { "id": "client_id",     "type": "text",     "title": "Client ID",     "default": "" },
+                { "id": "client_secret", "type": "password", "title": "Client Secret", "default": "" }
               ]
             }
           ]
@@ -74,10 +74,10 @@
           "columns": [
             {
               "controls": [
-                { "id": "sync_enabled",   "type": "boolean",        "title": "Enable automatic sync",    "default": true },
-                { "id": "sync_interval",  "type": "number_spinner", "title": "Sync interval (minutes)",  "default": 60,
+                { "id": "sync_enabled",  "type": "boolean",        "title": "Enable automatic sync",   "default": true },
+                { "id": "sync_interval", "type": "number_spinner", "title": "Sync interval (minutes)", "default": 60,
                   "validations": [{ "type": "min_max", "min": 5, "max": 1440, "error": "5–1440 min" }] },
-                { "id": "environment",    "type": "select",         "title": "Environment",
+                { "id": "environment",   "type": "select",         "title": "Environment",
                   "values": [
                     { "text": "Production",  "value": "prod"  },
                     { "text": "Staging",     "value": "stage" },
@@ -113,21 +113,21 @@
       "title": "Enable → Tab",
       "sections": [
         {
-          "title": "Enable en Tab — activa o desactiva el tab 'Tab Condicional'",
+          "title": "Enable on Tab — enables or disables the 'Conditional Tab'",
           "columns": [
             {
               "controls": [
                 {
                   "id": "enable_tab_demo",
                   "type": "boolean",
-                  "title": "Habilitar el tab 'Tab Condicional'",
+                  "title": "Enable the 'Conditional Tab'",
                   "default": false
                 },
                 {
                   "id": "enable_tab_note",
                   "type": "text",
-                  "title": "Nota",
-                  "default": "El tab 'Tab Condicional' tiene enable: \"enable_tab_demo == true\". Activá el toggle de arriba y verás que el tab se activa.",
+                  "title": "Note",
+                  "default": "The 'Conditional Tab' has enable: \"enable_tab_demo == true\". Toggle the switch above and the tab will become active.",
                   "enable": false
                 }
               ]
@@ -138,19 +138,19 @@
     },
 
     {
-      "title": "Tab Condicional",
+      "title": "Conditional Tab",
       "enable": "enable_tab_demo == true",
       "sections": [
         {
-          "title": "Este tab se habilitó porque enable_tab_demo == true",
+          "title": "This tab was enabled because enable_tab_demo == true",
           "columns": [
             {
               "controls": [
                 {
                   "id": "conditional_tab_field",
                   "type": "text",
-                  "title": "Campo de ejemplo",
-                  "default": "Visible porque el tab está habilitado"
+                  "title": "Sample field",
+                  "default": "Visible because the tab is enabled"
                 }
               ]
             }
@@ -160,17 +160,17 @@
     },
 
     {
-      "title": "Enable → Sección & Campo",
+      "title": "Enable → Section & Field",
       "sections": [
         {
-          "title": "Enable en Sección — activa o desactiva la sección siguiente",
+          "title": "Enable on Section — enables or disables the section below",
           "columns": [
             {
               "controls": [
                 {
                   "id": "enable_section_demo",
                   "type": "boolean",
-                  "title": "Habilitar la sección 'Sección controlada por enable'",
+                  "title": "Enable the 'Section controlled by enable'",
                   "default": false
                 }
               ]
@@ -178,7 +178,7 @@
           ]
         },
         {
-          "title": "Sección controlada por enable (enable: \"enable_section_demo == true\")",
+          "title": "Section controlled by enable (enable: \"enable_section_demo == true\")",
           "enable": "enable_section_demo == true",
           "columns": [
             {
@@ -186,13 +186,13 @@
                 {
                   "id": "section_enable_field_1",
                   "type": "text",
-                  "title": "Campo A",
-                  "default": "Interactivo solo cuando la sección está habilitada"
+                  "title": "Field A",
+                  "default": "Interactive only when the section is enabled"
                 },
                 {
                   "id": "section_enable_field_2",
                   "type": "number_spinner",
-                  "title": "Campo B",
+                  "title": "Field B",
                   "default": 42,
                   "validations": [
                     { "type": "min_max", "min": 0, "max": 9999, "error": "0–9999" }
@@ -201,7 +201,7 @@
                 {
                   "id": "section_enable_field_3",
                   "type": "boolean",
-                  "title": "Campo C (boolean)",
+                  "title": "Field C (boolean)",
                   "default": false
                 }
               ]
@@ -209,27 +209,27 @@
           ]
         },
         {
-          "title": "Enable en Campo — activa o desactiva campos individuales",
+          "title": "Enable on Field — enables or disables individual fields",
           "columns": [
             {
               "controls": [
                 {
                   "id": "enable_fields_demo",
                   "type": "boolean",
-                  "title": "Habilitar los campos de abajo",
+                  "title": "Enable the fields below",
                   "default": false
                 },
                 {
                   "id": "field_enable_text",
                   "type": "text",
-                  "title": "Campo de texto (enable: \"enable_fields_demo == true\")",
+                  "title": "Text field (enable: \"enable_fields_demo == true\")",
                   "default": "",
                   "enable": "enable_fields_demo == true"
                 },
                 {
                   "id": "field_enable_spinner",
                   "type": "number_spinner",
-                  "title": "Campo numérico (enable: \"enable_fields_demo == true\")",
+                  "title": "Number field (enable: \"enable_fields_demo == true\")",
                   "default": 100,
                   "validations": [
                     { "type": "min_max", "min": 1, "max": 1000, "error": "1–1000" }
@@ -241,9 +241,9 @@
                   "type": "select",
                   "title": "Select (enable: \"enable_fields_demo == true\")",
                   "values": [
-                    { "text": "Opción A", "value": "a" },
-                    { "text": "Opción B", "value": "b" },
-                    { "text": "Opción C", "value": "c" }
+                    { "text": "Option A", "value": "a" },
+                    { "text": "Option B", "value": "b" },
+                    { "text": "Option C", "value": "c" }
                   ],
                   "default": "a",
                   "enable": "enable_fields_demo == true"
@@ -256,17 +256,17 @@
     },
 
     {
-      "title": "Display → Sección & Campo",
+      "title": "Display → Section & Field",
       "sections": [
         {
-          "title": "Display en Sección — muestra u oculta la sección siguiente",
+          "title": "Display on Section — shows or hides the section below",
           "columns": [
             {
               "controls": [
                 {
                   "id": "show_section_demo",
                   "type": "boolean",
-                  "title": "Mostrar la sección 'Sección controlada por display'",
+                  "title": "Show the 'Section controlled by display'",
                   "default": false
                 }
               ]
@@ -274,7 +274,7 @@
           ]
         },
         {
-          "title": "Sección controlada por display (display: \"show_section_demo == true\")",
+          "title": "Section controlled by display (display: \"show_section_demo == true\")",
           "display": "show_section_demo == true",
           "columns": [
             {
@@ -282,19 +282,19 @@
                 {
                   "id": "section_display_field_1",
                   "type": "text",
-                  "title": "Campo A",
-                  "default": "Solo visible cuando show_section_demo es true"
+                  "title": "Field A",
+                  "default": "Only visible when show_section_demo is true"
                 },
                 {
                   "id": "section_display_field_2",
                   "type": "boolean",
-                  "title": "Campo B (boolean)",
+                  "title": "Field B (boolean)",
                   "default": false
                 },
                 {
                   "id": "section_display_field_3",
                   "type": "password",
-                  "title": "Campo C (password)",
+                  "title": "Field C (password)",
                   "default": ""
                 }
               ]
@@ -302,20 +302,20 @@
           ]
         },
         {
-          "title": "Display en Campo — muestra u oculta campos individuales",
+          "title": "Display on Field — shows or hides individual fields",
           "columns": [
             {
               "controls": [
                 {
                   "id": "show_fields_demo",
                   "type": "boolean",
-                  "title": "Mostrar los campos de abajo",
+                  "title": "Show the fields below",
                   "default": false
                 },
                 {
                   "id": "field_display_text",
                   "type": "text",
-                  "title": "Campo de texto (display: \"show_fields_demo == true\")",
+                  "title": "Text field (display: \"show_fields_demo == true\")",
                   "default": "",
                   "display": "show_fields_demo == true"
                 },
@@ -324,8 +324,8 @@
                   "type": "select",
                   "title": "Select (display: \"show_fields_demo == true\")",
                   "values": [
-                    { "text": "Opción X", "value": "x" },
-                    { "text": "Opción Y", "value": "y" }
+                    { "text": "Option X", "value": "x" },
+                    { "text": "Option Y", "value": "y" }
                   ],
                   "default": "x",
                   "display": "show_fields_demo == true"
@@ -333,7 +333,7 @@
                 {
                   "id": "field_display_spinner",
                   "type": "number_spinner",
-                  "title": "Número (display: \"show_fields_demo == true\")",
+                  "title": "Number (display: \"show_fields_demo == true\")",
                   "default": 0,
                   "display": "show_fields_demo == true",
                   "validations": [
@@ -355,14 +355,14 @@
     },
 
     {
-      "title": "2 Columnas",
+      "title": "2 Columns",
       "sections": [
         {
-          "title": "Layout de 2 columnas — todos los tipos de control",
+          "title": "2-column layout — all control types",
           "columns": [
             {
               "controls": [
-                { "id": "col2_text",     "type": "text",           "title": "Text",     "default": "valor de texto" },
+                { "id": "col2_text",     "type": "text",           "title": "Text",     "default": "sample text value" },
                 { "id": "col2_password", "type": "password",       "title": "Password", "default": "" },
                 { "id": "col2_number",   "type": "number",         "title": "Number",   "default": 80 },
                 { "id": "col2_spinner",  "type": "number_spinner", "title": "Spinner",  "default": 500,
@@ -377,9 +377,9 @@
                   "type": "select",
                   "title": "Select",
                   "values": [
-                    { "text": "Opción 1", "value": "1" },
-                    { "text": "Opción 2", "value": "2" },
-                    { "text": "Opción 3", "value": "3" }
+                    { "text": "Option 1", "value": "1" },
+                    { "text": "Option 2", "value": "2" },
+                    { "text": "Option 3", "value": "3" }
                   ],
                   "default": "1"
                 },
@@ -389,7 +389,7 @@
                   "title": "Radio",
                   "values": [
                     { "text": "Alpha", "value": "alpha" },
-                    { "text": "Beta",  "value": "beta" },
+                    { "text": "Beta",  "value": "beta"  },
                     { "text": "Gamma", "value": "gamma" }
                   ],
                   "default": "alpha"
@@ -399,7 +399,7 @@
           ]
         },
         {
-          "title": "Key-Value — mapeo de campos",
+          "title": "Key-Value — field mapping",
           "columns": [
             {
               "controls": [
@@ -407,13 +407,13 @@
                   "id": "demo_mappings",
                   "type": "keyvalue",
                   "title": "",
-                  "key_title": "Campo Origen",
-                  "key_header": "Origen",
-                  "value_title": "Campo Destino",
-                  "value_header": "Destino",
+                  "key_title": "Source Field",
+                  "key_header": "Source",
+                  "value_title": "Target Field",
+                  "value_header": "Target",
                   "default": [
                     { "key": "firstName", "value": "first_name" },
-                    { "key": "lastName",  "value": "last_name" }
+                    { "key": "lastName",  "value": "last_name"  }
                   ]
                 }
               ]
