@@ -1,4 +1,5 @@
 {
+  "customSyncTables": ["USERS", "BADGES", "GROUPS", "GROUPS_USERS", "COMPANIES"],
   "tabs": [
     {
       "title": "Sync",

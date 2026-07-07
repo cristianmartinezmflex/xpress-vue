@@ -102,4 +102,5 @@ export interface Tab {
 
 export interface FormSchema {
   tabs: Tab[]
+  customSyncTables?: string[]
 }

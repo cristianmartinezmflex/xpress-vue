@@ -75,11 +75,12 @@ watch(() => route.params.schema, (key) => loadSchema(key as string), { immediate
 
 const { dispatch } = useDmActions(
   () => ({
-    guid:        route.query.guid as string | undefined,
-    state:       formRenderer.value?.state ?? {},
-    serviceBase: DM_SERVICE_BASE,
-    schemaKey:   route.params.schema as string,
-    navigate:    (path: string) => router.push(path),
+    guid:             route.query.guid as string | undefined,
+    state:            formRenderer.value?.state ?? {},
+    serviceBase:      DM_SERVICE_BASE,
+    schemaKey:        route.params.schema as string,
+    customSyncTables: schema.value?.customSyncTables,
+    navigate:         (path: string) => router.push(path),
   }),
   // DM-specific actions for this view — add dm_{DmType}_{fn} entries here as needed.
   // e.g. 'dm_onGuard_testConnect': async (ctx) => { ... }

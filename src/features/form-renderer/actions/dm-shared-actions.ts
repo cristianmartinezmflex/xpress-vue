@@ -9,11 +9,12 @@ import { useDialog }           from '../composables/useDialog'
 import { useCustomSyncDialog } from '../composables/useCustomSyncDialog'
 
 export interface ActionContext {
-  guid:        string | undefined
-  state:       Record<string, any>
-  serviceBase: string
-  schemaKey?:  string
-  navigate?:   (path: string) => void
+  guid:              string | undefined
+  state:             Record<string, any>
+  serviceBase:       string
+  schemaKey?:        string
+  customSyncTables?: string[]
+  navigate?:         (path: string) => void
 }
 
 export type ActionFn = (ctx: ActionContext) => void | Promise<void>
@@ -60,7 +61,7 @@ export async function dm_shared_runPartialSync({ guid, serviceBase }: ActionCont
   if (!res.ok) alert(`Error al iniciar partial sync: el servicio devolvió ${res.status}`)
 }
 
-export function dm_shared_runCustomSync({ guid, state, serviceBase }: ActionContext): void {
+export function dm_shared_runCustomSync({ guid, state, serviceBase, customSyncTables }: ActionContext): void {
   if (!guid) { alert('No GUID provided — cannot run sync.'); return }
   const currentJson = state['custom_sync_settings'] as string | undefined
   useCustomSyncDialog().show(currentJson, async (tables) => {
@@ -71,7 +72,7 @@ export function dm_shared_runCustomSync({ guid, state, serviceBase }: ActionCont
       body: JSON.stringify({ dmGuid: guid, syncType: 'CUSTOM_SYNC', customSyncSettings: JSON.stringify(tables) }),
     })
     if (!res.ok) alert(`Error al iniciar custom sync: el servicio devolvió ${res.status}`)
-  })
+  }, customSyncTables)
 }
 
 // ─── Sync (wait for result) ───────────────────────────────────────────────────
@@ -165,7 +166,7 @@ export async function dm_shared_testConnection({ guid, state, serviceBase }: Act
 
 // ─── Custom Sync Editor ──────────────────────────────────────────────────────
 
-export function dm_shared_editCustomSync({ guid, state, serviceBase }: ActionContext): void {
+export function dm_shared_editCustomSync({ guid, state, serviceBase, customSyncTables }: ActionContext): void {
   const currentJson = state['custom_sync_settings'] as string | undefined
   useCustomSyncDialog().show(currentJson, async (tables) => {
     const json = JSON.stringify(tables)
@@ -177,7 +178,7 @@ export function dm_shared_editCustomSync({ guid, state, serviceBase }: ActionCon
         body: JSON.stringify(state),
       })
     }
-  })
+  }, customSyncTables)
 }
 
 // ─── Activity ─────────────────────────────────────────────────────────────────

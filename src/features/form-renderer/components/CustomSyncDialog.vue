@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useCustomSyncDialog, type CustomSyncTable } from '../composables/useCustomSyncDialog'
 
 const { state, confirm, cancel } = useCustomSyncDialog()
 
 // LISTS enum from modDataManagerEnums.vb — value matches the VB integer
-const AVAILABLE_TABLES = [
+const ALL_TABLES = [
   { value:  0, label: 'ZONES' },
   { value:  1, label: 'GROUPS' },
   { value:  2, label: 'GROUPS_USERS' },
@@ -37,8 +38,15 @@ const AVAILABLE_TABLES = [
   { value: 29, label: 'GROUPS_VEHICLES' },
 ]
 
+const AVAILABLE_TABLES = computed(() =>
+  state.allowedTables
+    ? ALL_TABLES.filter(t => state.allowedTables!.includes(t.label))
+    : ALL_TABLES
+)
+
 function addTable() {
-  state.tables.push({ iDMTable: 4, bPartial: false }) // default: USERS
+  const defaultTable = AVAILABLE_TABLES.value[0]?.value ?? 4
+  state.tables.push({ iDMTable: defaultTable, bPartial: false })
 }
 
 function removeTable(index: number) {
@@ -46,7 +54,7 @@ function removeTable(index: number) {
 }
 
 function labelFor(value: number): string {
-  return AVAILABLE_TABLES.find(t => t.value === value)?.label ?? String(value)
+  return ALL_TABLES.find(t => t.value === value)?.label ?? String(value)
 }
 </script>
 
