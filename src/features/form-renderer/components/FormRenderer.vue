@@ -42,9 +42,9 @@ const buttonBarControls = computed<Control[]>(() =>
     .flatMap((s) => s.columns?.flatMap((col) => col.controls?.filter((c) => c.type === 'button_bar') ?? []) ?? []),
 )
 
-const { state, errors, validate } = useFormState(props.schema, props.initialValues)
+const { state, errors, validate, resetToDefaults } = useFormState(props.schema, props.initialValues)
 
-defineExpose({ state })
+defineExpose({ state, resetToDefaults })
 
 const controlMap = computed<Record<string, Control>>(() => {
   const map: Record<string, Control> = {}

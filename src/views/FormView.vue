@@ -6,6 +6,7 @@ import DialogMessage    from '@/features/form-renderer/components/DialogMessage.
 import CustomSyncDialog from '@/features/form-renderer/components/CustomSyncDialog.vue'
 import type { FormSchema } from '@/features/form-renderer/types/schema'
 import { useDmActions } from '@/features/form-renderer/composables/useDmActions'
+import { useDialog }   from '@/features/form-renderer/composables/useDialog'
 
 const DM_SERVICE_BASE = 'http://localhost:30011'
 
@@ -73,6 +74,19 @@ async function loadSchema(key: string) {
 
 watch(() => route.params.schema, (key) => loadSchema(key as string), { immediate: true })
 
+const { show: showDialog } = useDialog()
+
+// ─── OnGuard-specific helpers ─────────────────────────────────────────────────
+
+async function onGuardPost(subRoute: string, guid: string, body?: object) {
+  const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${guid}/${subRoute}`, {
+    method:  'POST',
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body:    body ? JSON.stringify(body) : undefined,
+  })
+  return res.json().catch(() => ({ success: false, message: `Service returned ${res.status}` }))
+}
+
 const { dispatch } = useDmActions(
   () => ({
     guid:             route.query.guid as string | undefined,
@@ -82,8 +96,46 @@ const { dispatch } = useDmActions(
     customSyncTables: schema.value?.customSyncTables,
     navigate:         (path: string) => router.push(path),
   }),
-  // DM-specific actions for this view — add dm_{DmType}_{fn} entries here as needed.
-  // e.g. 'dm_onGuard_testConnect': async (ctx) => { ... }
+  {
+    // ── Shared client-side ─────────────────────────────────────────────────
+    'setDefaults': () => {
+      formRenderer.value?.resetToDefaults()
+    },
+
+    // ── OnGuard-specific ───────────────────────────────────────────────────
+    'checkSubscriptions': async (ctx) => {
+      if (!ctx.guid) { showDialog({ success: false, title: 'Check Subscriptions', message: 'No GUID provided.' }); return }
+      const result = await onGuardPost('check-subscriptions', ctx.guid)
+      const subs: string[] = result.data ?? []
+      const detail = subs.length > 0 ? subs.join('\n') : 'No subscriptions found.'
+      showDialog({ success: result.success, title: 'XPressEntry Subscriptions', message: result.message + (subs.length > 0 ? '\n\n' + detail : '') })
+    },
+
+    'deleteSubscription': async (ctx) => {
+      if (!ctx.guid) { showDialog({ success: false, title: 'Delete Subscription', message: 'No GUID provided.' }); return }
+      const desc = (ctx.state['subscription_description'] as string | undefined) ?? ''
+      const result = await onGuardPost('delete-subscription', ctx.guid, { description: desc })
+      showDialog({ success: result.success, title: 'Delete Subscription', message: result.message })
+    },
+
+    'updateSegmentList': async (ctx) => {
+      if (!ctx.guid) { showDialog({ success: false, title: 'Update Segments', message: 'No GUID provided.' }); return }
+      const result = await onGuardPost('update-segments', ctx.guid)
+      showDialog({ success: result.success, title: 'Update Segment List', message: result.message })
+    },
+
+    'updatePanelList': async (ctx) => {
+      if (!ctx.guid) { showDialog({ success: false, title: 'Update Panels', message: 'No GUID provided.' }); return }
+      const result = await onGuardPost('update-panels', ctx.guid)
+      showDialog({ success: result.success, title: 'Update Panel List', message: result.message })
+    },
+
+    'createLogicalSource': async (ctx) => {
+      if (!ctx.guid) { showDialog({ success: false, title: 'Create Logical Source', message: 'No GUID provided.' }); return }
+      const result = await onGuardPost('create-logical-source', ctx.guid)
+      showDialog({ success: result.success, title: 'Create Logical Source & Readers', message: result.message })
+    },
+  },
 )
 
 async function handleAction(_id: string, handler: string) {

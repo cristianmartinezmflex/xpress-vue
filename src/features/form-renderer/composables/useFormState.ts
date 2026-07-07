@@ -92,7 +92,22 @@ export function useFormState(schema: FormSchema, initialValues?: Record<string, 
     return true
   }
 
+  function resetToDefaults() {
+    schema.tabs.forEach((tab) => {
+      tab.sections?.forEach((section) => {
+        section.columns?.forEach((col) => {
+          col.controls?.forEach((control) => {
+            if (!control.id) return
+            if (control.default !== undefined) {
+              state[control.id] = control.default
+            }
+          })
+        })
+      })
+    })
+  }
+
   initState()
 
-  return { state, errors: readonly(errors), validate }
+  return { state, errors: readonly(errors), validate, resetToDefaults }
 }
