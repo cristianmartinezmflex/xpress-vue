@@ -54,6 +54,62 @@
     },
 
     {
+      "title": "Settings",
+      "sections": [
+        {
+          "title": "Connection",
+          "columns": [
+            {
+              "controls": [
+                { "id": "api_url",      "type": "text",     "title": "API URL",      "default": "https://api.cloud-identity.example.com" },
+                { "id": "tenant_id",    "type": "text",     "title": "Tenant ID",    "default": "" },
+                { "id": "client_id",    "type": "text",     "title": "Client ID",    "default": "" },
+                { "id": "client_secret","type": "password", "title": "Client Secret","default": "" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Options",
+          "columns": [
+            {
+              "controls": [
+                { "id": "sync_enabled",   "type": "boolean",        "title": "Enable automatic sync",    "default": true },
+                { "id": "sync_interval",  "type": "number_spinner", "title": "Sync interval (minutes)",  "default": 60,
+                  "validations": [{ "type": "min_max", "min": 5, "max": 1440, "error": "5–1440 min" }] },
+                { "id": "environment",    "type": "select",         "title": "Environment",
+                  "values": [
+                    { "text": "Production",  "value": "prod"  },
+                    { "text": "Staging",     "value": "stage" },
+                    { "text": "Development", "value": "dev"   }
+                  ],
+                  "default": "prod"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_settings",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
+                    { "id": "btn_ok",           "title": "OK",           "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
       "title": "Enable → Tab",
       "sections": [
         {
@@ -370,11 +426,11 @@
             {
               "controls": [
                 {
-                  "id": "btn_bar_demo",
+                  "id": "btn_bar_2col",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_test_demo", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
-                    { "id": "btn_ok_demo",   "title": "OK",           "onClick": "dm_shared_save" }
+                    { "id": "btn_test_2col", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
+                    { "id": "btn_ok_2col",   "title": "OK",           "onClick": "dm_shared_save" }
                   ]
                 }
               ]
