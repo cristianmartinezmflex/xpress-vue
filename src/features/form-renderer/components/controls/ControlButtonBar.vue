@@ -13,6 +13,23 @@ function isButtonEnabled(btn: Button): boolean {
   return evaluateEnable(btn.enable, props.state ?? {})
 }
 
+// Tooltip state
+const tooltip = ref<{ text: string; x: number; y: number } | null>(null)
+
+function showTooltip(event: MouseEvent, btn: Button) {
+  if (!btn.tooltip) return
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  tooltip.value = {
+    text: btn.tooltip,
+    x: rect.left,
+    y: rect.bottom + 6,
+  }
+}
+
+function hideTooltip() {
+  tooltip.value = null
+}
+
 // Context menu state
 const contextMenu = ref<{ btn: Button; x: number; y: number } | null>(null)
 
@@ -36,36 +53,35 @@ function handleContextMenuItem(handler: string) {
 
 <template>
   <div class="flex flex-wrap gap-2 pt-1">
-    <div
+    <button
       v-for="btn in buttons"
       :key="btn.id"
-      class="relative group"
+      type="button"
+      class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 transition"
+      :class="isButtonEnabled(btn)
+        ? 'cursor-pointer hover:bg-gray-50'
+        : 'opacity-50 cursor-not-allowed pointer-events-none'"
+      :disabled="!isButtonEnabled(btn)"
+      @click="emit('action', btn.id, btn.onClick)"
+      @contextmenu="onRightClick($event, btn)"
+      @mouseenter="showTooltip($event, btn)"
+      @mouseleave="hideTooltip"
     >
-      <button
-        type="button"
-        class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 transition"
-        :class="isButtonEnabled(btn)
-          ? 'cursor-pointer hover:bg-gray-50'
-          : 'opacity-50 cursor-not-allowed pointer-events-none'"
-        :disabled="!isButtonEnabled(btn)"
-        @click="emit('action', btn.id, btn.onClick)"
-        @contextmenu="onRightClick($event, btn)"
-      >
-        {{ btn.title }}
-      </button>
-
-      <!-- Tooltip -->
-      <div
-        v-if="btn.tooltip"
-        class="pointer-events-none absolute top-full left-0 mt-2 z-50
-               w-64 rounded-md bg-gray-800 px-3 py-2 text-xs text-white shadow-lg
-               opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-      >
-        <div class="absolute bottom-full left-4 border-4 border-transparent border-b-gray-800" />
-        {{ btn.tooltip }}
-      </div>
-    </div>
+      {{ btn.title }}
+    </button>
   </div>
+
+  <!-- Tooltip (teleported to avoid overflow clipping) -->
+  <Teleport to="body">
+    <div
+      v-if="tooltip"
+      class="fixed z-[70] w-64 rounded-md bg-gray-800 px-3 py-2 text-xs text-white shadow-lg pointer-events-none"
+      :style="{ top: tooltip.y + 'px', left: tooltip.x + 'px' }"
+    >
+      <div class="absolute bottom-full left-4 border-4 border-transparent border-b-gray-800" />
+      {{ tooltip.text }}
+    </div>
+  </Teleport>
 
   <!-- Context menu (teleported to body to avoid overflow clipping) -->
   <Teleport to="body">

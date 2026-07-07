@@ -31,8 +31,9 @@ const DM_META: Record<string, { icon: string; badge: string; badgeColor: string 
 }
 
 // Local/demo schemas — always shown regardless of API state
-const LOCAL_SCHEMAS: Array<{ key: string; label: string; icon: string; badge: string; badgeColor: string }> = [
-  { key: 'cloud-identity', label: 'Cloud Identity Sync', icon: '☁️', badge: 'Demo', badgeColor: 'bg-purple-100 text-purple-700' },
+// Set `guid` to a real DM GUID from the service to enable sync actions.
+const LOCAL_SCHEMAS: Array<{ key: string; label: string; icon: string; badge: string; badgeColor: string; guid?: string }> = [
+  { key: 'cloud-identity', label: 'Cloud Identity Sync', icon: '☁️', badge: 'Demo', badgeColor: 'bg-purple-100 text-purple-700', guid: '2e97964f-92fd-449d-b283-643847efae51' },
 ]
 
 function schemaKey(dm: DataManagerItem): string | null {
@@ -163,7 +164,7 @@ onMounted(async () => {
           :key="s.key"
           type="button"
           class="group text-left bg-white rounded-xl border border-dashed border-gray-300 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-purple-300 transition cursor-pointer"
-          @click="router.push(`/form/${s.key}`)"
+          @click="router.push({ path: `/form/${s.key}`, query: s.guid ? { guid: s.guid } : {} })"
         >
           <div class="flex items-start justify-between">
             <span class="text-3xl">{{ s.icon }}</span>

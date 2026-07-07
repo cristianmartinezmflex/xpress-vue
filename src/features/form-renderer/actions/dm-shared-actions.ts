@@ -60,19 +60,18 @@ export async function dm_shared_runPartialSync({ guid, serviceBase }: ActionCont
   if (!res.ok) alert(`Error al iniciar partial sync: el servicio devolvió ${res.status}`)
 }
 
-export async function dm_shared_runCustomSync({ guid, state, serviceBase }: ActionContext): Promise<void> {
+export function dm_shared_runCustomSync({ guid, state, serviceBase }: ActionContext): void {
   if (!guid) { alert('No GUID provided — cannot run sync.'); return }
-  const body = JSON.stringify({
-    dmGuid:              guid,
-    syncType:            'CUSTOM_SYNC',
-    customSyncSettings:  state['custom_sync_settings'] ?? null,
+  const currentJson = state['custom_sync_settings'] as string | undefined
+  useCustomSyncDialog().show(currentJson, async (tables) => {
+    state['custom_sync_settings'] = JSON.stringify(tables)
+    const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync`, {
+      method: 'POST',
+      headers: JSON_HEADERS,
+      body: JSON.stringify({ dmGuid: guid, syncType: 'CUSTOM_SYNC', customSyncSettings: JSON.stringify(tables) }),
+    })
+    if (!res.ok) alert(`Error al iniciar custom sync: el servicio devolvió ${res.status}`)
   })
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync`, {
-    method: 'POST',
-    headers: JSON_HEADERS,
-    body,
-  })
-  if (!res.ok) alert(`Error al iniciar custom sync: el servicio devolvió ${res.status}`)
 }
 
 // ─── Sync (wait for result) ───────────────────────────────────────────────────
