@@ -113,22 +113,15 @@
       "title": "Enable → Tab",
       "sections": [
         {
-          "title": "Enable on Tab — enables or disables the 'Conditional Tab'",
+          "title": "Enable on Tab — tab stays visible but becomes non-clickable when disabled",
           "columns": [
             {
               "controls": [
                 {
                   "id": "enable_tab_demo",
                   "type": "boolean",
-                  "title": "Enable the 'Conditional Tab'",
+                  "title": "Enable the 'Disabled Tab' tab",
                   "default": false
-                },
-                {
-                  "id": "enable_tab_note",
-                  "type": "text",
-                  "title": "Note",
-                  "default": "The 'Conditional Tab' has enable: \"enable_tab_demo == true\". Toggle the switch above and the tab will become active.",
-                  "enable": false
                 }
               ]
             }
@@ -138,11 +131,11 @@
     },
 
     {
-      "title": "Conditional Tab",
+      "title": "Disabled Tab",
       "enable": "enable_tab_demo == true",
       "sections": [
         {
-          "title": "This tab was enabled because enable_tab_demo == true",
+          "title": "This tab is enabled because enable_tab_demo == true",
           "columns": [
             {
               "controls": [
@@ -150,7 +143,50 @@
                   "id": "conditional_tab_field",
                   "type": "text",
                   "title": "Sample field",
-                  "default": "Visible because the tab is enabled"
+                  "default": "This tab was disabled — toggle the switch to enable it"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Display → Tab",
+      "sections": [
+        {
+          "title": "Display on Tab — tab is completely hidden when display is false",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "show_tab_demo",
+                  "type": "boolean",
+                  "title": "Show the 'Hidden Tab' tab",
+                  "default": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Hidden Tab",
+      "display": "show_tab_demo == true",
+      "sections": [
+        {
+          "title": "This tab is visible because show_tab_demo == true",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "hidden_tab_field",
+                  "type": "text",
+                  "title": "Sample field",
+                  "default": "This tab was hidden — toggle the switch to show it"
                 }
               ]
             }
@@ -357,6 +393,53 @@
     {
       "title": "2 Columns",
       "sections": [
+        {
+          "title": "Enable on Column — left column disabled, right stays active",
+          "columns": [
+            {
+              "enable": "enable_col_demo == true",
+              "controls": [
+                { "id": "col_enable_text",   "type": "text",   "title": "Text field (in left column)",   "default": "" },
+                { "id": "col_enable_number", "type": "number", "title": "Number field (in left column)", "default": 0  }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "enable_col_demo",
+                  "type": "boolean",
+                  "title": "Enable the left column",
+                  "default": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Display on Column — left column hidden, right stays visible",
+          "columns": [
+            {
+              "display": "show_col_demo == true",
+              "controls": [
+                { "id": "col_display_text",   "type": "text",   "title": "Text field (in left column)",   "default": "Now you see me!" },
+                { "id": "col_display_select", "type": "select", "title": "Select (in left column)",
+                  "values": [{ "text": "Option A", "value": "a" }, { "text": "Option B", "value": "b" }],
+                  "default": "a"
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "show_col_demo",
+                  "type": "boolean",
+                  "title": "Show the left column",
+                  "default": false
+                }
+              ]
+            }
+          ]
+        },
         {
           "title": "2-column layout — all control types",
           "columns": [

@@ -32,8 +32,16 @@ const emit = defineEmits<{
 const sectionEnabled  = computed(() => evaluateEnable(props.enable, props.state))
 const sectionVisible  = computed(() => evaluateDisplay(props.display, props.state))
 
-function isControlEnabled(control: Control): boolean {
-  return sectionEnabled.value && evaluateEnable(control.enable, props.state)
+function isColumnEnabled(col: Column): boolean {
+  return sectionEnabled.value && evaluateEnable(col.enable, props.state)
+}
+
+function isColumnVisible(col: Column): boolean {
+  return evaluateDisplay(col.display, props.state)
+}
+
+function isControlEnabled(control: Control, col: Column): boolean {
+  return isColumnEnabled(col) && evaluateEnable(control.enable, props.state)
 }
 
 function isControlVisible(control: Control): boolean {
@@ -60,14 +68,16 @@ function isControlVisible(control: Control): boolean {
     >
       <div
         v-for="(col, colIdx) in columns"
+        v-show="isColumnVisible(col)"
         :key="colIdx"
-        class="flex flex-col gap-4"
+        class="flex flex-col gap-4 transition-opacity"
+        :class="!isColumnEnabled(col) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : ''"
       >
         <template v-for="control in col.controls" :key="control.id">
           <div
             v-show="isControlVisible(control)"
             class="transition-opacity"
-            :class="!isControlEnabled(control) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : ''"
+            :class="!isControlEnabled(control, col) && isColumnEnabled(col) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : ''"
           >
             <ControlPassword
               v-if="control.type === 'password'"

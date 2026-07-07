@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import type { FormSchema, Control } from '../types/schema'
 import { useFormState } from '../composables/useFormState'
-import { evaluateEnable } from '../composables/useDisabled'
+import { evaluateEnable, evaluateDisplay } from '../composables/useDisabled'
 import FormSection from './FormSection.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
 
@@ -16,12 +16,19 @@ const emit = defineEmits<{ action: [id: string, handler: string] }>()
 
 const activeTab = ref(0)
 
+// Tabs filtered by `display` — completely hidden when false.
+// Tabs filtered by having content — tabs with no sections/controls are also hidden.
 const visibleTabs = computed(() =>
   props.schema.tabs.filter((tab) =>
-    evaluateEnable(tab.enable, state) &&
+    evaluateDisplay(tab.display, state) &&
     tab.sections?.some((s) => s.columns?.some((col) => col.controls?.length > 0))
   ),
 )
+
+// Whether a tab is interactive — `enable: false` keeps it visible but non-clickable.
+function isTabEnabled(tab: (typeof visibleTabs.value)[number]): boolean {
+  return evaluateEnable(tab.enable, state)
+}
 
 const showTabs   = computed(() => visibleTabs.value.length > 1)
 const currentTab = computed(() => visibleTabs.value[activeTab.value])
@@ -74,11 +81,16 @@ function onUpdateState(id: string, value: any) {
         v-for="(tab, idx) in visibleTabs"
         :key="tab.title"
         type="button"
-        class="px-5 py-3 text-sm font-medium border-b-2 transition cursor-pointer"
-        :class="activeTab === idx
-          ? 'border-blue-500 text-blue-600'
-          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-        @click="activeTab = idx"
+        class="px-5 py-3 text-sm font-medium border-b-2 transition"
+        :class="[
+          !isTabEnabled(tab)
+            ? 'border-transparent text-gray-300 cursor-not-allowed'
+            : activeTab === idx
+              ? 'border-blue-500 text-blue-600 cursor-pointer'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer'
+        ]"
+        :disabled="!isTabEnabled(tab)"
+        @click="isTabEnabled(tab) && (activeTab = idx)"
       >
         {{ tab.title }}
       </button>

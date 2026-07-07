@@ -85,6 +85,8 @@ export interface Control {
 
 export interface Column {
   controls: Control[]
+  enable?: EnableProp
+  display?: DisplayProp
 }
 
 export interface Section {
@@ -98,6 +100,7 @@ export interface Tab {
   title: string
   sections?: Section[]
   enable?: EnableProp
+  display?: DisplayProp
 }
 
 export interface FormSchema {
