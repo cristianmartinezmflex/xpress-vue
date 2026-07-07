@@ -1,0 +1,375 @@
+{
+  "tabs": [
+    {
+      "title": "Sync",
+      "sections": [
+        {
+          "title": "Sync Operations",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "sync_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_partial_sync", "title": "Partial Sync Now", "onClick": "dm_shared_runPartialSync" },
+                    { "id": "btn_full_sync",    "title": "Full Sync Now",    "onClick": "dm_shared_runFullSync" },
+                    {
+                      "id": "btn_custom_sync",
+                      "title": "Custom Sync Now",
+                      "onClick": "dm_shared_runCustomSync",
+                      "rightClickMenu": [
+                        { "label": "Edit Custom Sync", "onClick": "dm_shared_editCustomSync" }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Live Log",
+          "columns": [
+            {
+              "controls": [
+                { "id": "sync_log", "type": "log_view" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Enable → Tab",
+      "sections": [
+        {
+          "title": "Enable en Tab — activa o desactiva el tab 'Tab Condicional'",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "enable_tab_demo",
+                  "type": "boolean",
+                  "title": "Habilitar el tab 'Tab Condicional'",
+                  "default": false
+                },
+                {
+                  "id": "enable_tab_note",
+                  "type": "text",
+                  "title": "Nota",
+                  "default": "El tab 'Tab Condicional' tiene enable: \"enable_tab_demo == true\". Activá el toggle de arriba y verás que el tab se activa.",
+                  "enable": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Tab Condicional",
+      "enable": "enable_tab_demo == true",
+      "sections": [
+        {
+          "title": "Este tab se habilitó porque enable_tab_demo == true",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "conditional_tab_field",
+                  "type": "text",
+                  "title": "Campo de ejemplo",
+                  "default": "Visible porque el tab está habilitado"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Enable → Sección & Campo",
+      "sections": [
+        {
+          "title": "Enable en Sección — activa o desactiva la sección siguiente",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "enable_section_demo",
+                  "type": "boolean",
+                  "title": "Habilitar la sección 'Sección controlada por enable'",
+                  "default": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Sección controlada por enable (enable: \"enable_section_demo == true\")",
+          "enable": "enable_section_demo == true",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "section_enable_field_1",
+                  "type": "text",
+                  "title": "Campo A",
+                  "default": "Interactivo solo cuando la sección está habilitada"
+                },
+                {
+                  "id": "section_enable_field_2",
+                  "type": "number_spinner",
+                  "title": "Campo B",
+                  "default": 42,
+                  "validations": [
+                    { "type": "min_max", "min": 0, "max": 9999, "error": "0–9999" }
+                  ]
+                },
+                {
+                  "id": "section_enable_field_3",
+                  "type": "boolean",
+                  "title": "Campo C (boolean)",
+                  "default": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Enable en Campo — activa o desactiva campos individuales",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "enable_fields_demo",
+                  "type": "boolean",
+                  "title": "Habilitar los campos de abajo",
+                  "default": false
+                },
+                {
+                  "id": "field_enable_text",
+                  "type": "text",
+                  "title": "Campo de texto (enable: \"enable_fields_demo == true\")",
+                  "default": "",
+                  "enable": "enable_fields_demo == true"
+                },
+                {
+                  "id": "field_enable_spinner",
+                  "type": "number_spinner",
+                  "title": "Campo numérico (enable: \"enable_fields_demo == true\")",
+                  "default": 100,
+                  "validations": [
+                    { "type": "min_max", "min": 1, "max": 1000, "error": "1–1000" }
+                  ],
+                  "enable": "enable_fields_demo == true"
+                },
+                {
+                  "id": "field_enable_select",
+                  "type": "select",
+                  "title": "Select (enable: \"enable_fields_demo == true\")",
+                  "values": [
+                    { "text": "Opción A", "value": "a" },
+                    { "text": "Opción B", "value": "b" },
+                    { "text": "Opción C", "value": "c" }
+                  ],
+                  "default": "a",
+                  "enable": "enable_fields_demo == true"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Display → Sección & Campo",
+      "sections": [
+        {
+          "title": "Display en Sección — muestra u oculta la sección siguiente",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "show_section_demo",
+                  "type": "boolean",
+                  "title": "Mostrar la sección 'Sección controlada por display'",
+                  "default": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Sección controlada por display (display: \"show_section_demo == true\")",
+          "display": "show_section_demo == true",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "section_display_field_1",
+                  "type": "text",
+                  "title": "Campo A",
+                  "default": "Solo visible cuando show_section_demo es true"
+                },
+                {
+                  "id": "section_display_field_2",
+                  "type": "boolean",
+                  "title": "Campo B (boolean)",
+                  "default": false
+                },
+                {
+                  "id": "section_display_field_3",
+                  "type": "password",
+                  "title": "Campo C (password)",
+                  "default": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Display en Campo — muestra u oculta campos individuales",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "show_fields_demo",
+                  "type": "boolean",
+                  "title": "Mostrar los campos de abajo",
+                  "default": false
+                },
+                {
+                  "id": "field_display_text",
+                  "type": "text",
+                  "title": "Campo de texto (display: \"show_fields_demo == true\")",
+                  "default": "",
+                  "display": "show_fields_demo == true"
+                },
+                {
+                  "id": "field_display_select",
+                  "type": "select",
+                  "title": "Select (display: \"show_fields_demo == true\")",
+                  "values": [
+                    { "text": "Opción X", "value": "x" },
+                    { "text": "Opción Y", "value": "y" }
+                  ],
+                  "default": "x",
+                  "display": "show_fields_demo == true"
+                },
+                {
+                  "id": "field_display_spinner",
+                  "type": "number_spinner",
+                  "title": "Número (display: \"show_fields_demo == true\")",
+                  "default": 0,
+                  "display": "show_fields_demo == true",
+                  "validations": [
+                    { "type": "min_max", "min": 0, "max": 999, "error": "0–999" }
+                  ]
+                },
+                {
+                  "id": "field_display_bool",
+                  "type": "boolean",
+                  "title": "Boolean (display: \"show_fields_demo == true\")",
+                  "default": false,
+                  "display": "show_fields_demo == true"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "2 Columnas",
+      "sections": [
+        {
+          "title": "Layout de 2 columnas — todos los tipos de control",
+          "columns": [
+            {
+              "controls": [
+                { "id": "col2_text",     "type": "text",           "title": "Text",     "default": "valor de texto" },
+                { "id": "col2_password", "type": "password",       "title": "Password", "default": "" },
+                { "id": "col2_number",   "type": "number",         "title": "Number",   "default": 80 },
+                { "id": "col2_spinner",  "type": "number_spinner", "title": "Spinner",  "default": 500,
+                  "validations": [ { "type": "min_max", "min": 1, "max": 9999, "error": "1–9999" } ] },
+                { "id": "col2_boolean",  "type": "boolean",        "title": "Boolean",  "default": true }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "col2_select",
+                  "type": "select",
+                  "title": "Select",
+                  "values": [
+                    { "text": "Opción 1", "value": "1" },
+                    { "text": "Opción 2", "value": "2" },
+                    { "text": "Opción 3", "value": "3" }
+                  ],
+                  "default": "1"
+                },
+                {
+                  "id": "col2_radio",
+                  "type": "radio",
+                  "title": "Radio",
+                  "values": [
+                    { "text": "Alpha", "value": "alpha" },
+                    { "text": "Beta",  "value": "beta" },
+                    { "text": "Gamma", "value": "gamma" }
+                  ],
+                  "default": "alpha"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Key-Value — mapeo de campos",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "demo_mappings",
+                  "type": "keyvalue",
+                  "title": "",
+                  "key_title": "Campo Origen",
+                  "key_header": "Origen",
+                  "value_title": "Campo Destino",
+                  "value_header": "Destino",
+                  "default": [
+                    { "key": "firstName", "value": "first_name" },
+                    { "key": "lastName",  "value": "last_name" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_demo",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_test_demo", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
+                    { "id": "btn_ok_demo",   "title": "OK",           "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

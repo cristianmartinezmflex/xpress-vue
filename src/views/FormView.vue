@@ -22,16 +22,18 @@ const saveResult   = ref<'ok' | 'error' | null>(null)
 const formRenderer = ref<InstanceType<typeof FormRenderer> | null>(null)
 
 const schemaMap: Record<string, () => Promise<any>> = {
-  'example':     () => import('@/data/example.json'),
-  'galaxy-rest': () => import('@/data/galaxy-rest.json'),
-  'on-guard':    () => import('@/data/on-guard.json'),
+  'example':          () => import('@/data/example.json'),
+  'galaxy-rest':      () => import('@/data/galaxy-rest.json'),
+  'on-guard':         () => import('@/data/on-guard.json'),
+  'cloud-identity':   () => import('@/data/cloud-identity.json'),
 }
 
 const title = computed(() => {
   const map: Record<string, string> = {
-    'example':     'Example',
-    'galaxy-rest': 'Galaxy REST Data Manager',
-    'on-guard':    'OnGuard Data Manager',
+    'example':        'Example',
+    'galaxy-rest':    'Galaxy REST Data Manager',
+    'on-guard':       'OnGuard Data Manager',
+    'cloud-identity': 'Cloud Identity Sync (Demo)',
   }
   return map[route.params.schema as string] ?? 'Form'
 })
