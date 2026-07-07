@@ -47,9 +47,9 @@ export function useFormState(schema: FormSchema, initialValues?: Record<string, 
 
     // Override with schema-aware values: apply type coercion and schema defaults.
     schema.tabs.forEach((tab) => {
-      tab.columns?.forEach((col) => {
-        col.sections.forEach((section) => {
-          section.controls.forEach((control) => {
+      tab.sections?.forEach((section) => {
+        section.columns?.forEach((col) => {
+          col.controls?.forEach((control) => {
             if (!control.id) return
 
             if (initialValues && control.id in initialValues) {

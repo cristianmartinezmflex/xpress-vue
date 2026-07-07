@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Control, EnableProp, DisplayProp } from '../types/schema'
+import type { Column, Control, EnableProp, DisplayProp } from '../types/schema'
 import { evaluateEnable, evaluateDisplay } from '../composables/useDisabled'
 import ControlText from './controls/ControlText.vue'
 import ControlPassword from './controls/ControlPassword.vue'
@@ -15,7 +15,7 @@ import ControlLogView  from './controls/ControlLogView.vue'
 
 const props = defineProps<{
   title?: string
-  controls: Control[]
+  columns: Column[]
   state: Record<string, any>
   errors: Readonly<Record<string, string>>
   enable?: EnableProp
@@ -50,98 +50,109 @@ function isControlVisible(control: Control): boolean {
     <div v-if="title" class="px-4 py-2 bg-gray-50 border-b border-gray-200">
       <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">{{ title }}</h3>
     </div>
-    <div class="p-4 flex flex-col gap-4" :class="!sectionEnabled ? 'pointer-events-none select-none' : ''">
-      <template v-for="control in controls" :key="control.id">
 
-        <div
-          v-show="isControlVisible(control)"
-          class="transition-opacity"
-          :class="!isControlEnabled(control) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : ''"
-        >
-          <ControlPassword
-            v-if="control.type === 'password'"
-            :title="control.title"
-            :model-value="state[control.id] ?? ''"
-            :error="errors[control.id]"
-            @update:model-value="emit('update:state', control.id, $event)"
-          />
+    <div
+      class="p-4"
+      :class="[
+        columns.length >= 2 ? 'grid grid-cols-2 gap-x-6' : 'flex flex-col gap-4',
+        !sectionEnabled ? 'pointer-events-none select-none' : ''
+      ]"
+    >
+      <div
+        v-for="(col, colIdx) in columns"
+        :key="colIdx"
+        class="flex flex-col gap-4"
+      >
+        <template v-for="control in col.controls" :key="control.id">
+          <div
+            v-show="isControlVisible(control)"
+            class="transition-opacity"
+            :class="!isControlEnabled(control) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : ''"
+          >
+            <ControlPassword
+              v-if="control.type === 'password'"
+              :title="control.title"
+              :model-value="state[control.id] ?? ''"
+              :error="errors[control.id]"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
 
-          <ControlText
-            v-else-if="control.type === 'text'"
-            :title="control.title"
-            :model-value="state[control.id] ?? ''"
-            :error="errors[control.id]"
-            @update:model-value="emit('update:state', control.id, $event)"
-          />
+            <ControlText
+              v-else-if="control.type === 'text'"
+              :title="control.title"
+              :model-value="state[control.id] ?? ''"
+              :error="errors[control.id]"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
 
-          <ControlBoolean
-            v-else-if="control.type === 'boolean'"
-            :title="control.title"
-            :model-value="state[control.id] ?? false"
-            @update:model-value="emit('update:state', control.id, $event)"
-          />
+            <ControlBoolean
+              v-else-if="control.type === 'boolean'"
+              :title="control.title"
+              :model-value="state[control.id] ?? false"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
 
-          <ControlNumber
-            v-else-if="control.type === 'number'"
-            :title="control.title"
-            :model-value="state[control.id] ?? 0"
-            :error="errors[control.id]"
-            @update:model-value="emit('update:state', control.id, $event)"
-          />
+            <ControlNumber
+              v-else-if="control.type === 'number'"
+              :title="control.title"
+              :model-value="state[control.id] ?? 0"
+              :error="errors[control.id]"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
 
-          <ControlNumberSpinner
-            v-else-if="control.type === 'number_spinner'"
-            :title="control.title"
-            :model-value="state[control.id] ?? 0"
-            :validations="control.validations"
-            :error="errors[control.id]"
-            @update:model-value="emit('update:state', control.id, $event)"
-          />
+            <ControlNumberSpinner
+              v-else-if="control.type === 'number_spinner'"
+              :title="control.title"
+              :model-value="state[control.id] ?? 0"
+              :validations="control.validations"
+              :error="errors[control.id]"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
 
-          <ControlSelect
-            v-else-if="control.type === 'select'"
-            :title="control.title"
-            :model-value="state[control.id]"
-            :values="control.values ?? []"
-            :error="errors[control.id]"
-            @update:model-value="emit('update:state', control.id, $event)"
-          />
+            <ControlSelect
+              v-else-if="control.type === 'select'"
+              :title="control.title"
+              :model-value="state[control.id]"
+              :values="control.values ?? []"
+              :error="errors[control.id]"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
 
-          <ControlRadio
-            v-else-if="control.type === 'radio'"
-            :id="control.id"
-            :title="control.title"
-            :model-value="state[control.id]"
-            :values="control.values ?? []"
-            @update:model-value="emit('update:state', control.id, $event)"
-          />
+            <ControlRadio
+              v-else-if="control.type === 'radio'"
+              :id="control.id"
+              :title="control.title"
+              :model-value="state[control.id]"
+              :values="control.values ?? []"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
 
-          <ControlButtonBar
-            v-else-if="control.type === 'button_bar'"
-            :buttons="control.buttons ?? []"
-            :state="state"
-            @action="(id, handler) => emit('action', id, handler)"
-          />
+            <ControlButtonBar
+              v-else-if="control.type === 'button_bar'"
+              :buttons="control.buttons ?? []"
+              :state="state"
+              @action="(id, handler) => emit('action', id, handler)"
+            />
 
-          <ControlLogView
-            v-else-if="control.type === 'log_view'"
-            :guid="guid"
-            :service-base="serviceBase"
-          />
+            <ControlLogView
+              v-else-if="control.type === 'log_view'"
+              :guid="guid"
+              :service-base="serviceBase"
+            />
 
-          <ControlKeyValue
-            v-else-if="control.type === 'keyvalue'"
-            :title="control.title"
-            :key-title="control.key_title"
-            :key-header="control.key_header"
-            :value-title="control.value_title"
-            :value-header="control.value_header"
-            :model-value="state[control.id] ?? []"
-            @update:model-value="emit('update:state', control.id, $event)"
-          />
-        </div>
-
-      </template>
+            <ControlKeyValue
+              v-else-if="control.type === 'keyvalue'"
+              :title="control.title"
+              :key-title="control.key_title"
+              :key-header="control.key_header"
+              :value-title="control.value_title"
+              :value-header="control.value_header"
+              :model-value="state[control.id] ?? []"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+          </div>
+        </template>
+      </div>
     </div>
   </div>
 </template>

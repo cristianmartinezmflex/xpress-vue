@@ -2,11 +2,11 @@
   "tabs": [
     {
       "title": "Sync",
-      "columns": [
+      "sections": [
         {
-          "sections": [
+          "title": "Sync Operations",
+          "columns": [
             {
-              "title": "Sync Operations",
               "controls": [
                 {
                   "id": "sync_buttons",
@@ -36,9 +36,13 @@
                   ]
                 }
               ]
-            },
+            }
+          ]
+        },
+        {
+          "title": "Live Log",
+          "columns": [
             {
-              "title": "Live Log",
               "controls": [
                 {
                   "id": "sync_log",
@@ -52,11 +56,11 @@
     },
     {
       "title": "Basic",
-      "columns": [
+      "sections": [
         {
-          "sections": [
+          "title": "titulo 1",
+          "columns": [
             {
-              "title": "titulo 1",
               "controls": [
                 {
                   "id": "remote_computer_name",
@@ -99,14 +103,8 @@
                   "type": "select",
                   "title": "Sync Type (select)",
                   "values": [
-                    {
-                      "text": "OpenAccess",
-                      "value": 17
-                    },
-                    {
-                      "text": "DataConduit",
-                      "value": 18
-                    }
+                    { "text": "OpenAccess", "value": 17 },
+                    { "text": "DataConduit", "value": 18 }
                   ],
                   "default": 17
                 },
@@ -115,14 +113,8 @@
                   "type": "radio",
                   "title": "Sync Type (radio)",
                   "values": [
-                    {
-                      "text": "OpenAccess",
-                      "value": 17
-                    },
-                    {
-                      "text": "DataConduit",
-                      "value": 18
-                    }
+                    { "text": "OpenAccess", "value": 17 },
+                    { "text": "DataConduit", "value": 18 }
                   ],
                   "default": 17
                 },
@@ -143,9 +135,13 @@
                   ]
                 }
               ]
-            },
+            }
+          ]
+        },
+        {
+          "title": "titulo 2",
+          "columns": [
             {
-              "title": "titulo 2",
               "controls": [
                 {
                   "id": "user_mappings",
@@ -156,14 +152,8 @@
                   "value_title": "Destination Columns",
                   "value_header": "XPressEntry Field",
                   "default": [
-                    {
-                      "key": "Data3",
-                      "value": "SOMEXPEUDF (UDF24)"
-                    },
-                    {
-                      "key": "Data5",
-                      "value": "XPE UDF 2 (UDF25)"
-                    }
+                    { "key": "Data3", "value": "SOMEXPEUDF (UDF24)" },
+                    { "key": "Data5", "value": "XPE UDF 2 (UDF25)" }
                   ]
                 }
               ]

@@ -19,32 +19,27 @@ const activeTab = ref(0)
 const visibleTabs = computed(() =>
   props.schema.tabs.filter((tab) =>
     evaluateEnable(tab.enable, state) &&
-    tab.columns?.some((col) => col.sections?.some((s) => s.controls?.length > 0))
+    tab.sections?.some((s) => s.columns?.some((col) => col.controls?.length > 0))
   ),
 )
 
 const showTabs   = computed(() => visibleTabs.value.length > 1)
 const currentTab = computed(() => visibleTabs.value[activeTab.value])
 
-const allSections = computed(() =>
-  currentTab.value?.columns?.flatMap((col) => col.sections) ?? [],
-)
+const allSections = computed(() => currentTab.value?.sections ?? [])
 
 const isFooterSection = (s: { title?: string }) => !s.title || s.title.trim() === ''
 
 const sections = computed(() =>
-  allSections.value.map((s) => ({
-    ...s,
-    controls: isFooterSection(s)
-      ? s.controls.filter((c) => c.type !== 'button_bar')
-      : s.controls,
-  })).filter((s) => s.controls.length > 0),
+  allSections.value.filter(
+    (s) => !isFooterSection(s) && s.columns?.some((col) => col.controls?.length > 0),
+  ),
 )
 
 const buttonBarControls = computed<Control[]>(() =>
   allSections.value
     .filter((s) => isFooterSection(s))
-    .flatMap((s) => s.controls.filter((c) => c.type === 'button_bar')),
+    .flatMap((s) => s.columns?.flatMap((col) => col.controls?.filter((c) => c.type === 'button_bar') ?? []) ?? []),
 )
 
 const { state, errors, validate } = useFormState(props.schema, props.initialValues)
@@ -54,9 +49,9 @@ defineExpose({ state })
 const controlMap = computed<Record<string, Control>>(() => {
   const map: Record<string, Control> = {}
   props.schema.tabs.forEach((tab) =>
-    tab.columns?.forEach((col) =>
-      col.sections.forEach((section) =>
-        section.controls.forEach((ctrl) => { map[ctrl.id] = ctrl })
+    tab.sections?.forEach((section) =>
+      section.columns?.forEach((col) =>
+        col.controls?.forEach((ctrl) => { map[ctrl.id] = ctrl })
       )
     )
   )
@@ -96,7 +91,7 @@ function onUpdateState(id: string, value: any) {
           v-for="(section, idx) in sections"
           :key="idx"
           :title="section.title"
-          :controls="section.controls"
+          :columns="section.columns"
           :state="state"
           :errors="errors"
           :enable="section.enable"

@@ -83,20 +83,20 @@ export interface Control {
   display?: DisplayProp
 }
 
+export interface Column {
+  controls: Control[]
+}
+
 export interface Section {
   title?: string
-  controls: Control[]
+  columns: Column[]
   enable?: EnableProp
   display?: DisplayProp
 }
 
-export interface Column {
-  sections: Section[]
-}
-
 export interface Tab {
   title: string
-  columns?: Column[]
+  sections?: Section[]
   enable?: EnableProp
 }
 

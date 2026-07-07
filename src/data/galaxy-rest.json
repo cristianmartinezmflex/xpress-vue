@@ -2,11 +2,11 @@
   "tabs": [
     {
       "title": "Sync",
-      "columns": [
+      "sections": [
         {
-          "sections": [
+          "title": "Sync Operations",
+          "columns": [
             {
-              "title": "Sync Operations",
               "controls": [
                 {
                   "id": "sync_buttons",
@@ -36,9 +36,13 @@
                   ]
                 }
               ]
-            },
+            }
+          ]
+        },
+        {
+          "title": "Live Log",
+          "columns": [
             {
-              "title": "Live Log",
               "controls": [
                 {
                   "id": "sync_log",
@@ -52,11 +56,11 @@
     },
     {
       "title": "Basic",
-      "columns": [
+      "sections": [
         {
-          "sections": [
+          "title": "Connection",
+          "columns": [
             {
-              "title": "Connection",
               "controls": [
                 {
                   "id": "server_ip",
@@ -70,16 +74,8 @@
                   "title": "Port",
                   "default": 8000,
                   "validations": [
-                    {
-                      "type": "required",
-                      "error": "Port is required"
-                    },
-                    {
-                      "type": "min_max",
-                      "min": 1,
-                      "max": 65535,
-                      "error": "Port must be between 1 and 65535"
-                    }
+                    { "type": "required", "error": "Port is required" },
+                    { "type": "min_max", "min": 1, "max": 65535, "error": "Port must be between 1 and 65535" }
                   ]
                 },
                 {
@@ -99,33 +95,22 @@
                   "type": "select",
                   "title": "Server Timezone",
                   "values": [
-                    {
-                      "text": "US Eastern Standard Time",
-                      "value": "US Eastern Standard Time"
-                    },
-                    {
-                      "text": "US Central Standard Time",
-                      "value": "US Central Standard Time"
-                    },
-                    {
-                      "text": "US Mountain Standard Time",
-                      "value": "US Mountain Standard Time"
-                    },
-                    {
-                      "text": "US Pacific Standard Time",
-                      "value": "US Pacific Standard Time"
-                    },
-                    {
-                      "text": "UTC",
-                      "value": "UTC"
-                    }
+                    { "text": "US Eastern Standard Time", "value": "US Eastern Standard Time" },
+                    { "text": "US Central Standard Time", "value": "US Central Standard Time" },
+                    { "text": "US Mountain Standard Time", "value": "US Mountain Standard Time" },
+                    { "text": "US Pacific Standard Time", "value": "US Pacific Standard Time" },
+                    { "text": "UTC", "value": "UTC" }
                   ],
                   "default": "US Mountain Standard Time"
                 }
               ]
-            },
+            }
+          ]
+        },
+        {
+          "title": "API Settings",
+          "columns": [
             {
-              "title": "API Settings",
               "controls": [
                 {
                   "id": "api_query_size",
@@ -133,16 +118,8 @@
                   "title": "Api Query Size",
                   "default": 500,
                   "validations": [
-                    {
-                      "type": "required",
-                      "error": "Api Query Size is required"
-                    },
-                    {
-                      "type": "min_max",
-                      "min": 1,
-                      "max": 10000,
-                      "error": "Must be between 1 and 10000"
-                    }
+                    { "type": "required", "error": "Api Query Size is required" },
+                    { "type": "min_max", "min": 1, "max": 10000, "error": "Must be between 1 and 10000" }
                   ]
                 },
                 {
@@ -151,16 +128,8 @@
                   "title": "Delay for API (MS)",
                   "default": 10,
                   "validations": [
-                    {
-                      "type": "required",
-                      "error": "Delay is required"
-                    },
-                    {
-                      "type": "min_max",
-                      "min": 0,
-                      "max": 60000,
-                      "error": "Must be between 0 and 60000"
-                    }
+                    { "type": "required", "error": "Delay is required" },
+                    { "type": "min_max", "min": 0, "max": 60000, "error": "Must be between 0 and 60000" }
                   ]
                 },
                 {
@@ -169,87 +138,37 @@
                   "title": "Data Change Check Interval (s)",
                   "default": 30,
                   "validations": [
-                    {
-                      "type": "required",
-                      "error": "Interval is required"
-                    },
-                    {
-                      "type": "min_max",
-                      "min": 1,
-                      "max": 3600,
-                      "error": "Must be between 1 and 3600"
-                    }
+                    { "type": "required", "error": "Interval is required" },
+                    { "type": "min_max", "min": 1, "max": 3600, "error": "Must be between 1 and 3600" }
                   ]
                 }
               ]
-            },
+            }
+          ]
+        },
+        {
+          "title": "Options",
+          "columns": [
             {
-              "title": "Options",
               "controls": [
-                {
-                  "id": "use_ssl",
-                  "type": "boolean",
-                  "title": "Use SSL",
-                  "default": false
-                },
-                {
-                  "id": "create_doors",
-                  "type": "boolean",
-                  "title": "Create Doors",
-                  "default": false
-                },
-                {
-                  "id": "validate_ssl",
-                  "type": "boolean",
-                  "title": "Validate SSL Cert",
-                  "default": false
-                },
-                {
-                  "id": "download_pictures",
-                  "type": "boolean",
-                  "title": "Download Pictures",
-                  "default": true
-                },
-                {
-                  "id": "verbose_api_data",
-                  "type": "boolean",
-                  "title": "Verbose API Data",
-                  "default": false
-                },
-                {
-                  "id": "pull_companies",
-                  "type": "boolean",
-                  "title": "Pull Customers As Companies",
-                  "default": false
-                },
-                {
-                  "id": "ignore_badge_invalidation",
-                  "type": "boolean",
-                  "title": "Ignore Badge Invalidation",
-                  "default": false
-                },
-                {
-                  "id": "compare_user_end_dates",
-                  "type": "boolean",
-                  "title": "Compare and set User End Date",
-                  "default": false
-                },
-                {
-                  "id": "use_enable_cardholder_api",
-                  "type": "boolean",
-                  "title": "Use API to Enable Cardholder in Galaxy",
-                  "default": false
-                },
-                {
-                  "id": "use_reader_timezone",
-                  "type": "boolean",
-                  "title": "Use Reader Timezone to Send Activity",
-                  "default": false
-                }
+                { "id": "use_ssl", "type": "boolean", "title": "Use SSL", "default": false },
+                { "id": "create_doors", "type": "boolean", "title": "Create Doors", "default": false },
+                { "id": "validate_ssl", "type": "boolean", "title": "Validate SSL Cert", "default": false },
+                { "id": "download_pictures", "type": "boolean", "title": "Download Pictures", "default": true },
+                { "id": "verbose_api_data", "type": "boolean", "title": "Verbose API Data", "default": false },
+                { "id": "pull_companies", "type": "boolean", "title": "Pull Customers As Companies", "default": false },
+                { "id": "ignore_badge_invalidation", "type": "boolean", "title": "Ignore Badge Invalidation", "default": false },
+                { "id": "compare_user_end_dates", "type": "boolean", "title": "Compare and set User End Date", "default": false },
+                { "id": "use_enable_cardholder_api", "type": "boolean", "title": "Use API to Enable Cardholder in Galaxy", "default": false },
+                { "id": "use_reader_timezone", "type": "boolean", "title": "Use Reader Timezone to Send Activity", "default": false }
               ]
-            },
+            }
+          ]
+        },
+        {
+          "title": "Custom User Mappings",
+          "columns": [
             {
-              "title": "Custom User Mappings",
               "controls": [
                 {
                   "id": "user_custom_fields",
@@ -262,29 +181,21 @@
                   "default": []
                 }
               ]
-            },
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
             {
-              "title": "",
               "controls": [
                 {
                   "id": "btn_bar_main",
                   "type": "button_bar",
                   "buttons": [
-                    {
-                      "id": "btn_test_connect",
-                      "title": "Test Connect",
-                      "onClick": "dm_shared_testConnection"
-                    },
-                    {
-                      "id": "btn_defaults",
-                      "title": "Defaults",
-                      "onClick": "setDefaults"
-                    },
-                    {
-                      "id": "btn_ok",
-                      "title": "OK",
-                      "onClick": "save"
-                    }
+                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
+                    { "id": "btn_defaults", "title": "Defaults", "onClick": "setDefaults" },
+                    { "id": "btn_ok", "title": "OK", "onClick": "save" }
                   ]
                 }
               ]
