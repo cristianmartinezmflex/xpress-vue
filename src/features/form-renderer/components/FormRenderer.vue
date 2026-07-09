@@ -35,7 +35,9 @@ const currentTab = computed(() => visibleTabs.value[activeTab.value])
 
 const allSections = computed(() => currentTab.value?.sections ?? [])
 
-const isFooterSection = (s: { title?: string }) => !s.title || s.title.trim() === ''
+const isFooterSection = (s: { title?: string; columns?: { controls?: { type: string }[] }[] }) =>
+  (!s.title || s.title.trim() === '') &&
+  (s.columns?.every((col) => (col.controls ?? []).every((c) => c.type === 'button_bar')) ?? true)
 
 const sections = computed(() =>
   allSections.value.filter(

@@ -19,12 +19,6 @@ export interface ActionContext {
 
 export type ActionFn = (ctx: ActionContext) => void | Promise<void>
 
-// ─── Internal helpers ─────────────────────────────────────────────────────────
-
-function syncBody(guid: string | undefined, syncType: string): string {
-  return JSON.stringify({ dmGuid: guid ?? null, syncType })
-}
-
 const JSON_HEADERS = { 'Content-Type': 'application/json' }
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
@@ -43,20 +37,16 @@ export async function dm_shared_save({ guid, state, serviceBase }: ActionContext
 
 export async function dm_shared_runFullSync({ guid, serviceBase }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided — cannot run sync.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync`, {
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync?syncType=FULL_SYNC`, {
     method: 'POST',
-    headers: JSON_HEADERS,
-    body: syncBody(guid, 'FULL_SYNC'),
   })
   if (!res.ok) alert(`Error al iniciar full sync: el servicio devolvió ${res.status}`)
 }
 
 export async function dm_shared_runPartialSync({ guid, serviceBase }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided — cannot run sync.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync`, {
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync?syncType=PARTIAL_SYNC`, {
     method: 'POST',
-    headers: JSON_HEADERS,
-    body: syncBody(guid, 'PARTIAL_SYNC'),
   })
   if (!res.ok) alert(`Error al iniciar partial sync: el servicio devolvió ${res.status}`)
 }
@@ -66,10 +56,10 @@ export function dm_shared_runCustomSync({ guid, state, serviceBase, customSyncTa
   const currentJson = state['custom_sync_settings'] as string | undefined
   useCustomSyncDialog().show(currentJson, async (tables) => {
     state['custom_sync_settings'] = JSON.stringify(tables)
-    const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync`, {
+    const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync?syncType=CUSTOM_SYNC`, {
       method: 'POST',
       headers: JSON_HEADERS,
-      body: JSON.stringify({ dmGuid: guid, syncType: 'CUSTOM_SYNC', customSyncSettings: JSON.stringify(tables) }),
+      body: JSON.stringify(tables),
     })
     if (!res.ok) alert(`Error al iniciar custom sync: el servicio devolvió ${res.status}`)
   }, customSyncTables)
@@ -79,26 +69,24 @@ export function dm_shared_runCustomSync({ guid, state, serviceBase, customSyncTa
 
 export async function dm_shared_runFullSyncForResult({ guid, serviceBase }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided — cannot run sync.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync-result`, {
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync-for-result?syncType=FULL_SYNC`, {
     method: 'POST',
-    headers: JSON_HEADERS,
-    body: syncBody(guid, 'FULL_SYNC'),
   })
-  if (!res.ok) { alert(`Error en full sync: el servicio devolvió ${res.status}`); return }
-  const result = await res.json()
-  if (result?.success === false) alert(`Sync falló: ${result?.error ?? 'Error desconocido'}`)
+  if (!res.ok) {
+    const result = await res.json().catch(() => null)
+    alert(`Sync falló: ${result?.Error ?? `El servicio devolvió ${res.status}`}`)
+  }
 }
 
 export async function dm_shared_runPartialSyncForResult({ guid, serviceBase }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided — cannot run sync.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync-result`, {
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync-for-result?syncType=PARTIAL_SYNC`, {
     method: 'POST',
-    headers: JSON_HEADERS,
-    body: syncBody(guid, 'PARTIAL_SYNC'),
   })
-  if (!res.ok) { alert(`Error en partial sync: el servicio devolvió ${res.status}`); return }
-  const result = await res.json()
-  if (result?.success === false) alert(`Sync falló: ${result?.error ?? 'Error desconocido'}`)
+  if (!res.ok) {
+    const result = await res.json().catch(() => null)
+    alert(`Sync falló: ${result?.Error ?? `El servicio devolvió ${res.status}`}`)
+  }
 }
 
 // ─── Status ───────────────────────────────────────────────────────────────────
@@ -115,10 +103,8 @@ export async function dm_shared_getSyncStatus({ guid, serviceBase }: ActionConte
 
 export async function dm_shared_cancelSync({ guid, serviceBase }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided — cannot cancel sync.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/cancel-sync`, {
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/cancel-sync?syncType=FULL_SYNC`, {
     method: 'POST',
-    headers: JSON_HEADERS,
-    body: syncBody(guid, 'FULL_SYNC'),
   })
   if (!res.ok) alert(`Error al cancelar sync: el servicio devolvió ${res.status}`)
 }
@@ -142,24 +128,24 @@ export async function dm_shared_testConnection({ guid, state, serviceBase }: Act
     return
   }
 
-  const res    = await fetch(`${serviceBase}/api/data-managers/${guid}/status`, {
+  const res    = await fetch(`${serviceBase}/api/data-managers/${guid}/test-connection`, {
     method:  'POST',
     headers: JSON_HEADERS,
     body:    JSON.stringify(state),
   })
   const result = await res.json().catch(() => null)
 
-  if (result?.success) {
+  if (res.ok) {
     show({
       success: true,
       title:   'Test Connection',
-      message: result.message ? result.message : 'Connection successful.',
+      message: 'Connection successful.',
     })
   } else {
     show({
       success: false,
       title:   'Test Connection',
-      message: result?.error ?? `Service returned ${res.status}.`,
+      message: result?.Error ?? `Service returned ${res.status}.`,
     })
   }
 }
@@ -184,6 +170,6 @@ export function dm_shared_editCustomSync({ guid, state, serviceBase, customSyncT
 // ─── Activity ─────────────────────────────────────────────────────────────────
 
 export async function dm_shared_sendActivitySync({ serviceBase }: ActionContext): Promise<void> {
-  const res = await fetch(`${serviceBase}/api/sync/activity`, { method: 'POST' })
+  const res = await fetch(`${serviceBase}/api/data-managers/send-activity-sync`, { method: 'POST' })
   if (!res.ok) alert(`Error en activity sync: el servicio devolvió ${res.status}`)
 }

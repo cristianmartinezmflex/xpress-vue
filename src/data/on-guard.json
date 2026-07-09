@@ -626,7 +626,7 @@
             {
               "controls": [
                 {
-                  "id": "customBadgeFields",
+                  "id": "badge_custom_mapping",
                   "type": "keyvalue",
                   "title": "",
                   "key_title": "Source Columns",

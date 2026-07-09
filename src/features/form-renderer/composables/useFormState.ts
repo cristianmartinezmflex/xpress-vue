@@ -20,10 +20,18 @@ function coerceValue(value: any, control: Control): any {
     return isNaN(n) ? value : n
   }
 
-  // keyvalue: the service returns a plain object {"key": "value", ...}
-  // but ControlKeyValue expects [{key, value}, ...].
+  // keyvalue: the service may return an array, a plain object, or a JSON string.
   if (control.type === 'keyvalue') {
     if (Array.isArray(value)) return value
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value)
+        if (Array.isArray(parsed)) return parsed
+        if (parsed && typeof parsed === 'object') {
+          return Object.entries(parsed).map(([k, v]) => ({ key: k, value: String(v) }))
+        }
+      } catch { /* fall through */ }
+    }
     if (value && typeof value === 'object') {
       return Object.entries(value).map(([k, v]) => ({ key: k, value: String(v) }))
     }
