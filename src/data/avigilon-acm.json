@@ -1,0 +1,198 @@
+﻿{
+  "tabs": [
+    {
+      "title": "Sync",
+      "sections": [
+        {
+          "title": "Sync Operations",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "sync_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_partial_sync", "title": "Partial Sync Now", "onClick": "dm_shared_runPartialSync" },
+                    { "id": "btn_full_sync",    "title": "Full Sync Now",    "onClick": "dm_shared_runFullSync"    }
+                  ]
+                },
+                { "id": "sync_log", "type": "log_view" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "General",
+      "sections": [
+        {
+          "title": "Connection",
+          "columns": [
+            {
+              "controls": [
+                { "id": "server_ip",          "type": "text",     "title": "Server",                    "default": "192.168.1.201", "validations": [{ "type": "required", "error": "Server is required" }] },
+                { "id": "server_port",         "type": "text",     "title": "Port",                      "default": "443" },
+                { "id": "username",            "type": "text",     "title": "Username",                  "default": "admin" },
+                { "id": "password",            "type": "password", "title": "Password",                  "default": "" },
+                { "id": "use_ssl",             "type": "boolean",  "title": "Use SSL",                   "default": true },
+                { "id": "validate_ssl_cert",   "type": "boolean",  "title": "Validate SSL Certificate",  "default": true },
+                { "id": "verbose_api_data",    "type": "boolean",  "title": "Verbose API Logging",       "default": false }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Sync Options",
+          "columns": [
+            {
+              "controls": [
+                { "id": "partial_sync_users",          "type": "boolean",        "title": "Partial Sync Modified Identities",      "default": true },
+                { "id": "use_local_grant_for_success", "type": "boolean",        "title": "Use Local Grant for Activity Success",  "default": true },
+                { "id": "from_zone_id", "type": "select_dynamic", "title": "Doors From Zone", "loadFrom": "avigilon/zones", "default": -1 },
+                { "id": "to_zone_id",   "type": "select_dynamic", "title": "Doors To Zone",   "loadFrom": "avigilon/zones", "default": -1 },
+                { "id": "xml_events_port",             "type": "text",           "title": "XML Events Port (blank = disabled)",   "default": "" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Activity & Occupancy",
+          "columns": [
+            {
+              "controls": [
+                { "id": "sync_dm_activities",          "type": "boolean", "title": "Sync DM Activities",                   "default": true },
+                { "id": "sync_xpe_activities",         "type": "boolean", "title": "Sync XPressEntry Activities",          "default": true },
+                { "id": "pull_data_manager_occupancy", "type": "boolean", "title": "Pull Occupancy from Data Manager",     "default": true },
+                { "id": "send_xpe_live_activities",    "type": "boolean", "title": "Send XPressEntry Live Activities",     "default": false },
+                { "id": "send_xpe_record_updates",     "type": "boolean", "title": "Send XPressEntry Record Updates",      "default": false },
+                { "id": "send_xpe_visitor_updates_only","type": "boolean","title": "Send Visitor Updates Only",            "default": false },
+                {
+                  "id": "convert_act_to_muster_type",
+                  "type": "select",
+                  "title": "Convert Activity to Muster Type",
+                  "values": [
+                    { "text": "None (don't convert)",     "value": "0" },
+                    { "text": "Muster Success",           "value": "1" },
+                    { "text": "Muster Success or Failure","value": "2" }
+                  ],
+                  "default": "0"
+                },
+                { "id": "retry_send_activities_count", "type": "number_spinner", "title": "Retry Send Activities Count", "default": 3, "validations": [{ "type": "min_max", "min": 0, "max": 100, "error": "Must be between 0 and 100" }] }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "MSMQ",
+          "columns": [
+            {
+              "controls": [
+                { "id": "enable_msmq",                  "type": "boolean",        "title": "Enable MSMQ",                    "default": true },
+                { "id": "msmq_name",                    "type": "text",           "title": "MSMQ Queue Name",                "default": ".\\Private$\\DataManagerEventACM" },
+                { "id": "msmq_loop_limit",              "type": "number_spinner", "title": "MSMQ Loop Limit",                "default": 10, "validations": [{ "type": "min_max", "min": 1, "max": 1000, "error": "Must be between 1 and 1000" }] },
+                { "id": "single_msmq_event_processing", "type": "boolean",        "title": "Single MSMQ Event Processing",   "default": false },
+                { "id": "software_event_retry_count",   "type": "number_spinner", "title": "Software Event Retry Count",     "default": 3, "validations": [{ "type": "min_max", "min": 0, "max": 100, "error": "Must be between 0 and 100" }] }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "PostGRE Transactions Connection",
+          "columns": [
+            {
+              "controls": [
+                { "id": "postgre_ip_address", "type": "text",     "title": "Server",   "default": "" },
+                { "id": "postgre_port",       "type": "text",     "title": "Port",     "default": "" },
+                { "id": "postgre_database",   "type": "text",     "title": "Database", "default": "TransactionDB" },
+                { "id": "postgre_username",   "type": "text",     "title": "Username", "default": "" },
+                { "id": "postgre_password",   "type": "password", "title": "Password", "default": "" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Door Relay (Pulse on Scan)",
+          "columns": [
+            {
+              "controls": [
+                { "id": "pulse_door_relay",  "type": "boolean",        "title": "Pulse Door Relay on Handheld Scan", "default": false },
+                { "id": "strike_dn_field",   "type": "text",           "title": "Strike DN Field",                  "default": "plasecdoorStrkDN" },
+                { "id": "pulse_duration",    "type": "number_spinner", "title": "Pulse Duration",                   "default": 0, "validations": [{ "type": "min_max", "min": 0, "max": 99999, "error": "Must be 0 or greater" }] }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Advanced",
+          "columns": [
+            {
+              "controls": [
+                { "id": "dm_enable_delete_activities_timer", "type": "boolean",        "title": "Enable Delete Activities Timer",    "default": false },
+                { "id": "dm_default_user_profile",          "type": "number_spinner", "title": "Default User Profile ID (-1 = none)", "default": -1, "validations": [{ "type": "min_max", "min": -1, "max": 999999, "error": "Must be -1 or a valid profile ID" }] },
+                { "id": "default_outside_zone_id",          "type": "number_spinner", "title": "Default Outside Zone ID (-1 = none)", "default": -1, "validations": [{ "type": "min_max", "min": -1, "max": 999999, "error": "Must be -1 or a valid zone ID" }] }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_general",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
+                    { "id": "btn_defaults",     "title": "Defaults",     "onClick": "setDefaults" },
+                    { "id": "btn_save",         "title": "Save",         "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Custom Mapping",
+      "sections": [
+        {
+          "title": "Identity Field Mappings",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "CustomFields",
+                  "type": "keyvalue",
+                  "title": "",
+                  "key_header": "ACM Identity Field",
+                  "value_header": "XPressEntry UDF Field",
+                  "default": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_mapping",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_load_fields",  "title": "Load ACM Fields", "onClick": "loadAvigilonFields" },
+                    { "id": "btn_save_mapping", "title": "Save",            "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

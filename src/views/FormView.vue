@@ -27,6 +27,7 @@ const schemaMap: Record<string, () => Promise<any>> = {
   'galaxy-rest':      () => import('@/data/galaxy-rest.json'),
   'on-guard':         () => import('@/data/on-guard.json'),
   'cloud-identity':   () => import('@/data/cloud-identity.json'),
+  'avigilon':         () => import('@/data/avigilon-acm.json'),
 }
 
 const title = computed(() => {
@@ -35,6 +36,7 @@ const title = computed(() => {
     'galaxy-rest':    'Galaxy REST Data Manager',
     'on-guard':       'OnGuard Data Manager',
     'cloud-identity': 'Cloud Identity Sync (Demo)',
+    'avigilon':       'Avigilon ACM Data Manager',
   }
   return map[route.params.schema as string] ?? 'Form'
 })
@@ -134,6 +136,26 @@ const { dispatch } = useDmActions(
       if (!ctx.guid) { showDialog({ success: false, title: 'Create Logical Source', message: 'No GUID provided.' }); return }
       const result = await onGuardPost('create-logical-source', ctx.guid)
       showDialog({ success: result.success, title: 'Create Logical Source & Readers', message: result.message })
+    },
+
+    // ── Avigilon-specific ──────────────────────────────────────────────────
+    'loadAvigilonFields': async (ctx) => {
+      if (!ctx.guid) { showDialog({ success: false, title: 'Load ACM Fields', message: 'No GUID provided.' }); return }
+      const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${ctx.guid}/avigilon/identity-fields`)
+      if (!res.ok) {
+        const body = await res.json().catch(() => null)
+        showDialog({ success: false, title: 'Load ACM Fields', message: body?.Error ?? `Service returned ${res.status}` })
+        return
+      }
+      const fields: string[] = await res.json()
+      const existing: { key: string; value: string }[] = ctx.state['CustomFields'] ?? []
+      const existingKeys = new Set(existing.map((r) => r.key))
+      const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
+      ctx.state['CustomFields'] = [...existing, ...newRows]
+      const msg = newRows.length > 0
+        ? `Se cargaron ${newRows.length} campo(s) nuevo(s) desde Avigilon ACM.`
+        : 'No hay nuevos campos (todos ya están mapeados).'
+      showDialog({ success: true, title: 'Load ACM Fields', message: msg })
     },
   },
 )

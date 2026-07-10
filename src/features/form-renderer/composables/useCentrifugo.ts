@@ -21,7 +21,13 @@ const subscribers = new Map<string, Set<LogCallback>>()
 function getClient(): Centrifuge {
   if (client) return client
 
-  client = new Centrifuge(CENTRIFUGO_WS_URL, { token: '' })
+  client = new Centrifuge(CENTRIFUGO_WS_URL, {
+    token: '',
+    minReconnectDelay: 5000,
+    maxReconnectDelay: 60000,
+  })
+
+  client.on('error', () => { /* suppress console noise when Centrifugo is not running */ })
 
   const sub = client.newSubscription(CENTRIFUGO_CHANNEL)
 
@@ -30,11 +36,9 @@ function getClient(): Centrifuge {
     const dmGuid: string | undefined = data.dmGuid?.toLowerCase()
     const entry = buildEntry(data)
 
-    // broadcast to subscribers for this DM guid
     if (dmGuid) {
       subscribers.get(dmGuid)?.forEach(cb => cb(entry))
     }
-    // also broadcast to wildcard subscribers (no guid filter)
     subscribers.get('*')?.forEach(cb => cb(entry))
   })
 

@@ -7,7 +7,8 @@ import ControlPassword from './controls/ControlPassword.vue'
 import ControlBoolean from './controls/ControlBoolean.vue'
 import ControlNumber from './controls/ControlNumber.vue'
 import ControlNumberSpinner from './controls/ControlNumberSpinner.vue'
-import ControlSelect from './controls/ControlSelect.vue'
+import ControlSelect        from './controls/ControlSelect.vue'
+import ControlSelectDynamic from './controls/ControlSelectDynamic.vue'
 import ControlRadio from './controls/ControlRadio.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
 import ControlKeyValue from './controls/ControlKeyValue.vue'
@@ -124,6 +125,17 @@ function isControlVisible(control: Control): boolean {
               :title="control.title"
               :model-value="state[control.id]"
               :values="control.values ?? []"
+              :error="errors[control.id]"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlSelectDynamic
+              v-else-if="control.type === 'select_dynamic'"
+              :title="control.title"
+              :model-value="state[control.id] ?? -1"
+              :load-from="control.loadFrom ?? ''"
+              :guid="guid"
+              :service-base="serviceBase"
               :error="errors[control.id]"
               @update:model-value="emit('update:state', control.id, $event)"
             />

@@ -62,6 +62,7 @@ export type ControlType =
   | 'number'
   | 'number_spinner'
   | 'select'
+  | 'select_dynamic'
   | 'radio'
   | 'button_bar'
   | 'keyvalue'
@@ -79,6 +80,7 @@ export interface Control {
   key_header?: string
   value_title?: string
   value_header?: string
+  loadFrom?: string   // used by select_dynamic: sub-path appended to /api/data-managers/{guid}/
   enable?: EnableProp
   display?: DisplayProp
 }

@@ -23,12 +23,23 @@ const JSON_HEADERS = { 'Content-Type': 'application/json' }
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
 
-export async function dm_shared_save({ guid, state, serviceBase }: ActionContext): Promise<void> {
+export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided — cannot save.'); return }
+
+  const body: Record<string, any> = { ...state }
+
+  // Avigilon stores CustomFields as a plain object (Hashtable), but the keyvalue
+  // control produces [{key, value}] arrays. Convert before sending.
+  if (schemaKey === 'avigilon' && Array.isArray(body['CustomFields'])) {
+    body['CustomFields'] = Object.fromEntries(
+      (body['CustomFields'] as { key: string; value: string }[]).map((r) => [r.key, r.value]),
+    )
+  }
+
   const res = await fetch(`${serviceBase}/api/data-managers/${guid}`, {
     method: 'PUT',
     headers: JSON_HEADERS,
-    body: JSON.stringify(state),
+    body: JSON.stringify(body),
   })
   if (!res.ok) alert(`Error al guardar: el servicio devolvió ${res.status}`)
 }
@@ -120,7 +131,7 @@ export function dm_shared_setupDataManager({ guid, schemaKey, navigate }: Action
 
 // ─── Test Connection ──────────────────────────────────────────────────────────
 
-export async function dm_shared_testConnection({ guid, state, serviceBase }: ActionContext): Promise<void> {
+export async function dm_shared_testConnection({ guid, state, serviceBase, schemaKey }: ActionContext): Promise<void> {
   const { show } = useDialog()
 
   if (!guid) {
@@ -128,10 +139,17 @@ export async function dm_shared_testConnection({ guid, state, serviceBase }: Act
     return
   }
 
+  const body: Record<string, any> = { ...state }
+  if (schemaKey === 'avigilon' && Array.isArray(body['CustomFields'])) {
+    body['CustomFields'] = Object.fromEntries(
+      (body['CustomFields'] as { key: string; value: string }[]).map((r) => [r.key, r.value]),
+    )
+  }
+
   const res    = await fetch(`${serviceBase}/api/data-managers/${guid}/test-connection`, {
     method:  'POST',
     headers: JSON_HEADERS,
-    body:    JSON.stringify(state),
+    body:    JSON.stringify(body),
   })
   const result = await res.json().catch(() => null)
 
@@ -142,11 +160,10 @@ export async function dm_shared_testConnection({ guid, state, serviceBase }: Act
       message: 'Connection successful.',
     })
   } else {
-    show({
-      success: false,
-      title:   'Test Connection',
-      message: result?.Error ?? `Service returned ${res.status}.`,
-    })
+    const raw: string = result?.Error ?? `Service returned ${res.status}.`
+    // Show only the first meaningful line — avoid dumping a full stack trace.
+    const message = raw.split(/\r?\n/).find((l) => l.trim().length > 0) ?? raw
+    show({ success: false, title: 'Test Connection', message })
   }
 }
 

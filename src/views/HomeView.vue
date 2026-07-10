@@ -21,13 +21,15 @@ const dataManagers = ref<DataManagerItem[]>([])
 // Maps data_manager_type int → Vue schema key (only types with a JSON schema defined)
 const DM_TYPE_SCHEMA: Record<number, string> = {
   1:  'on-guard',
+  45: 'avigilon',
   61: 'galaxy-rest',
 }
 
 // Icon/badge for API-loaded DMs (keyed by schema key)
 const DM_META: Record<string, { icon: string; badge: string; badgeColor: string }> = {
-  'on-guard':    { icon: '🛡️', badge: 'OnGuard',     badgeColor: 'bg-green-100 text-green-700' },
-  'galaxy-rest': { icon: '🔗', badge: 'Galaxy REST',  badgeColor: 'bg-blue-100 text-blue-700'  },
+  'on-guard':    { icon: '🛡️', badge: 'OnGuard',      badgeColor: 'bg-green-100 text-green-700'  },
+  'avigilon':    { icon: '📷', badge: 'Avigilon ACM',  badgeColor: 'bg-orange-100 text-orange-700' },
+  'galaxy-rest': { icon: '🔗', badge: 'Galaxy REST',   badgeColor: 'bg-blue-100 text-blue-700'    },
 }
 
 // Local/demo schemas — always shown regardless of API state
