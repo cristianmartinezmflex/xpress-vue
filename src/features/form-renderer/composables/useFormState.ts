@@ -38,6 +38,16 @@ function coerceValue(value: any, control: Control): any {
     return []
   }
 
+  // multiselect_dynamic: value is already a vbBack-separated string — pass through.
+  // socket_interfaces / ip_badge_mappings: already a vbBack-separated XML string — pass through.
+  if (
+    control.type === 'multiselect_dynamic' ||
+    control.type === 'socket_interfaces' ||
+    control.type === 'ip_badge_mappings'
+  ) {
+    return typeof value === 'string' ? value : ''
+  }
+
   return value
 }
 

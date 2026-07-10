@@ -28,12 +28,22 @@ export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: Ac
 
   const body: Record<string, any> = { ...state }
 
-  // Avigilon stores CustomFields as a plain object (Hashtable), but the keyvalue
-  // control produces [{key, value}] arrays. Convert before sending.
+  // Avigilon: CustomFields keyvalue array → plain object (Hashtable)
   if (schemaKey === 'avigilon' && Array.isArray(body['CustomFields'])) {
     body['CustomFields'] = Object.fromEntries(
       (body['CustomFields'] as { key: string; value: string }[]).map((r) => [r.key, r.value]),
     )
+  }
+
+  // AEOS: keyvalue arrays → plain objects (Hashtable)
+  if (schemaKey === 'aeos') {
+    for (const field of ['emp_fields', 'visitor_fields', 'contractor_fields']) {
+      if (Array.isArray(body[field])) {
+        body[field] = Object.fromEntries(
+          (body[field] as { key: string; value: string }[]).map((r) => [r.key, r.value]),
+        )
+      }
+    }
   }
 
   const res = await fetch(`${serviceBase}/api/data-managers/${guid}`, {
@@ -144,6 +154,15 @@ export async function dm_shared_testConnection({ guid, state, serviceBase, schem
     body['CustomFields'] = Object.fromEntries(
       (body['CustomFields'] as { key: string; value: string }[]).map((r) => [r.key, r.value]),
     )
+  }
+  if (schemaKey === 'aeos') {
+    for (const field of ['emp_fields', 'visitor_fields', 'contractor_fields']) {
+      if (Array.isArray(body[field])) {
+        body[field] = Object.fromEntries(
+          (body[field] as { key: string; value: string }[]).map((r) => [r.key, r.value]),
+        )
+      }
+    }
   }
 
   const res    = await fetch(`${serviceBase}/api/data-managers/${guid}/test-connection`, {

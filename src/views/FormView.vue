@@ -28,6 +28,7 @@ const schemaMap: Record<string, () => Promise<any>> = {
   'on-guard':         () => import('@/data/on-guard.json'),
   'cloud-identity':   () => import('@/data/cloud-identity.json'),
   'avigilon':         () => import('@/data/avigilon-acm.json'),
+  'aeos':             () => import('@/data/aeos.json'),
 }
 
 const title = computed(() => {
@@ -37,6 +38,7 @@ const title = computed(() => {
     'on-guard':       'OnGuard Data Manager',
     'cloud-identity': 'Cloud Identity Sync (Demo)',
     'avigilon':       'Avigilon ACM Data Manager',
+    'aeos':           'Nedap AEOS Data Manager',
   }
   return map[route.params.schema as string] ?? 'Form'
 })
@@ -136,6 +138,55 @@ const { dispatch } = useDmActions(
       if (!ctx.guid) { showDialog({ success: false, title: 'Create Logical Source', message: 'No GUID provided.' }); return }
       const result = await onGuardPost('create-logical-source', ctx.guid)
       showDialog({ success: result.success, title: 'Create Logical Source & Readers', message: result.message })
+    },
+
+    // ── AEOS-specific ─────────────────────────────────────────────────────
+    'loadAeosUserFields': async (ctx) => {
+      if (!ctx.guid) { showDialog({ success: false, title: 'Load AEOS Fields', message: 'No GUID provided.' }); return }
+      const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${ctx.guid}/aeos/employee-fields`)
+      if (!res.ok) {
+        const body = await res.json().catch(() => null)
+        showDialog({ success: false, title: 'Load AEOS Fields', message: body?.Error ?? `Service returned ${res.status}` })
+        return
+      }
+      const fields: string[] = await res.json()
+      const existing: { key: string; value: string }[] = ctx.state['emp_fields'] ?? []
+      const existingKeys = new Set(existing.map((r) => r.key))
+      const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
+      ctx.state['emp_fields'] = [...existing, ...newRows]
+      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Se cargaron ${newRows.length} campo(s) nuevo(s).` : 'No hay nuevos campos.' })
+    },
+
+    'loadAeosVisitorFields': async (ctx) => {
+      if (!ctx.guid) { showDialog({ success: false, title: 'Load AEOS Fields', message: 'No GUID provided.' }); return }
+      const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${ctx.guid}/aeos/visitor-fields`)
+      if (!res.ok) {
+        const body = await res.json().catch(() => null)
+        showDialog({ success: false, title: 'Load AEOS Fields', message: body?.Error ?? `Service returned ${res.status}` })
+        return
+      }
+      const fields: string[] = await res.json()
+      const existing: { key: string; value: string }[] = ctx.state['visitor_fields'] ?? []
+      const existingKeys = new Set(existing.map((r) => r.key))
+      const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
+      ctx.state['visitor_fields'] = [...existing, ...newRows]
+      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Se cargaron ${newRows.length} campo(s) nuevo(s).` : 'No hay nuevos campos.' })
+    },
+
+    'loadAeosContractorFields': async (ctx) => {
+      if (!ctx.guid) { showDialog({ success: false, title: 'Load AEOS Fields', message: 'No GUID provided.' }); return }
+      const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${ctx.guid}/aeos/contractor-fields`)
+      if (!res.ok) {
+        const body = await res.json().catch(() => null)
+        showDialog({ success: false, title: 'Load AEOS Fields', message: body?.Error ?? `Service returned ${res.status}` })
+        return
+      }
+      const fields: string[] = await res.json()
+      const existing: { key: string; value: string }[] = ctx.state['contractor_fields'] ?? []
+      const existingKeys = new Set(existing.map((r) => r.key))
+      const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
+      ctx.state['contractor_fields'] = [...existing, ...newRows]
+      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Se cargaron ${newRows.length} campo(s) nuevo(s).` : 'No hay nuevos campos.' })
     },
 
     // ── Avigilon-specific ──────────────────────────────────────────────────

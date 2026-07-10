@@ -1,0 +1,339 @@
+{
+  "tabs": [
+    {
+      "title": "Sync",
+      "sections": [
+        {
+          "title": "Sync Operations",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "sync_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_partial_sync", "title": "Partial Sync Now", "onClick": "dm_shared_runPartialSync" },
+                    { "id": "btn_full_sync",    "title": "Full Sync Now",    "onClick": "dm_shared_runFullSync"    }
+                  ]
+                },
+                { "id": "sync_log", "type": "log_view" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "General",
+      "sections": [
+        {
+          "title": "Connection",
+          "columns": [
+            {
+              "controls": [
+                { "id": "server_ip",   "type": "text",     "title": "Server",   "default": "localhost",    "validations": [{ "type": "required", "error": "Server is required" }] },
+                { "id": "server_port", "type": "text",     "title": "Port",     "default": "8443" },
+                { "id": "login",       "type": "text",     "title": "User",     "default": "administrator" },
+                { "id": "password",    "type": "password", "title": "Password", "default": "aeosrules" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Options",
+          "columns": [
+            {
+              "controls": [
+                { "id": "enable_paging",                     "type": "boolean",        "title": "Enable User Paging",              "default": true },
+                { "id": "page_size",                         "type": "number_spinner", "title": "Page Size",                       "default": 100, "validations": [{ "type": "min_max", "min": 1, "max": 5000, "error": "Must be between 1 and 5000" }] },
+                { "id": "events_port",                       "type": "text",           "title": "Socket Port",                     "default": "8035" },
+                { "id": "valid_access_events",               "type": "text",           "title": "APB Events",                      "default": "1015" },
+                { "id": "auto_assign_entrance_areas",        "type": "boolean",        "title": "Auto Assign Areas to Doors",      "default": false },
+                { "id": "outside_area_id",                   "type": "select_dynamic", "title": "Outside Area",                    "loadFrom": "aeos/zones", "default": -1 },
+                { "id": "inside_area_id",                    "type": "select_dynamic", "title": "Inside Area",                     "loadFrom": "aeos/zones", "default": -1 },
+                { "id": "pull_contact_persons_for_users",    "type": "boolean",        "title": "Pull Contact Person for Users",   "default": false },
+                { "id": "default_identifier_type",           "type": "select_dynamic", "title": "Default Identifier Type for Unknown Cards", "loadFrom": "aeos/badge-types", "default": -1 }
+              ]
+            },
+            {
+              "controls": [
+                { "id": "verbose_tcp",                           "type": "boolean", "title": "TCP Interface Verbose",                 "default": false },
+                { "id": "debug_data",                            "type": "boolean", "title": "SOAP Verbose Log",                      "default": false },
+                { "id": "use_ip_badge",                          "type": "boolean", "title": "Use IPBadge for Activities",            "default": false },
+                { "id": "ip_badge_fallback_to_socket_interface", "type": "boolean", "title": "IPBadge Fall Back to Socket Interface", "default": false }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_general",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
+                    { "id": "btn_defaults",     "title": "Defaults",     "onClick": "setDefaults" },
+                    { "id": "btn_save",         "title": "Save",         "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Socket Interface",
+      "sections": [
+        {
+          "title": "Socket Interfaces",
+          "columns": [
+            {
+              "controls": [
+                { "id": "send_socket_activities_to_access_points", "type": "boolean",          "title": "Send to Access Points", "default": false },
+                { "id": "socket_interface_settings",               "type": "socket_interfaces", "title": "Socket Interfaces" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_socket",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_save_socket", "title": "Save", "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "IP Badge Mappings",
+      "sections": [
+        {
+          "title": "IP Badge Mappings",
+          "columns": [
+            {
+              "controls": [
+                { "id": "activity_timeout",  "type": "number_spinner",  "title": "Activity Timeout (seconds)", "default": 600, "validations": [{ "type": "min_max", "min": 0, "max": 99999, "error": "Must be 0 or greater" }] },
+                { "id": "ip_badge_settings", "type": "ip_badge_mappings","title": "IP Badge Mappings" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_ipbadge",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_save_ipbadge", "title": "Save", "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Identifier Types",
+      "sections": [
+        {
+          "title": "Enabled Identifier Types",
+          "columns": [
+            {
+              "controls": [
+                { "id": "identifier_types_selected", "type": "multiselect_dynamic", "title": "Identifier Types", "loadFrom": "aeos/badge-types", "default": "" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_identifiers",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_save_identifiers", "title": "Save", "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Event Settings",
+      "sections": [
+        {
+          "title": "Event Filter",
+          "columns": [
+            {
+              "controls": [
+                { "id": "enable_event_filter", "type": "boolean", "title": "Enable Events Filter", "default": false },
+                { "id": "event_filter",        "type": "text",    "title": "Filter Name",          "default": "" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "User Search",
+          "columns": [
+            {
+              "controls": [
+                { "id": "search_users_in_events_with_name",   "type": "boolean",        "title": "Enable User Search with Name",             "default": true  },
+                { "id": "enable_user_event_filter",           "type": "boolean",        "title": "Enable User Filter for Events",            "default": false },
+                { "id": "user_event_filter",                  "type": "text",           "title": "User Event Filter",                        "default": "" },
+                { "id": "events_user_search_limit",           "type": "number_spinner", "title": "Events User Search Limit",                 "default": 5,   "validations": [{ "type": "min_max", "min": 0, "max": 9999, "error": "Must be 0 or greater" }] },
+                { "id": "modification_date_filter_mins",      "type": "number_spinner", "title": "Modification Range Filter (Minutes)",      "default": 0,   "validations": [{ "type": "min_max", "min": 0, "max": 9999, "error": "Must be 0 or greater" }] },
+                { "id": "delete_user_in_badge_delete_events", "type": "boolean",        "title": "Delete Users Only in Badge Delete Events", "default": false }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Extra Filters",
+          "columns": [
+            {
+              "controls": [
+                { "id": "process_profile_update_events",       "type": "boolean", "title": "Process Profile Update Events",       "default": false },
+                { "id": "download_pictures_in_events",         "type": "boolean", "title": "Download Pictures in User Events",    "default": true  },
+                { "id": "process_users_in_badge_issue_events", "type": "boolean", "title": "Process Users in Badge Issue Events", "default": true  }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_events",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_save_events", "title": "Save", "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Employee",
+      "sections": [
+        {
+          "title": "Employee Field Mappings",
+          "columns": [
+            {
+              "controls": [
+                { "id": "emp_fields", "type": "keyvalue", "title": "", "key_header": "Source Field", "value_header": "XPressEntry Field", "default": [] }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_emp",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_load_emp_fields", "title": "Load AEOS Fields", "onClick": "loadAeosUserFields" },
+                    { "id": "btn_save_emp",        "title": "Save",             "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Visitor",
+      "sections": [
+        {
+          "title": "Visitor Field Mappings",
+          "columns": [
+            {
+              "controls": [
+                { "id": "visitor_fields", "type": "keyvalue", "title": "", "key_header": "Source Field", "value_header": "XPressEntry Field", "default": [] }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_visitor",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_load_visitor_fields", "title": "Load AEOS Fields", "onClick": "loadAeosVisitorFields" },
+                    { "id": "btn_save_visitor",        "title": "Save",             "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Contractor",
+      "sections": [
+        {
+          "title": "Contractor Field Mappings",
+          "columns": [
+            {
+              "controls": [
+                { "id": "contractor_fields", "type": "keyvalue", "title": "", "key_header": "Source Field", "value_header": "XPressEntry Field", "default": [] }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_contractor",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_load_contractor_fields", "title": "Load AEOS Fields", "onClick": "loadAeosContractorFields" },
+                    { "id": "btn_save_contractor",        "title": "Save",             "onClick": "dm_shared_save" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

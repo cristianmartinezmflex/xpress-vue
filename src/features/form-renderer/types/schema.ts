@@ -63,10 +63,13 @@ export type ControlType =
   | 'number_spinner'
   | 'select'
   | 'select_dynamic'
+  | 'multiselect_dynamic'
   | 'radio'
   | 'button_bar'
   | 'keyvalue'
   | 'log_view'
+  | 'socket_interfaces'
+  | 'ip_badge_mappings'
 
 export interface Control {
   id: string

@@ -11,8 +11,11 @@ import ControlSelect        from './controls/ControlSelect.vue'
 import ControlSelectDynamic from './controls/ControlSelectDynamic.vue'
 import ControlRadio from './controls/ControlRadio.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
-import ControlKeyValue from './controls/ControlKeyValue.vue'
-import ControlLogView  from './controls/ControlLogView.vue'
+import ControlKeyValue             from './controls/ControlKeyValue.vue'
+import ControlLogView              from './controls/ControlLogView.vue'
+import ControlMultiselectDynamic   from './controls/ControlMultiselectDynamic.vue'
+import ControlSocketInterfaces     from './controls/ControlSocketInterfaces.vue'
+import ControlIpBadgeMappings      from './controls/ControlIpBadgeMappings.vue'
 
 const props = defineProps<{
   title?: string
@@ -170,6 +173,30 @@ function isControlVisible(control: Control): boolean {
               :value-title="control.value_title"
               :value-header="control.value_header"
               :model-value="state[control.id] ?? []"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlMultiselectDynamic
+              v-else-if="control.type === 'multiselect_dynamic'"
+              :title="control.title"
+              :model-value="state[control.id] ?? ''"
+              :load-from="control.loadFrom ?? ''"
+              :guid="guid"
+              :service-base="serviceBase"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlSocketInterfaces
+              v-else-if="control.type === 'socket_interfaces'"
+              :title="control.title"
+              :model-value="state[control.id] ?? ''"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlIpBadgeMappings
+              v-else-if="control.type === 'ip_badge_mappings'"
+              :title="control.title"
+              :model-value="state[control.id] ?? ''"
               @update:model-value="emit('update:state', control.id, $event)"
             />
           </div>
