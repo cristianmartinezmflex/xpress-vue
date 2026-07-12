@@ -70,6 +70,8 @@ export type ControlType =
   | 'log_view'
   | 'socket_interfaces'
   | 'ip_badge_mappings'
+  | 'rio_devices'
+  | 'site_timezones'
 
 export interface Control {
   id: string

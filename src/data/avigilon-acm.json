@@ -12,8 +12,9 @@
                   "id": "sync_buttons",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_partial_sync", "title": "Partial Sync Now", "onClick": "dm_shared_runPartialSync" },
-                    { "id": "btn_full_sync",    "title": "Full Sync Now",    "onClick": "dm_shared_runFullSync"    }
+                    { "id": "btn_partial_sync", "title": "Partial Sync Now", "onClick": "dm_shared_runPartialSync", "tooltip": "Pull the latest table changes from the external system. Partial syncs are incremental changes to Users and Badges, if allowed by the external system's API." },
+                    { "id": "btn_full_sync",    "title": "Full Sync Now",    "onClick": "dm_shared_runFullSync",    "tooltip": "Pull all records from the external system. Replaces the full local dataset with the current state of the external system." },
+                    { "id": "btn_custom_sync",  "title": "Custom Sync Now", "onClick": "dm_shared_runCustomSync", "tooltip": "Run a custom sync operation defined by this data manager. Right-click to edit the custom sync tables.", "rightClickMenu": [{ "label": "Edit Custom Sync", "onClick": "dm_shared_editCustomSync" }] }
                   ]
                 },
                 { "id": "sync_log", "type": "log_view" }
@@ -144,9 +145,9 @@
                   "id": "btn_bar_general",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
-                    { "id": "btn_defaults",     "title": "Defaults",     "onClick": "setDefaults" },
-                    { "id": "btn_save",         "title": "Save",         "onClick": "dm_shared_save" }
+                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the Avigilon ACM server using the current credentials." },
+                    { "id": "btn_defaults",     "title": "Defaults",     "onClick": "setDefaults",               "tooltip": "Reset all settings on this tab to their default values." },
+                    { "id": "btn_save",         "title": "Save",         "onClick": "dm_shared_save",            "tooltip": "Save the current settings." }
                   ]
                 }
               ]
@@ -184,8 +185,8 @@
                   "id": "btn_bar_mapping",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_load_fields",  "title": "Load ACM Fields", "onClick": "loadAvigilonFields" },
-                    { "id": "btn_save_mapping", "title": "Save",            "onClick": "dm_shared_save" }
+                    { "id": "btn_load_fields",  "title": "Load ACM Fields", "onClick": "loadAvigilonFields", "tooltip": "Load available identity fields from the Avigilon ACM system for custom field mapping." },
+                    { "id": "btn_save_mapping", "title": "Save",            "onClick": "dm_shared_save",     "tooltip": "Save the current custom field mappings." }
                   ]
                 }
               ]

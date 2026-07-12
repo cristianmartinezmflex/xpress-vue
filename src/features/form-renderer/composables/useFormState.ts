@@ -48,6 +48,15 @@ function coerceValue(value: any, control: Control): any {
     return typeof value === 'string' ? value : ''
   }
 
+  // rio_devices / site_timezones: stored as JSON — serialize object/array to string for round-trip.
+  if (control.type === 'rio_devices' || control.type === 'site_timezones') {
+    if (typeof value === 'string') return value
+    if (Array.isArray(value) || (value && typeof value === 'object')) {
+      return JSON.stringify(value)
+    }
+    return ''
+  }
+
   return value
 }
 

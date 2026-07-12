@@ -16,6 +16,8 @@ import ControlLogView              from './controls/ControlLogView.vue'
 import ControlMultiselectDynamic   from './controls/ControlMultiselectDynamic.vue'
 import ControlSocketInterfaces     from './controls/ControlSocketInterfaces.vue'
 import ControlIpBadgeMappings      from './controls/ControlIpBadgeMappings.vue'
+import ControlRioDevices           from './controls/ControlRioDevices.vue'
+import ControlSiteTimezones        from './controls/ControlSiteTimezones.vue'
 
 const props = defineProps<{
   title?: string
@@ -197,6 +199,25 @@ function isControlVisible(control: Control): boolean {
               v-else-if="control.type === 'ip_badge_mappings'"
               :title="control.title"
               :model-value="state[control.id] ?? ''"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlRioDevices
+              v-else-if="control.type === 'rio_devices'"
+              :title="control.title"
+              :model-value="state[control.id] ?? ''"
+              :guid="guid"
+              :service-base="serviceBase"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlSiteTimezones
+              v-else-if="control.type === 'site_timezones'"
+              :title="control.title"
+              :model-value="state[control.id] ?? ''"
+              :guid="guid"
+              :service-base="serviceBase"
+              :state="state"
               @update:model-value="emit('update:state', control.id, $event)"
             />
           </div>

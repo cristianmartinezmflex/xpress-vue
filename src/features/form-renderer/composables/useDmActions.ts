@@ -14,12 +14,9 @@ export function useDmActions(
   async function dispatch(handler: string): Promise<void> {
     const ctx = getContext()
 
-    if (handler.startsWith('dm_shared_')) {
-      const fn = (DmSharedFunctions as Record<string, ActionFn>)[handler]
-      if (fn) { await fn(ctx); return }
-      console.warn(`[useDmActions] Shared function not found: "${handler}". Add it to dm-shared-actions.ts.`)
-      return
-    }
+    // Check dm-shared-actions.ts for any handler (dm_shared_* or dm-type-specific like genetec_*)
+    const sharedFn = (DmSharedFunctions as Record<string, ActionFn>)[handler]
+    if (sharedFn) { await sharedFn(ctx); return }
 
     const fn = dmSpecificActions[handler]
     if (fn) { await fn(ctx); return }

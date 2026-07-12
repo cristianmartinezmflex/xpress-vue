@@ -1,0 +1,185 @@
+{
+  "tabs": [
+    {
+      "title": "Sync",
+      "sections": [
+        {
+          "title": "Sync Operations",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "sync_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_partial_sync", "title": "Partial Sync Now", "onClick": "dm_shared_runPartialSync", "tooltip": "Pull the latest table changes from the external system. Partial syncs are incremental changes to Users and Badges, if allowed by the external system's API." },
+                    { "id": "btn_full_sync",    "title": "Full Sync Now",    "onClick": "dm_shared_runFullSync",    "tooltip": "Pull all records from the external system. Replaces the full local dataset with the current state of the external system." },
+                    { "id": "btn_custom_sync",  "title": "Custom Sync Now", "onClick": "dm_shared_runCustomSync", "tooltip": "Run a custom sync operation defined by this data manager. Right-click to edit the custom sync tables.", "rightClickMenu": [{ "label": "Edit Custom Sync", "onClick": "dm_shared_editCustomSync" }] }
+                  ]
+                },
+                { "id": "sync_log", "type": "log_view" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "General",
+      "sections": [
+        {
+          "title": "SDK Connection",
+          "columns": [
+            {
+              "controls": [
+                { "id": "server_ip", "type": "text",     "title": "Server",   "default": "localhost", "validations": [{ "type": "required", "error": "Server is required" }] },
+                { "id": "login",     "type": "text",     "title": "Username", "default": "admin" },
+                { "id": "password",  "type": "password", "title": "Password", "default": "" }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "sdk_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_test", "title": "Test Connection", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the Genetec Security Center using the current credentials." }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Data Settings",
+          "columns": [
+            {
+              "controls": [
+                { "id": "related_data",                  "type": "boolean",        "title": "Download Related Data",            "default": true },
+                { "id": "update_cardholder_occupancy",   "type": "boolean",        "title": "Update Cardholder Occupancy",      "default": true },
+                { "id": "use_raw_data",                  "type": "boolean",        "title": "Use Raw Data",                     "default": false },
+                { "id": "page_size",                     "type": "number_spinner", "title": "Page Size",                        "default": 10000, "validations": [{ "type": "min_max", "min": 1, "max": 100000, "error": "Must be between 1 and 100000" }] },
+                { "id": "min_hours_of_activities_to_pull","type": "number_spinner","title": "Min Hours of Activities to Pull",  "default": 4 }
+              ]
+            },
+            {
+              "controls": [
+                { "id": "rio_enabled",       "type": "boolean",        "title": "Enable CloudLink (RIO)",    "default": true },
+                { "id": "rio_reader_timeout","type": "number_spinner", "title": "RIO Reader Timeout (ms)",   "default": 3000 }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Custom Card Format",
+          "columns": [
+            {
+              "controls": [
+                { "id": "custom_card_format",  "type": "boolean",        "title": "Use Custom Card Format", "default": false }
+              ]
+            },
+            {
+              "controls": [
+                { "id": "card_num_start_bit",  "type": "number_spinner", "title": "Card Number Start Bit",  "default": 0, "enable": "custom_card_format == true" },
+                { "id": "card_num_bit_length", "type": "number_spinner", "title": "Card Number Bit Length",  "default": 0, "enable": "custom_card_format == true" },
+                { "id": "fc_start_bit",        "type": "number_spinner", "title": "Facility Code Start Bit","default": 0, "enable": "custom_card_format == true" },
+                { "id": "fc_bit_length",       "type": "number_spinner", "title": "Facility Code Bit Length","default": 0, "enable": "custom_card_format == true" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "CloudLink",
+      "sections": [
+        {
+          "title": "CloudLink (RIO) Devices",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "cloudlink_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_sync_doors",  "title": "Sync Doors from Genetec", "onClick": "genetec_syncDoors", "enable": "rio_enabled == true", "tooltip": "Synchronize door and reader data from the Genetec Security Center into XPressEntry." },
+                    { "id": "btn_save_first",  "title": "Save Settings",           "onClick": "dm_shared_save",   "tooltip": "Save the current settings before configuring CloudLink devices." }
+                  ]
+                },
+                {
+                  "id": "rio_list",
+                  "type": "rio_devices",
+                  "title": "CloudLink Devices"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Custom",
+      "sections": [
+        {
+          "title": "Custom Field Mapping",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "customfields_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_load_fields", "title": "Load Genetec Custom Fields", "onClick": "genetec_loadCustomFields", "tooltip": "Load available custom cardholder fields from the Genetec Security Center." }
+                  ]
+                },
+                {
+                  "id": "customFields",
+                  "type": "keyvalue",
+                  "title": "Custom Fields (Genetec Field → XPE Field)",
+                  "key_title": "Genetec Field",
+                  "key_header": "Genetec Field",
+                  "value_title": "XPE Field",
+                  "value_header": "XPE Field"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Event Names",
+          "columns": [
+            {
+              "controls": [
+                { "id": "cardholder_event_name",        "type": "text", "title": "Cardholder Event Name",        "default": "" },
+                { "id": "cardholder_event_name_denied",  "type": "text", "title": "Cardholder Denied Event Name", "default": "" },
+                { "id": "credential_event_name",         "type": "text", "title": "Credential Event Name",        "default": "" },
+                { "id": "credential_event_name_denied",  "type": "text", "title": "Credential Denied Event Name", "default": "" },
+                { "id": "zone_event_name",               "type": "text", "title": "Zone / Area Event Name",       "default": "" }
+              ]
+            },
+            {
+              "controls": [
+                { "id": "cardholder_events",    "type": "boolean", "title": "Cardholder Software Events",   "default": true },
+                { "id": "credential_events",    "type": "boolean", "title": "Credential Software Events",   "default": true },
+                { "id": "access_rule_events",   "type": "boolean", "title": "Access Rule Software Events",  "default": true }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Credential Fields",
+          "columns": [
+            {
+              "controls": [
+                { "id": "custom_credential_field_1", "type": "text", "title": "Custom Credential Field 1", "default": "" },
+                { "id": "custom_credential_field_2", "type": "text", "title": "Custom Credential Field 2", "default": "" },
+                { "id": "custom_credential_field_3", "type": "text", "title": "Custom Credential Field 3", "default": "" },
+                { "id": "send_wiegand_on_searched",  "type": "boolean", "title": "Send Wiegand on Searched", "default": false }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

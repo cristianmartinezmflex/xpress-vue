@@ -46,6 +46,35 @@ export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: Ac
     }
   }
 
+  // RS2 REST: custom_fields_users keyvalue array → plain object, site_timezones array → plain object
+  if (schemaKey === 'rs2-rest') {
+    if (Array.isArray(body['custom_fields_users'])) {
+      body['custom_fields_users'] = Object.fromEntries(
+        (body['custom_fields_users'] as { key: string; value: string }[]).map((r) => [r.key, r.value]),
+      )
+    }
+    if (typeof body['site_timezones'] === 'string' && body['site_timezones']) {
+      try {
+        const arr = JSON.parse(body['site_timezones']) as { siteId: string; timezone: string }[]
+        if (Array.isArray(arr)) {
+          body['site_timezones'] = Object.fromEntries(arr.map((r) => [r.siteId, r.timezone]))
+        }
+      } catch { /* leave as-is */ }
+    }
+  }
+
+  // Genetec: customFields keyvalue array → plain object (Hashtable), rio_list JSON string → array
+  if (schemaKey === 'genetec') {
+    if (Array.isArray(body['customFields'])) {
+      body['customFields'] = Object.fromEntries(
+        (body['customFields'] as { key: string; value: string }[]).map((r) => [r.key, r.value]),
+      )
+    }
+    if (typeof body['rio_list'] === 'string' && body['rio_list']) {
+      try { body['rio_list'] = JSON.parse(body['rio_list']) } catch { /* leave as-is */ }
+    }
+  }
+
   const res = await fetch(`${serviceBase}/api/data-managers/${guid}`, {
     method: 'PUT',
     headers: JSON_HEADERS,
@@ -165,6 +194,33 @@ export async function dm_shared_testConnection({ guid, state, serviceBase, schem
     }
   }
 
+  if (schemaKey === 'rs2-rest') {
+    if (Array.isArray(body['custom_fields_users'])) {
+      body['custom_fields_users'] = Object.fromEntries(
+        (body['custom_fields_users'] as { key: string; value: string }[]).map((r) => [r.key, r.value]),
+      )
+    }
+    if (typeof body['site_timezones'] === 'string' && body['site_timezones']) {
+      try {
+        const arr = JSON.parse(body['site_timezones']) as { siteId: string; timezone: string }[]
+        if (Array.isArray(arr)) {
+          body['site_timezones'] = Object.fromEntries(arr.map((r) => [r.siteId, r.timezone]))
+        }
+      } catch { /* leave as-is */ }
+    }
+  }
+
+  if (schemaKey === 'genetec') {
+    if (Array.isArray(body['customFields'])) {
+      body['customFields'] = Object.fromEntries(
+        (body['customFields'] as { key: string; value: string }[]).map((r) => [r.key, r.value]),
+      )
+    }
+    if (typeof body['rio_list'] === 'string' && body['rio_list']) {
+      try { body['rio_list'] = JSON.parse(body['rio_list']) } catch { /* leave as-is */ }
+    }
+  }
+
   const res    = await fetch(`${serviceBase}/api/data-managers/${guid}/test-connection`, {
     method:  'POST',
     headers: JSON_HEADERS,
@@ -208,4 +264,53 @@ export function dm_shared_editCustomSync({ guid, state, serviceBase, customSyncT
 export async function dm_shared_sendActivitySync({ serviceBase }: ActionContext): Promise<void> {
   const res = await fetch(`${serviceBase}/api/data-managers/send-activity-sync`, { method: 'POST' })
   if (!res.ok) alert(`Error en activity sync: el servicio devolvió ${res.status}`)
+}
+
+// ─── Genetec-specific actions ─────────────────────────────────────────────────
+
+// ─── RS2 REST-specific actions ────────────────────────────────────────────────
+
+export async function rs2_loadSites({ guid, state, serviceBase }: ActionContext): Promise<void> {
+  if (!guid) { alert('No GUID provided.'); return }
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/rs2/sites`)
+  if (!res.ok) { alert(`Error loading sites: HTTP ${res.status}`); return }
+  const sites: { id: string; name: string }[] = await res.json()
+  // Store loaded sites in a transient state key so ControlSiteTimezones can display names
+  state['_rs2_sites_cache'] = JSON.stringify([{ id: '-1', name: 'All Sites' }, ...sites])
+  alert(`Loaded ${sites.length} site(s) from RS2. Sites are now available in the Site Timezones dropdown.`)
+}
+
+export async function rs2_loadUserFields({ guid, state, serviceBase }: ActionContext): Promise<void> {
+  if (!guid) { alert('No GUID provided.'); return }
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/rs2/user-fields`)
+  if (!res.ok) { alert(`Error loading user fields: HTTP ${res.status}`); return }
+  const fields: string[] = await res.json()
+  const existing: { key: string; value: string }[] = Array.isArray(state['custom_fields_users'])
+    ? state['custom_fields_users']
+    : []
+  const existingKeys = new Set(existing.map((r) => r.key))
+  const merged = [...existing, ...fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))]
+  state['custom_fields_users'] = merged
+}
+
+export async function genetec_loadCustomFields({ guid, state, serviceBase }: ActionContext): Promise<void> {
+  if (!guid) { alert('No GUID provided.'); return }
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/genetec/cardholder-fields`)
+  if (!res.ok) { alert(`Error loading fields: ${res.status}`); return }
+  const fields: string[] = await res.json()
+  const existing: { key: string; value: string }[] = Array.isArray(state['customFields']) ? state['customFields'] : []
+  const existingKeys = new Set(existing.map((r) => r.key))
+  const merged = [...existing, ...fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))]
+  state['customFields'] = merged
+}
+
+export async function genetec_syncDoors({ guid, serviceBase }: ActionContext): Promise<void> {
+  if (!guid) { alert('No GUID provided.'); return }
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/genetec/sync-doors`, { method: 'POST' })
+  if (res.ok) {
+    alert('Door sync started.')
+  } else {
+    const data = await res.json().catch(() => null)
+    alert(`Sync doors failed: ${data?.Error ?? `HTTP ${res.status}`}`)
+  }
 }

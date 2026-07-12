@@ -22,6 +22,8 @@ const dataManagers = ref<DataManagerItem[]>([])
 const DM_TYPE_SCHEMA: Record<number, string> = {
   1:  'on-guard',
   45: 'avigilon',
+  16: 'genetec',
+  51: 'rs2-rest',
   61: 'galaxy-rest',
   62: 'aeos',
 }
@@ -30,6 +32,8 @@ const DM_TYPE_SCHEMA: Record<number, string> = {
 const DM_META: Record<string, { icon: string; badge: string; badgeColor: string }> = {
   'on-guard':    { icon: '🛡️', badge: 'OnGuard',      badgeColor: 'bg-green-100 text-green-700'  },
   'avigilon':    { icon: '📷', badge: 'Avigilon ACM',  badgeColor: 'bg-orange-100 text-orange-700' },
+  'genetec':     { icon: '🔷', badge: 'Genetec',        badgeColor: 'bg-indigo-100 text-indigo-700'  },
+  'rs2-rest':    { icon: '🔐', badge: 'RS2 REST',       badgeColor: 'bg-rose-100 text-rose-700'       },
   'aeos':        { icon: '🔒', badge: 'Nedap AEOS',    badgeColor: 'bg-teal-100 text-teal-700'     },
   'galaxy-rest': { icon: '🔗', badge: 'Galaxy REST',   badgeColor: 'bg-blue-100 text-blue-700'    },
 }
@@ -63,7 +67,9 @@ onMounted(async () => {
       return
     }
     const data: DataManagerItem[] = await res.json()
-    dataManagers.value = data.filter(dm => schemaKey(dm) !== null)
+    dataManagers.value = data
+      .filter(dm => schemaKey(dm) !== null)
+      .sort((a, b) => a.data_manager_name.localeCompare(b.data_manager_name))
   } catch {
     error.value = `No se pudo conectar al servicio en ${DM_SERVICE_BASE}`
   } finally {

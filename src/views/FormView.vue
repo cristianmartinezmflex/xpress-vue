@@ -29,6 +29,8 @@ const schemaMap: Record<string, () => Promise<any>> = {
   'cloud-identity':   () => import('@/data/cloud-identity.json'),
   'avigilon':         () => import('@/data/avigilon-acm.json'),
   'aeos':             () => import('@/data/aeos.json'),
+  'genetec':          () => import('@/data/genetec.json'),
+  'rs2-rest':         () => import('@/data/rs2-rest.json'),
 }
 
 const title = computed(() => {
@@ -39,6 +41,8 @@ const title = computed(() => {
     'cloud-identity': 'Cloud Identity Sync (Demo)',
     'avigilon':       'Avigilon ACM Data Manager',
     'aeos':           'Nedap AEOS Data Manager',
+    'genetec':        'Genetec Data Manager',
+    'rs2-rest':       'RS2 REST Data Manager',
   }
   return map[route.params.schema as string] ?? 'Form'
 })

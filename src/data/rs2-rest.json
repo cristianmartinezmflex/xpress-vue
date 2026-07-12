@@ -1,0 +1,160 @@
+{
+  "tabs": [
+    {
+      "title": "Sync",
+      "sections": [
+        {
+          "title": "Sync Operations",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "sync_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_partial_sync", "title": "Partial Sync Now", "onClick": "dm_shared_runPartialSync", "tooltip": "Pull the latest table changes from the external system. Partial syncs are incremental changes to Users and Badges, if allowed by the external system's API." },
+                    { "id": "btn_full_sync",    "title": "Full Sync Now",    "onClick": "dm_shared_runFullSync",    "tooltip": "Pull all records from the external system. Replaces the full local dataset with the current state of the external system." },
+                    { "id": "btn_custom_sync",  "title": "Custom Sync Now", "onClick": "dm_shared_runCustomSync", "tooltip": "Run a custom sync operation defined by this data manager. Right-click to edit the custom sync tables.", "rightClickMenu": [{ "label": "Edit Custom Sync", "onClick": "dm_shared_editCustomSync" }] }
+                  ]
+                },
+                { "id": "sync_log", "type": "log_view" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "General",
+      "sections": [
+        {
+          "title": "Server",
+          "columns": [
+            {
+              "controls": [
+                { "id": "serverip",  "type": "text",           "title": "Server IP / Hostname", "default": "localhost", "validations": [{ "type": "required", "error": "Server is required" }] },
+                { "id": "port",      "type": "text",           "title": "API Port",             "default": "7777" },
+                { "id": "timezoneinfo", "type": "select",      "title": "Server Timezone",      "default": "US Mountain Standard Time",
+                  "values": [
+                    { "text": "Eastern Standard Time",     "value": "Eastern Standard Time"     },
+                    { "text": "Central Standard Time",     "value": "Central Standard Time"     },
+                    { "text": "US Mountain Standard Time", "value": "US Mountain Standard Time" },
+                    { "text": "Mountain Standard Time",    "value": "Mountain Standard Time"    },
+                    { "text": "Pacific Standard Time",     "value": "Pacific Standard Time"     },
+                    { "text": "Alaskan Standard Time",     "value": "Alaskan Standard Time"     },
+                    { "text": "Hawaiian Standard Time",    "value": "Hawaiian Standard Time"     },
+                    { "text": "GMT Standard Time",         "value": "GMT Standard Time"         },
+                    { "text": "UTC",                       "value": "UTC"                       },
+                    { "text": "Central European Standard Time", "value": "Central European Standard Time" },
+                    { "text": "W. Europe Standard Time",   "value": "W. Europe Standard Time"   },
+                    { "text": "AUS Eastern Standard Time", "value": "AUS Eastern Standard Time" }
+                  ]
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "connection_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_test", "title": "Test Connection", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the RS2 server using the current credentials." }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "RS2 Credentials",
+          "columns": [
+            {
+              "controls": [
+                { "id": "username",           "type": "text",     "title": "Username",           "default": "" },
+                { "id": "password",           "type": "password", "title": "Password",           "default": "" },
+                { "id": "api_token",          "type": "password", "title": "API Token",          "default": "19137A2256583B065DD336D02BD46F27" },
+                { "id": "enable_data_protect","type": "boolean",  "title": "Enable Data Protect","default": true }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Options",
+          "columns": [
+            {
+              "controls": [
+                { "id": "selected_site",          "type": "select_dynamic", "title": "Select Site",              "loadFrom": "rs2/sites", "default": "-1" },
+                { "id": "pagesize",               "type": "number_spinner", "title": "Page Size",                "default": 100, "validations": [{ "type": "min_max", "min": 1, "max": 10000, "error": "Must be between 1 and 10000" }] }
+              ]
+            },
+            {
+              "controls": [
+                { "id": "active_cardholders_only","type": "boolean", "title": "Active Cardholders Only", "default": false },
+                { "id": "create_doors",           "type": "boolean", "title": "Create Doors for Readers","default": true  },
+                { "id": "validate_ssl",           "type": "boolean", "title": "Validate SSL Cert",       "default": false },
+                { "id": "verbose_api_data",       "type": "boolean", "title": "Verbose API Data",        "default": false },
+                { "id": "curl_debugging",         "type": "boolean", "title": "Enable Curl Debugging",   "default": false }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Site Timezones",
+      "sections": [
+        {
+          "title": "Site Timezone Overrides",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "site_tz_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_load_sites_tz", "title": "Load Sites from RS2", "onClick": "rs2_loadSites", "tooltip": "Load available sites from the RS2 system to assign per-site timezone overrides." }
+                  ]
+                },
+                {
+                  "id": "site_timezones",
+                  "type": "site_timezones",
+                  "title": "Site Timezones"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Custom Mappings",
+      "sections": [
+        {
+          "title": "Custom Field Mapping",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "custom_fields_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_load_user_fields", "title": "Load RS2 User Fields", "onClick": "rs2_loadUserFields", "tooltip": "Load available user fields from the RS2 system for custom field mapping." }
+                  ]
+                },
+                {
+                  "id": "custom_fields_users",
+                  "type": "keyvalue",
+                  "title": "Custom User Field Mapping (RS2 Field → XPE Field)",
+                  "key_title":    "RS2 Source Field",
+                  "key_header":   "RS2 Source Field",
+                  "value_title":  "XPressEntry Field",
+                  "value_header": "XPressEntry Field"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

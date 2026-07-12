@@ -247,8 +247,8 @@
                   "id": "btn_bar_subscription",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_check_subscriptions", "title": "Check XPressEntry Subscriptions", "onClick": "checkSubscriptions" },
-                    { "id": "btn_delete_subscription", "title": "Delete Current Subscription", "onClick": "deleteSubscription" }
+                    { "id": "btn_check_subscriptions", "title": "Check XPressEntry Subscriptions", "onClick": "checkSubscriptions", "tooltip": "Verify that XPressEntry software event subscriptions are correctly registered with the OnGuard system." },
+                    { "id": "btn_delete_subscription", "title": "Delete Current Subscription",    "onClick": "deleteSubscription",  "tooltip": "Remove the current XPressEntry software event subscription from the OnGuard system." }
                   ]
                 }
               ]
@@ -363,9 +363,9 @@
                   "id": "btn_bar_basic",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
-                    { "id": "btn_defaults", "title": "Defaults", "onClick": "setDefaults" },
-                    { "id": "btn_ok", "title": "OK", "onClick": "dm_shared_save" }
+                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the OnGuard server using the current credentials." },
+                    { "id": "btn_defaults",     "title": "Defaults",     "onClick": "setDefaults",               "tooltip": "Reset all settings on this tab to their default values." },
+                    { "id": "btn_ok",           "title": "OK",           "onClick": "dm_shared_save",            "tooltip": "Save the current settings." }
                   ]
                 }
               ]
@@ -423,7 +423,7 @@
                   "id": "btn_bar_segments",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_update_segment_list", "title": "Update Segment list", "onClick": "updateSegmentList" }
+                    { "id": "btn_update_segment_list", "title": "Update Segment list", "onClick": "updateSegmentList", "tooltip": "Retrieve and refresh the list of available segments from the OnGuard system." }
                   ]
                 },
                 { "id": "cardholder_segment", "type": "boolean", "title": "Segment Cardholders", "default": false },
@@ -503,7 +503,7 @@
                   "id": "btn_bar_alarm",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_create_logical_source", "title": "Create Logical Source and Readers", "onClick": "createLogicalSource" }
+                    { "id": "btn_create_logical_source", "title": "Create Logical Source and Readers", "onClick": "createLogicalSource", "tooltip": "Create a logical source and its associated readers in OnGuard for alarm activity integration." }
                   ]
                 }
               ]
@@ -535,7 +535,7 @@
                   "id": "btn_bar_panel",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_update_panel_list", "title": "Update Panel List", "onClick": "updatePanelList" }
+                    { "id": "btn_update_panel_list", "title": "Update Panel List", "onClick": "updatePanelList", "tooltip": "Retrieve and refresh the list of available panels from the OnGuard system." }
                   ]
                 }
               ]
@@ -582,9 +582,9 @@
                   "id": "btn_bar_advanced",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_test_connect_adv", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
-                    { "id": "btn_defaults_adv", "title": "Defaults", "onClick": "setDefaults" },
-                    { "id": "btn_ok_adv", "title": "OK", "onClick": "dm_shared_save" }
+                    { "id": "btn_test_connect_adv", "title": "Test Connect", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the OnGuard server using the current credentials." },
+                    { "id": "btn_defaults_adv",     "title": "Defaults",     "onClick": "setDefaults",               "tooltip": "Reset all settings on this tab to their default values." },
+                    { "id": "btn_ok_adv",           "title": "OK",           "onClick": "dm_shared_save",            "tooltip": "Save the current settings." }
                   ]
                 }
               ]

@@ -193,9 +193,9 @@
                   "id": "btn_bar_main",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
-                    { "id": "btn_defaults", "title": "Defaults", "onClick": "setDefaults" },
-                    { "id": "btn_ok", "title": "OK", "onClick": "save" }
+                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the Galaxy REST server using the current credentials." },
+                    { "id": "btn_defaults",     "title": "Defaults",     "onClick": "setDefaults",               "tooltip": "Reset all settings to their default values." },
+                    { "id": "btn_ok",           "title": "OK",           "onClick": "save",                      "tooltip": "Save the current settings." }
                   ]
                 }
               ]
