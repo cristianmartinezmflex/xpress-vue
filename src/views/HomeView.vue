@@ -24,7 +24,7 @@ const DM_TYPE_SCHEMA: Record<number, string> = {
   45: 'avigilon',
   16: 'genetec',
   51: 'rs2-rest',
-  61: 'galaxy-rest',
+  // 61: 'galaxy-rest', // hidden for now
   62: 'aeos',
 }
 
