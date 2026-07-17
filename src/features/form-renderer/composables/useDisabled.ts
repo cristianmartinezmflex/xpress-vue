@@ -16,10 +16,9 @@ function evaluateObjectCondition(cond: DynamicCondition, state: Record<string, a
   return true
 }
 
-// Evaluates an expression like "field == true", "field != 'DataConduit'", "count >= 5"
-// against the form state. String values must be wrapped in single quotes in the expression.
-function evaluateExpression(expr: string, state: Record<string, any>): boolean {
-  const match = expr.match(/^(\S+)\s*(==|!=|>=|<=|>|<|=)\s*(?:'([^']*)'|(\S+))$/)
+// Evaluates a single comparison like "field == true", "field != 'DataConduit'", "count >= 5"
+function evaluateSingleExpression(expr: string, state: Record<string, any>): boolean {
+  const match = expr.trim().match(/^(\S+)\s*(==|!=|>=|<=|>|<|=)\s*(?:'([^']*)'|(\S+))$/)
   if (!match) throw new Error(`[useDisabled] Invalid expression: "${expr}"`)
 
   const [, field, operator, strValue, rawValue] = match
@@ -52,6 +51,18 @@ function evaluateExpression(expr: string, state: Record<string, any>): boolean {
     case '<=':  return a <= value
     default: throw new Error(`[useDisabled] Unknown operator: "${operator}"`)
   }
+}
+
+// Evaluates an expression string — supports && and || between simple comparisons.
+// Examples: "field == true", "a == true && b == false", "x == 1 || y == 2"
+function evaluateExpression(expr: string, state: Record<string, any>): boolean {
+  if (expr.includes('&&')) {
+    return expr.split('&&').every(part => evaluateSingleExpression(part, state))
+  }
+  if (expr.includes('||')) {
+    return expr.split('||').some(part => evaluateSingleExpression(part, state))
+  }
+  return evaluateSingleExpression(expr, state)
 }
 
 // Returns true when the element should be ENABLED (interactive)

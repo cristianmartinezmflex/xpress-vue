@@ -61,6 +61,7 @@
                 { "id": "verbose_tcp",                           "type": "boolean", "title": "TCP Interface Verbose",                 "default": false },
                 { "id": "debug_data",                            "type": "boolean", "title": "SOAP Verbose Log",                      "default": false },
                 { "id": "use_ip_badge",                          "type": "boolean", "title": "Use IPBadge for Activities",            "default": false },
+                { "id": "use_sockets_for_activities",            "type": "boolean", "title": "Use Sockets for Activities",             "default": true,  "value_from": "use_ip_badge", "invert": true, "inverts": "use_ip_badge" },
                 { "id": "ip_badge_fallback_to_socket_interface", "type": "boolean", "title": "IPBadge Fall Back to Socket Interface", "default": false }
               ]
             }
@@ -203,7 +204,7 @@
                 { "id": "search_users_in_events_with_name",   "type": "boolean",        "title": "Enable User Search with Name",             "default": true  },
                 { "id": "enable_user_event_filter",           "type": "boolean",        "title": "Enable User Filter for Events",            "default": false },
                 { "id": "user_event_filter",                  "type": "text",           "title": "User Event Filter",                        "default": "" },
-                { "id": "events_user_search_limit",           "type": "number_spinner", "title": "Events User Search Limit",                 "default": 5,   "validations": [{ "type": "min_max", "min": 0, "max": 9999, "error": "Must be 0 or greater" }] },
+                { "id": "events_user_search_limit", "type": "select", "title": "Events User Search Limit", "default": "Visitor", "values": [{ "text": "Visitor", "value": "Visitor" }, { "text": "Employee", "value": "Employee" }, { "text": "Contractor", "value": "Contractor" }] },
                 { "id": "modification_date_filter_mins",      "type": "number_spinner", "title": "Modification Range Filter (Minutes)",      "default": 0,   "validations": [{ "type": "min_max", "min": 0, "max": 9999, "error": "Must be 0 or greater" }] },
                 { "id": "delete_user_in_badge_delete_events", "type": "boolean",        "title": "Delete Users Only in Badge Delete Events", "default": false }
               ]
@@ -217,7 +218,8 @@
               "controls": [
                 { "id": "process_profile_update_events",       "type": "boolean", "title": "Process Profile Update Events",       "default": false },
                 { "id": "download_pictures_in_events",         "type": "boolean", "title": "Download Pictures in User Events",    "default": true  },
-                { "id": "process_users_in_badge_issue_events", "type": "boolean", "title": "Process Users in Badge Issue Events", "default": true  }
+                { "id": "process_users_in_badge_issue_events", "type": "boolean", "title": "Process Users in Badge Issue Events", "default": true  },
+                { "id": "update_badges_in_carrier_events",     "type": "boolean", "title": "Update Badges in Carrier Events",     "default": true  }
               ]
             }
           ]

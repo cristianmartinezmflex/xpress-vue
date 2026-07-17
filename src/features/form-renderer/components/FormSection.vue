@@ -93,19 +93,30 @@ function isControlVisible(control: Control): boolean {
               @update:model-value="emit('update:state', control.id, $event)"
             />
 
+            <div v-else-if="control.type === 'text' && control.value_from" class="text-sm text-gray-600">
+              <span class="font-medium text-gray-700">{{ control.title }}:</span>
+              {{ state[control.value_from] ?? '' }}
+            </div>
+
             <ControlText
               v-else-if="control.type === 'text'"
               :title="control.title"
               :model-value="state[control.id] ?? ''"
               :error="errors[control.id]"
+              :disabled="control.disabled"
               @update:model-value="emit('update:state', control.id, $event)"
             />
 
             <ControlBoolean
               v-else-if="control.type === 'boolean'"
               :title="control.title"
-              :model-value="state[control.id] ?? false"
-              @update:model-value="emit('update:state', control.id, $event)"
+              :model-value="control.value_from
+                ? (control.invert ? !state[control.value_from] : !!state[control.value_from])
+                : (state[control.id] ?? false)"
+              :disabled="control.disabled || !isControlEnabled(control, col)"
+              @update:model-value="control.inverts
+                ? emit('update:state', control.inverts, !$event)
+                : emit('update:state', control.id, $event)"
             />
 
             <ControlNumber

@@ -88,6 +88,10 @@ export interface Control {
   loadFrom?: string   // used by select_dynamic: sub-path appended to /api/data-managers/{guid}/
   enable?: EnableProp
   display?: DisplayProp
+  disabled?: boolean
+  value_from?: string  // read-only mirror of another field's value (field id to mirror)
+  invert?: boolean     // used with value_from on boolean controls: displays the inverse value
+  inverts?: string     // when set, clicking this boolean writes the inverse to this field id instead of control.id
 }
 
 export interface Column {

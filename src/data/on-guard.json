@@ -113,7 +113,9 @@
                   "id": "namespace",
                   "type": "text",
                   "title": "Full Namespace",
-                  "default": ""
+                  "default": "",
+                  "disabled": true,
+                  "value_from": "remote_namespace"
                 },
                 {
                   "id": "large_user_table",
@@ -268,7 +270,7 @@
                   "id": "async_event_handling",
                   "type": "boolean",
                   "title": "Asynchronous Event Handling",
-                  "default": false,
+                  "default": true,
                   "enable": "sync_type == 'DataConduit'"
                 },
                 {
@@ -348,7 +350,7 @@
                   "type": "boolean",
                   "title": "Apply Filter to Visitors",
                   "default": false,
-                  "enable": "cardholders_no_visitors == false"
+                  "enable": "filter_active_cardholders == true && cardholders_no_visitors == false"
                 }
               ]
             }
@@ -450,9 +452,8 @@
           "columns": [
             {
               "controls": [
-                { "id": "companies_custom_list", "type": "text", "title": "Companies Custom List", "default": "" },
-                { "id": "companies_custom_ref", "type": "text", "title": "Companies Custom Ref", "default": "" },
-                { "id": "department", "type": "text", "title": "Department", "default": "DEPT" }
+                { "id": "companies_list", "type": "text", "title": "Companies Custom List", "default": "Department" },
+                { "id": "companies_reference", "type": "text", "title": "Companies Custom Ref", "default": "DEPT" }
               ]
             }
           ]

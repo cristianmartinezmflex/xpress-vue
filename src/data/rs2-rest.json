@@ -145,10 +145,10 @@
                   "id": "custom_fields_users",
                   "type": "keyvalue",
                   "title": "Custom User Field Mapping (RS2 Field → XPE Field)",
-                  "key_title":    "RS2 Source Field",
-                  "key_header":   "RS2 Source Field",
-                  "value_title":  "XPressEntry Field",
-                  "value_header": "XPressEntry Field"
+                  "key_title":    "Source Columns",
+                  "key_header":   "Source Columns",
+                  "value_title":  "Destination Columns",
+                  "value_header": "Destination Columns"
                 }
               ]
             }

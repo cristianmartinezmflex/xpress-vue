@@ -38,7 +38,7 @@
                 { "id": "password",            "type": "password", "title": "Password",                  "default": "" },
                 { "id": "use_ssl",             "type": "boolean",  "title": "Use SSL",                   "default": true },
                 { "id": "validate_ssl_cert",   "type": "boolean",  "title": "Validate SSL Certificate",  "default": true },
-                { "id": "verbose_api_data",    "type": "boolean",  "title": "Verbose API Logging",       "default": false }
+                { "id": "verbose_api_data",    "type": "boolean",  "title": "Verbose API Data",          "default": false }
               ]
             }
           ]
@@ -50,8 +50,8 @@
               "controls": [
                 { "id": "partial_sync_users",          "type": "boolean",        "title": "Partial Sync Modified Identities",      "default": true },
                 { "id": "use_local_grant_for_success", "type": "boolean",        "title": "Use Local Grant for Activity Success",  "default": true },
-                { "id": "from_zone_id", "type": "select_dynamic", "title": "Doors From Zone", "loadFrom": "avigilon/zones", "default": -1 },
-                { "id": "to_zone_id",   "type": "select_dynamic", "title": "Doors To Zone",   "loadFrom": "avigilon/zones", "default": -1 },
+                { "id": "from_zone_id", "type": "select_dynamic", "title": "Doors From Area", "loadFrom": "avigilon/zones", "default": -1 },
+                { "id": "to_zone_id",   "type": "select_dynamic", "title": "Doors To Area",   "loadFrom": "avigilon/zones", "default": -1 },
                 { "id": "xml_events_port",             "type": "text",           "title": "XML Events Port (blank = disabled)",   "default": "" }
               ]
             }
