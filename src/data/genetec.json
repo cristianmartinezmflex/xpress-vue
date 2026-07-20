@@ -36,17 +36,6 @@
                 { "id": "login",     "type": "text",     "title": "Username", "default": "admin" },
                 { "id": "password",  "type": "password", "title": "Password", "default": "" }
               ]
-            },
-            {
-              "controls": [
-                {
-                  "id": "sdk_buttons",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_test", "title": "Test Connection", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the Genetec Security Center using the current credentials." }
-                  ]
-                }
-              ]
             }
           ]
         },
@@ -102,8 +91,7 @@
                   "id": "cloudlink_buttons",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_sync_doors",  "title": "Sync Doors from Genetec", "onClick": "genetec_syncDoors", "enable": "rio_enabled == true", "tooltip": "Synchronize door and reader data from the Genetec Security Center into XPressEntry." },
-                    { "id": "btn_save_first",  "title": "Save Settings",           "onClick": "dm_shared_save",   "tooltip": "Save the current settings before configuring CloudLink devices." }
+                    { "id": "btn_sync_doors", "title": "Sync Doors from Genetec", "onClick": "genetec_syncDoors", "enable": "rio_enabled == true", "tooltip": "Synchronize door and reader data from the Genetec Security Center into XPressEntry." }
                   ]
                 },
                 {

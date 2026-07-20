@@ -4,7 +4,6 @@ import type { FormSchema, Control } from '../types/schema'
 import { useFormState } from '../composables/useFormState'
 import { evaluateEnable, evaluateDisplay } from '../composables/useDisabled'
 import FormSection from './FormSection.vue'
-import ControlButtonBar from './controls/ControlButtonBar.vue'
 
 const props = defineProps<{
   schema:         FormSchema
@@ -16,8 +15,6 @@ const emit = defineEmits<{ action: [id: string, handler: string] }>()
 
 const activeTab = ref(0)
 
-// Tabs filtered by `display` — completely hidden when false.
-// Tabs filtered by having content — tabs with no sections/controls are also hidden.
 const visibleTabs = computed(() =>
   props.schema.tabs.filter((tab) =>
     evaluateDisplay(tab.display, state) &&
@@ -25,7 +22,6 @@ const visibleTabs = computed(() =>
   ),
 )
 
-// Whether a tab is interactive — `enable: false` keeps it visible but non-clickable.
 function isTabEnabled(tab: (typeof visibleTabs.value)[number]): boolean {
   return evaluateEnable(tab.enable, state)
 }
@@ -33,22 +29,10 @@ function isTabEnabled(tab: (typeof visibleTabs.value)[number]): boolean {
 const showTabs   = computed(() => visibleTabs.value.length > 1)
 const currentTab = computed(() => visibleTabs.value[activeTab.value])
 
-const allSections = computed(() => currentTab.value?.sections ?? [])
-
-const isFooterSection = (s: { title?: string; columns?: { controls?: { type: string }[] }[] }) =>
-  (!s.title || s.title.trim() === '') &&
-  (s.columns?.every((col) => (col.controls ?? []).every((c) => c.type === 'button_bar')) ?? true)
-
 const sections = computed(() =>
-  allSections.value.filter(
-    (s) => !isFooterSection(s) && s.columns?.some((col) => col.controls?.length > 0),
+  (currentTab.value?.sections ?? []).filter((s) =>
+    s.columns?.some((col) => col.controls?.length > 0),
   ),
-)
-
-const buttonBarControls = computed<Control[]>(() =>
-  allSections.value
-    .filter((s) => isFooterSection(s))
-    .flatMap((s) => s.columns?.flatMap((col) => col.controls?.filter((c) => c.type === 'button_bar') ?? []) ?? []),
 )
 
 const { state, errors, validate, resetToDefaults } = useFormState(props.schema, props.initialValues)
@@ -98,9 +82,34 @@ function onUpdateState(id: string, value: any) {
       </button>
     </div>
 
+    <!-- Sticky action bar (generic buttons always visible) -->
+    <div class="flex items-center justify-end gap-2 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
+      <button
+        type="button"
+        class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
+        @click="emit('action', 'btn_test_connect', 'dm_shared_testConnection')"
+      >
+        Test Connect
+      </button>
+      <button
+        type="button"
+        class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
+        @click="emit('action', 'btn_defaults', 'setDefaults')"
+      >
+        Defaults
+      </button>
+      <button
+        type="button"
+        class="px-4 py-2 text-sm font-medium rounded-md border border-blue-500 bg-blue-500 text-white hover:bg-blue-600 transition cursor-pointer"
+        @click="emit('action', 'btn_save', 'dm_shared_save')"
+      >
+        Save
+      </button>
+    </div>
+
     <!-- Tab content -->
     <div class="flex-1 overflow-y-auto p-6">
-      <div v-if="allSections.length" class="flex flex-col gap-4 max-w-2xl mx-auto">
+      <div v-if="sections.length" class="flex flex-col gap-4 max-w-2xl mx-auto">
         <FormSection
           v-for="(section, idx) in sections"
           :key="idx"
@@ -115,16 +124,6 @@ function onUpdateState(id: string, value: any) {
           @update:state="onUpdateState"
           @action="(id, handler) => emit('action', id, handler)"
         />
-
-        <div v-if="buttonBarControls.length" class="flex justify-end pt-2">
-          <ControlButtonBar
-            v-for="ctrl in buttonBarControls"
-            :key="ctrl.id"
-            :buttons="ctrl.buttons ?? []"
-            :state="state"
-            @action="(id, handler) => emit('action', id, handler)"
-          />
-        </div>
       </div>
       <div v-else class="flex items-center justify-center h-40 text-gray-400 text-sm">
         No content defined for this tab.

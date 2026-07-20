@@ -51,17 +51,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "controls": [
-                {
-                  "id": "connection_buttons",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_test", "title": "Test Connection", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the RS2 server using the current credentials." }
-                  ]
-                }
-              ]
             }
           ]
         },

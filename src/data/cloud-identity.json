@@ -89,23 +89,6 @@
             }
           ]
         },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_settings",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
-                    { "id": "btn_ok",           "title": "OK",           "onClick": "dm_shared_save" }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
       ]
     },
 
@@ -497,23 +480,6 @@
                   "default": [
                     { "key": "firstName", "value": "first_name" },
                     { "key": "lastName",  "value": "last_name"  }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_2col",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_test_2col", "title": "Test Connect", "onClick": "dm_shared_testConnection" },
-                    { "id": "btn_ok_2col",   "title": "OK",           "onClick": "dm_shared_save" }
                   ]
                 }
               ]

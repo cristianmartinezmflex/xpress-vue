@@ -135,24 +135,6 @@
               ]
             }
           ]
-        },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_general",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the Avigilon ACM server using the current credentials." },
-                    { "id": "btn_defaults",     "title": "Defaults",     "onClick": "setDefaults",               "tooltip": "Reset all settings on this tab to their default values." },
-                    { "id": "btn_save",         "title": "Save",         "onClick": "dm_shared_save",            "tooltip": "Save the current settings." }
-                  ]
-                }
-              ]
-            }
-          ]
         }
       ]
     },
@@ -171,24 +153,8 @@
                   "key_header": "ACM Identity Field",
                   "value_header": "XPressEntry UDF Field",
                   "default": []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_mapping",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_load_fields",  "title": "Load ACM Fields", "onClick": "loadAvigilonFields", "tooltip": "Load available identity fields from the Avigilon ACM system for custom field mapping." },
-                    { "id": "btn_save_mapping", "title": "Save",            "onClick": "dm_shared_save",     "tooltip": "Save the current custom field mappings." }
-                  ]
-                }
+                },
+                { "id": "btn_load_fields", "type": "button_bar", "buttons": [{ "id": "btn_load_fields", "title": "Load ACM Fields", "onClick": "loadAvigilonFields", "tooltip": "Load available identity fields from the Avigilon ACM system for custom field mapping." }] }
               ]
             }
           ]

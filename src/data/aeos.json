@@ -66,24 +66,6 @@
               ]
             }
           ]
-        },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_general",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the AEOS server using the current credentials." },
-                    { "id": "btn_defaults",     "title": "Defaults",     "onClick": "setDefaults",               "tooltip": "Reset all settings on this tab to their default values." },
-                    { "id": "btn_save",         "title": "Save",         "onClick": "dm_shared_save",            "tooltip": "Save the current settings." }
-                  ]
-                }
-              ]
-            }
-          ]
         }
       ]
     },
@@ -97,22 +79,6 @@
               "controls": [
                 { "id": "send_socket_activities_to_access_points", "type": "boolean",          "title": "Send to Access Points", "default": false },
                 { "id": "socket_interface_settings",               "type": "socket_interfaces", "title": "Socket Interfaces" }
-              ]
-            }
-          ]
-        },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_socket",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_save_socket", "title": "Save", "onClick": "dm_shared_save", "tooltip": "Save the current socket interface settings." }
-                  ]
-                }
               ]
             }
           ]
@@ -132,22 +98,6 @@
               ]
             }
           ]
-        },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_ipbadge",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_save_ipbadge", "title": "Save", "onClick": "dm_shared_save", "tooltip": "Save the current IP badge mapping settings." }
-                  ]
-                }
-              ]
-            }
-          ]
         }
       ]
     },
@@ -160,22 +110,6 @@
             {
               "controls": [
                 { "id": "identifier_types_selected", "type": "multiselect_dynamic", "title": "Identifier Types", "loadFrom": "aeos/badge-types", "default": "" }
-              ]
-            }
-          ]
-        },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_identifiers",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_save_identifiers", "title": "Save", "onClick": "dm_shared_save", "tooltip": "Save the current identifier type settings." }
-                  ]
-                }
               ]
             }
           ]
@@ -223,22 +157,6 @@
               ]
             }
           ]
-        },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_events",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_save_events", "title": "Save", "onClick": "dm_shared_save", "tooltip": "Save the current event filter settings." }
-                  ]
-                }
-              ]
-            }
-          ]
         }
       ]
     },
@@ -250,24 +168,8 @@
           "columns": [
             {
               "controls": [
-                { "id": "emp_fields", "type": "keyvalue", "title": "", "key_header": "Source Field", "value_header": "XPressEntry Field", "default": [] }
-              ]
-            }
-          ]
-        },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_emp",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_load_emp_fields", "title": "Load AEOS Fields", "onClick": "loadAeosUserFields", "tooltip": "Load available employee fields from the AEOS system for field mapping." },
-                    { "id": "btn_save_emp",        "title": "Save",             "onClick": "dm_shared_save",     "tooltip": "Save the current employee field mappings." }
-                  ]
-                }
+                { "id": "emp_fields", "type": "keyvalue", "title": "", "key_header": "Source Field", "value_header": "XPressEntry Field", "default": [] },
+                { "id": "btn_load_emp_fields", "type": "button_bar", "buttons": [{ "id": "btn_load_emp_fields", "title": "Load AEOS Fields", "onClick": "loadAeosUserFields", "tooltip": "Load available employee fields from the AEOS system for field mapping." }] }
               ]
             }
           ]
@@ -282,24 +184,8 @@
           "columns": [
             {
               "controls": [
-                { "id": "visitor_fields", "type": "keyvalue", "title": "", "key_header": "Source Field", "value_header": "XPressEntry Field", "default": [] }
-              ]
-            }
-          ]
-        },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_visitor",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_load_visitor_fields", "title": "Load AEOS Fields", "onClick": "loadAeosVisitorFields", "tooltip": "Load available visitor fields from the AEOS system for field mapping." },
-                    { "id": "btn_save_visitor",        "title": "Save",             "onClick": "dm_shared_save",         "tooltip": "Save the current visitor field mappings." }
-                  ]
-                }
+                { "id": "visitor_fields", "type": "keyvalue", "title": "", "key_header": "Source Field", "value_header": "XPressEntry Field", "default": [] },
+                { "id": "btn_load_visitor_fields", "type": "button_bar", "buttons": [{ "id": "btn_load_visitor_fields", "title": "Load AEOS Fields", "onClick": "loadAeosVisitorFields", "tooltip": "Load available visitor fields from the AEOS system for field mapping." }] }
               ]
             }
           ]
@@ -314,24 +200,8 @@
           "columns": [
             {
               "controls": [
-                { "id": "contractor_fields", "type": "keyvalue", "title": "", "key_header": "Source Field", "value_header": "XPressEntry Field", "default": [] }
-              ]
-            }
-          ]
-        },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_contractor",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_load_contractor_fields", "title": "Load AEOS Fields", "onClick": "loadAeosContractorFields", "tooltip": "Load available contractor fields from the AEOS system for field mapping." },
-                    { "id": "btn_save_contractor",        "title": "Save",             "onClick": "dm_shared_save",           "tooltip": "Save the current contractor field mappings." }
-                  ]
-                }
+                { "id": "contractor_fields", "type": "keyvalue", "title": "", "key_header": "Source Field", "value_header": "XPressEntry Field", "default": [] },
+                { "id": "btn_load_contractor_fields", "type": "button_bar", "buttons": [{ "id": "btn_load_contractor_fields", "title": "Load AEOS Fields", "onClick": "loadAeosContractorFields", "tooltip": "Load available contractor fields from the AEOS system for field mapping." }] }
               ]
             }
           ]

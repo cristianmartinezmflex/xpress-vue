@@ -356,24 +356,6 @@
             }
           ]
         },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_basic",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_test_connect", "title": "Test Connect", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the OnGuard server using the current credentials." },
-                    { "id": "btn_defaults",     "title": "Defaults",     "onClick": "setDefaults",               "tooltip": "Reset all settings on this tab to their default values." },
-                    { "id": "btn_ok",           "title": "OK",           "onClick": "dm_shared_save",            "tooltip": "Save the current settings." }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
       ]
     },
     {
@@ -574,24 +556,6 @@
             }
           ]
         },
-        {
-          "title": "",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "btn_bar_advanced",
-                  "type": "button_bar",
-                  "buttons": [
-                    { "id": "btn_test_connect_adv", "title": "Test Connect", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection to the OnGuard server using the current credentials." },
-                    { "id": "btn_defaults_adv",     "title": "Defaults",     "onClick": "setDefaults",               "tooltip": "Reset all settings on this tab to their default values." },
-                    { "id": "btn_ok_adv",           "title": "OK",           "onClick": "dm_shared_save",            "tooltip": "Save the current settings." }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
       ]
     },
     {
