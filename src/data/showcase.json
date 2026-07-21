@@ -1,0 +1,476 @@
+{
+  "customSyncTables": ["USERS", "BADGES", "GROUPS"],
+  "tabs": [
+    {
+      "title": "Sync",
+      "sections": [
+        {
+          "title": "Sync Operations",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "sync_buttons",
+                  "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_partial_sync", "title": "Partial Sync Now", "onClick": "dm_shared_runPartialSync", "tooltip": "Pull incremental changes from the external system." },
+                    { "id": "btn_full_sync",    "title": "Full Sync Now",    "onClick": "dm_shared_runFullSync",    "tooltip": "Pull all records from the external system." },
+                    {
+                      "id": "btn_custom_sync", "title": "Custom Sync Now", "onClick": "dm_shared_runCustomSync",
+                      "tooltip": "Run a custom sync operation defined by this data manager. Right-click to edit the custom sync tables.",
+                      "rightClickMenu": [
+                        { "label": "Edit Custom Sync", "onClick": "dm_shared_editCustomSync" }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Live Log",
+          "columns": [
+            { "controls": [ { "id": "sync_log", "type": "log_view" } ] }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "General",
+      "sections": [
+        {
+          "title": "Connection",
+          "columns": [
+            {
+              "controls": [
+                { "id": "server_ip", "type": "text", "title": "Server", "default": "localhost",
+                  "validations": [ { "type": "required", "error": "Server is required" } ] },
+                { "id": "port", "type": "text", "title": "Port", "default": "443",
+                  "validations": [ { "type": "regex", "pattern": "^\\d+$", "error": "Port must be numeric" } ] },
+                { "id": "password", "type": "password", "title": "Password", "default": "" }
+              ]
+            },
+            {
+              "controls": [
+                { "id": "use_ssl", "type": "boolean", "title": "Use SSL", "default": true },
+                { "id": "timeout", "type": "number", "title": "Timeout (seconds)", "default": 30 },
+                { "id": "retry_count", "type": "number_spinner", "title": "Retry Count", "default": 3,
+                  "validations": [ { "type": "min_max", "min": 0, "max": 10, "error": "Must be between 0 and 10" } ] }
+              ]
+            },
+             {
+              "controls": [
+                { "id": "use_ssl", "type": "boolean", "title": "Use SSL 2", "default": true },
+                { "id": "timeout", "type": "number", "title": "Timeout (seconds)", "default": 30 },
+                { "id": "retry_count", "type": "number_spinner", "title": "Retry Count", "default": 3,
+                  "validations": [ { "type": "min_max", "min": 0, "max": 10, "error": "Must be between 0 and 10" } ] }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Select & Radio",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "sync_type", "type": "select", "title": "Sync Type", "default": "Standard",
+                  "values": [
+                    { "text": "Standard",    "value": "Standard"    },
+                    { "text": "DataConduit", "value": "DataConduit" }
+                  ]
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "sync_direction", "type": "radio", "title": "Direction", "default": "pull",
+                  "values": [
+                    { "text": "Pull", "value": "pull" },
+                    { "text": "Push", "value": "push" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_general", "type": "button_bar",
+                  "buttons": [
+                    { "id": "btn_test",     "title": "Test Connect", "onClick": "dm_shared_testConnection", "tooltip": "Test connection to the server." },
+                    { "id": "btn_defaults", "title": "Defaults",     "onClick": "setDefaults",              "tooltip": "Reset all settings on this tab to their defaults." },
+                    { "id": "btn_save",     "title": "Save",         "onClick": "dm_shared_save",           "tooltip": "Save current settings." }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Mirrored & Read-Only",
+      "sections": [
+        {
+          "title": "Read-only mirrored text (value_from)",
+          "columns": [
+            {
+              "controls": [
+                { "id": "remote_namespace", "type": "text", "title": "Remote Namespace", "default": "root\\showcase-dm", "display": false },
+                { "id": "namespace", "type": "text", "title": "Full Namespace", "value_from": "remote_namespace" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Mirrored / inverted checkbox pair (value_from + invert + inverts)",
+          "columns": [
+            {
+              "controls": [
+                { "id": "use_ip_badge", "type": "boolean", "title": "Use IPBadge for Activities", "default": false },
+                {
+                  "id": "use_sockets_for_activities", "type": "boolean", "title": "Use Sockets for Activities",
+                  "default": true, "value_from": "use_ip_badge", "invert": true, "inverts": "use_ip_badge"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Permanently disabled controls (disabled: true)",
+          "columns": [
+            {
+              "controls": [
+                { "id": "disabled_text_field", "type": "text", "title": "Read-only text", "default": "Cannot edit this", "disabled": true },
+                { "id": "disabled_checkbox", "type": "boolean", "title": "Read-only flag", "default": true, "disabled": true }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_mirrored", "type": "button_bar",
+                  "buttons": [ { "id": "btn_save_mirrored", "title": "Save", "onClick": "dm_shared_save", "tooltip": "Save current settings." } ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Enable → Tab",
+      "sections": [
+        {
+          "title": "Toggle to unlock the 'Locked Tab' tab",
+          "columns": [
+            { "controls": [ { "id": "enable_tab_demo", "type": "boolean", "title": "Enable the 'Locked Tab' tab", "default": false } ] }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Locked Tab",
+      "enable": "enable_tab_demo == true",
+      "sections": [
+        {
+          "title": "This tab is enabled because enable_tab_demo == true",
+          "columns": [
+            { "controls": [ { "id": "locked_tab_field", "type": "text", "title": "Sample field", "default": "Toggle the switch on the previous tab to unlock this one" } ] }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Display → Tab",
+      "sections": [
+        {
+          "title": "Toggle to reveal the 'Hidden Tab' tab",
+          "columns": [
+            { "controls": [ { "id": "show_tab_demo", "type": "boolean", "title": "Show the 'Hidden Tab' tab", "default": false } ] }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Hidden Tab",
+      "display": "show_tab_demo == true",
+      "sections": [
+        {
+          "title": "This tab is visible because show_tab_demo == true",
+          "columns": [
+            { "controls": [ { "id": "hidden_tab_field", "type": "text", "title": "Sample field", "default": "Toggle the switch on the previous tab to reveal this one" } ] }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Conditional Logic",
+      "sections": [
+        {
+          "title": "Enable → Section",
+          "columns": [
+            { "controls": [ { "id": "enable_section_demo", "type": "boolean", "title": "Enable the section below", "default": false } ] }
+          ]
+        },
+        {
+          "title": "Section controlled by enable (enable: \"enable_section_demo == true\")",
+          "enable": "enable_section_demo == true",
+          "columns": [
+            {
+              "controls": [
+                { "id": "section_enable_text", "type": "text", "title": "Text field", "default": "Interactive only when the section is enabled" },
+                { "id": "section_enable_number", "type": "number_spinner", "title": "Number field", "default": 42,
+                  "validations": [ { "type": "min_max", "min": 0, "max": 9999, "error": "0–9999" } ] }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Enable → Field",
+          "columns": [
+            {
+              "controls": [
+                { "id": "enable_fields_demo", "type": "boolean", "title": "Enable the fields below", "default": false },
+                { "id": "field_enable_text", "type": "text", "title": "Text (enable: \"enable_fields_demo == true\")", "default": "", "enable": "enable_fields_demo == true" },
+                {
+                  "id": "field_enable_select", "type": "select", "title": "Select (enable: \"enable_fields_demo == true\")",
+                  "values": [ { "text": "Option A", "value": "a" }, { "text": "Option B", "value": "b" } ],
+                  "default": "a", "enable": "enable_fields_demo == true"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Display → Section",
+          "columns": [
+            { "controls": [ { "id": "show_section_demo", "type": "boolean", "title": "Show the section below", "default": false } ] }
+          ]
+        },
+        {
+          "title": "Section controlled by display (display: \"show_section_demo == true\")",
+          "display": "show_section_demo == true",
+          "columns": [
+            {
+              "controls": [
+                { "id": "section_display_text", "type": "text", "title": "Text field", "default": "Only visible when show_section_demo is true" },
+                { "id": "section_display_password", "type": "password", "title": "Password field", "default": "" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Display → Field",
+          "columns": [
+            {
+              "controls": [
+                { "id": "show_fields_demo", "type": "boolean", "title": "Show the fields below", "default": false },
+                { "id": "field_display_text", "type": "text", "title": "Text (display: \"show_fields_demo == true\")", "default": "", "display": "show_fields_demo == true" },
+                {
+                  "id": "field_display_select", "type": "select", "title": "Select (display: \"show_fields_demo == true\")",
+                  "values": [ { "text": "Option X", "value": "x" }, { "text": "Option Y", "value": "y" } ],
+                  "default": "x", "display": "show_fields_demo == true"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Compound expressions (&& / ||)",
+          "columns": [
+            {
+              "controls": [
+                { "id": "cond_a", "type": "boolean", "title": "Condition A", "default": false },
+                { "id": "cond_b", "type": "boolean", "title": "Condition B", "default": false },
+                { "id": "field_and_demo", "type": "text", "title": "Enabled only when A == true && B == false", "default": "", "enable": "cond_a == true && cond_b == false" },
+                { "id": "field_or_demo", "type": "text", "title": "Visible when A == true || B == true", "default": "", "display": "cond_a == true || cond_b == true" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Legacy object condition — hasValue",
+          "columns": [
+            {
+              "controls": [
+                { "id": "trigger_text", "type": "text", "title": "Type any value to enable the field below", "default": "" },
+                { "id": "hasvalue_enable_demo", "type": "text", "title": "Enabled when trigger_text has a value", "default": "", "enable": { "type": "hasValue", "field": "trigger_text" } },
+                { "id": "trigger_numeric", "type": "text", "title": "Type digits only to reveal the field below", "default": "" },
+                { "id": "hasvalue_pattern_demo", "type": "text", "title": "Visible when trigger_numeric matches ^\\d+$", "default": "", "display": { "type": "hasValue", "field": "trigger_numeric", "pattern": "^\\d+$" } }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Legacy object condition — equals",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "mode_select", "type": "select", "title": "Mode", "default": "A",
+                  "values": [ { "text": "Mode A", "value": "A" }, { "text": "Mode B", "value": "B" } ]
+                },
+                { "id": "equals_display_demo", "type": "text", "title": "Visible when mode_select equals 'A'", "default": "", "display": { "type": "equals", "field": "mode_select", "value": "A" } },
+                { "id": "equals_enable_demo", "type": "text", "title": "Enabled when mode_select equals 'B'", "default": "", "enable": { "type": "equals", "field": "mode_select", "value": "B" } }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Static boolean enable/display",
+          "columns": [
+            {
+              "controls": [
+                { "id": "always_disabled_field", "type": "text", "title": "Always disabled (enable: false)", "default": "Always grayed out", "enable": false },
+                { "id": "always_hidden_field", "type": "text", "title": "Always hidden (display: false) — you should not see this", "default": "Always hidden", "display": false }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Enable → Column — left column disabled, right stays active",
+          "columns": [
+            {
+              "enable": "enable_col_demo == true",
+              "controls": [
+                { "id": "col_enable_text", "type": "text", "title": "Text (in left column)", "default": "" },
+                { "id": "col_enable_number", "type": "number", "title": "Number (in left column)", "default": 0 }
+              ]
+            },
+            {
+              "controls": [
+                { "id": "enable_col_demo", "type": "boolean", "title": "Enable the left column", "default": false }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Display → Column — left column hidden, right stays visible",
+          "columns": [
+            {
+              "display": "show_col_demo == true",
+              "controls": [
+                { "id": "col_display_text", "type": "text", "title": "Text (in left column)", "default": "Now you see me!" }
+              ]
+            },
+            {
+              "controls": [
+                { "id": "show_col_demo", "type": "boolean", "title": "Show the left column", "default": false }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_conditional", "type": "button_bar",
+                  "buttons": [ { "id": "btn_save_conditional", "title": "Save", "onClick": "dm_shared_save", "tooltip": "Save current settings." } ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Key-Value Mapping",
+      "sections": [
+        {
+          "title": "Field Mapping",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "field_mappings", "type": "keyvalue", "title": "",
+                  "key_title": "Source Field", "key_header": "Source Columns",
+                  "value_title": "Destination Field", "value_header": "Destination Columns",
+                  "default": [
+                    { "key": "firstName", "value": "first_name" },
+                    { "key": "lastName",  "value": "last_name"  }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_keyvalue", "type": "button_bar",
+                  "buttons": [ { "id": "btn_save_keyvalue", "title": "Save", "onClick": "dm_shared_save", "tooltip": "Save current settings." } ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Specialized Editors",
+      "sections": [
+        {
+          "title": "Socket Interfaces (AEOS)",
+          "columns": [
+            { "controls": [ { "id": "socket_interface_settings", "type": "socket_interfaces", "title": "Socket Interfaces" } ] }
+          ]
+        },
+        {
+          "title": "IP Badge Mappings (AEOS)",
+          "columns": [
+            { "controls": [ { "id": "ip_badge_settings", "type": "ip_badge_mappings", "title": "IP Badge Mappings" } ] }
+          ]
+        },
+        {
+          "title": "CloudLink / RIO Devices (Genetec)",
+          "columns": [
+            { "controls": [ { "id": "rio_list", "type": "rio_devices", "title": "RIO Devices" } ] }
+          ]
+        },
+        {
+          "title": "Site Timezones (RS2 REST)",
+          "columns": [
+            { "controls": [ { "id": "site_timezones", "type": "site_timezones", "title": "Site Timezones" } ] }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "btn_bar_specialized", "type": "button_bar",
+                  "buttons": [ { "id": "btn_save_specialized", "title": "Save", "onClick": "dm_shared_save", "tooltip": "Save current settings." } ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
