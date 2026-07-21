@@ -42,6 +42,7 @@ const DM_META: Record<string, { icon: string; badge: string; badgeColor: string 
 // Set `guid` to a real DM GUID from the service to enable sync actions.
 const LOCAL_SCHEMAS: Array<{ key: string; label: string; icon: string; badge: string; badgeColor: string; guid?: string }> = [
   { key: 'cloud-identity', label: 'Cloud Identity Sync', icon: '☁️', badge: 'Demo', badgeColor: 'bg-purple-100 text-purple-700', guid: '2e97964f-92fd-449d-b283-643847efae51' },
+  { key: 'showcase',       label: 'Form Showcase',       icon: '🧩', badge: 'Showcase', badgeColor: 'bg-yellow-100 text-yellow-700', guid: '12345678-1234-1234-1234-123456789012' },
 ]
 
 function schemaKey(dm: DataManagerItem): string | null {
