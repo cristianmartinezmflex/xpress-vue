@@ -131,19 +131,19 @@ defineExpose({ loadSites })
 
 <template>
   <div class="flex flex-col gap-4">
-    <span v-if="title" class="text-sm font-medium text-gray-700">{{ title }}</span>
+    <span v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</span>
 
     <!-- Load Sites inline button -->
     <div class="flex items-center gap-3">
       <button
         type="button"
-        class="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 text-blue-700 hover:bg-blue-50 transition"
+        class="px-3 py-1.5 text-xs font-medium rounded-lg border border-xp-primary text-xp-primary hover:bg-xp-light-hover transition"
         :disabled="loading"
         @click="loadSites"
       >
         {{ loading ? 'Loading…' : 'Load Sites from RS2' }}
       </button>
-      <span v-if="loadedSites.length > 0" class="text-xs text-green-600">
+      <span v-if="loadedSites.length > 0" class="text-xs text-xp-success">
         {{ loadedSites.length }} site(s) loaded
       </span>
     </div>
@@ -154,7 +154,7 @@ defineExpose({ loadSites })
         <label class="text-xs text-gray-500">Site</label>
         <select
           v-model="newSiteId"
-          class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
         >
           <option value="">— select a site —</option>
           <option
@@ -168,21 +168,21 @@ defineExpose({ loadSites })
           v-if="newSiteId === '__manual__'"
           v-model="newSiteId"
           placeholder="Site GUID"
-          class="mt-1 w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
         />
       </div>
       <div class="flex flex-col gap-1 flex-1">
         <label class="text-xs text-gray-500">Timezone</label>
         <select
           v-model="newTz"
-          class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
         >
           <option v-for="tz in WINDOWS_TIMEZONES" :key="tz" :value="tz">{{ tz }}</option>
         </select>
       </div>
       <button
         type="button"
-        class="shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700 text-lg leading-none pb-0.5"
+        class="shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-xp-primary text-white hover:bg-xp-primary-hover text-lg leading-none pb-0.5"
         :disabled="!newSiteId || newSiteId === '__manual__'"
         @click="addRow"
       >+</button>
@@ -207,7 +207,7 @@ defineExpose({ loadSites })
             <td class="px-3 py-2">
               <select
                 :value="row.timezone"
-                class="w-full rounded border border-gray-300 px-2 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full rounded-lg border border-gray-300 px-2 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
                 @change="updateTimezone(row.siteId, ($event.target as HTMLSelectElement).value)"
               >
                 <option v-for="tz in WINDOWS_TIMEZONES" :key="tz" :value="tz">{{ tz }}</option>
@@ -216,7 +216,7 @@ defineExpose({ loadSites })
             <td class="px-2 py-2 text-center">
               <button
                 type="button"
-                class="text-red-400 hover:text-red-600 text-xs"
+                class="text-xp-red hover:text-xp-red-hover text-xs"
                 @click="removeRow(row.siteId)"
               >✕</button>
             </td>

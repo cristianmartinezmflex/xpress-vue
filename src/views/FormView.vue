@@ -252,19 +252,19 @@ async function handleAction(_id: string, handler: string) {
       <!-- Save result indicator -->
       <span
         v-if="saving"
-        class="ml-auto text-xs text-blue-600 font-medium px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200"
+        class="ml-auto text-xs text-xp-primary font-medium px-2 py-0.5 rounded-full bg-blue-50 border border-xp-primary/30"
       >
         Guardando...
       </span>
       <span
         v-else-if="saveResult === 'ok'"
-        class="ml-auto text-xs text-green-600 font-medium px-2 py-0.5 rounded-full bg-green-50 border border-green-200"
+        class="ml-auto text-xs text-xp-success font-medium px-2 py-0.5 rounded-full bg-green-50 border border-green-200"
       >
         Guardado correctamente
       </span>
       <span
         v-else-if="saveResult === 'error'"
-        class="ml-auto text-xs text-red-600 font-medium px-2 py-0.5 rounded-full bg-red-50 border border-red-200"
+        class="ml-auto text-xs text-xp-red font-medium px-2 py-0.5 rounded-full bg-red-50 border border-red-200"
       >
         Error al guardar
       </span>
@@ -272,13 +272,13 @@ async function handleAction(_id: string, handler: string) {
       <!-- Load indicator -->
       <span
         v-else-if="dmValues && !apiError"
-        class="ml-auto text-xs text-green-600 font-medium px-2 py-0.5 rounded-full bg-green-50 border border-green-200"
+        class="ml-auto text-xs text-xp-success font-medium px-2 py-0.5 rounded-full bg-green-50 border border-green-200"
       >
         Loaded from service
       </span>
       <span
         v-else-if="apiError"
-        class="ml-auto text-xs text-amber-600 font-medium px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200"
+        class="ml-auto text-xs text-xp-orange font-medium px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200"
         :title="apiError"
       >
         Using defaults

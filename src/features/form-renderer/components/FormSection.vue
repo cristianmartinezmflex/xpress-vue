@@ -58,11 +58,11 @@ function isControlVisible(control: Control): boolean {
 <template>
   <div
     v-show="sectionVisible"
-    class="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden transition-opacity"
+    class="rounded-lg border border-gray-200 bg-white shadow-xp overflow-hidden transition-opacity"
     :class="!sectionEnabled ? 'opacity-50' : ''"
   >
     <div v-if="title" class="px-4 py-2 bg-gray-50 border-b border-gray-200">
-      <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">{{ title }}</h3>
+      <h3 class="text-sm font-semibold text-xp-label uppercase tracking-wide">{{ title }}</h3>
     </div>
 
     <div

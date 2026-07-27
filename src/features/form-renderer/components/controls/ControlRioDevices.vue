@@ -122,7 +122,7 @@ async function updateRio(dev: RioDevice) {
 
 <template>
   <div class="flex flex-col gap-3">
-    <span v-if="title" class="text-sm font-medium text-gray-700">{{ title }}</span>
+    <span v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</span>
 
     <div v-if="devices.length > 0" class="flex flex-col gap-2">
       <div
@@ -155,7 +155,7 @@ async function updateRio(dev: RioDevice) {
           </span>
           <button
             type="button"
-            class="ml-2 text-red-400 hover:text-red-600 text-xs px-2"
+            class="ml-2 text-xp-red hover:text-xp-red-hover text-xs px-2"
             @click.stop="removeDevice(dev.id)"
           >✕</button>
         </div>
@@ -165,19 +165,19 @@ async function updateRio(dev: RioDevice) {
           <div class="grid grid-cols-2 gap-3">
             <div class="flex flex-col gap-1">
               <label class="text-xs text-gray-500">Name</label>
-              <input :value="dev.name" class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" @input="updateField(dev.id, 'name', ($event.target as HTMLInputElement).value)" />
+              <input :value="dev.name" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(dev.id, 'name', ($event.target as HTMLInputElement).value)" />
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-xs text-gray-500">Server (IP / Hostname)</label>
-              <input :value="dev.server" class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" @input="updateField(dev.id, 'server', ($event.target as HTMLInputElement).value)" />
+              <input :value="dev.server" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(dev.id, 'server', ($event.target as HTMLInputElement).value)" />
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-xs text-gray-500">Username</label>
-              <input :value="dev.username" class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" @input="updateField(dev.id, 'username', ($event.target as HTMLInputElement).value)" />
+              <input :value="dev.username" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(dev.id, 'username', ($event.target as HTMLInputElement).value)" />
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-xs text-gray-500">Password</label>
-              <input type="password" :value="dev.password" class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" @input="updateField(dev.id, 'password', ($event.target as HTMLInputElement).value)" />
+              <input type="password" :value="dev.password" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(dev.id, 'password', ($event.target as HTMLInputElement).value)" />
             </div>
           </div>
 
@@ -186,7 +186,7 @@ async function updateRio(dev: RioDevice) {
               <input
                 type="checkbox"
                 :checked="dev.acceptUntrustedCert"
-                class="w-4 h-4 accent-blue-600"
+                class="w-4 h-4 accent-xp-primary"
                 @change="updateField(dev.id, 'acceptUntrustedCert', ($event.target as HTMLInputElement).checked)"
               />
               Accept Untrusted Certificate
@@ -195,7 +195,7 @@ async function updateRio(dev: RioDevice) {
               <input
                 type="checkbox"
                 :checked="dev.allDoorsOnline"
-                class="w-4 h-4 accent-blue-600"
+                class="w-4 h-4 accent-xp-primary"
                 @change="updateField(dev.id, 'allDoorsOnline', ($event.target as HTMLInputElement).checked)"
               />
               All Doors Online
@@ -207,7 +207,7 @@ async function updateRio(dev: RioDevice) {
             <textarea
               :value="dev.doorList"
               rows="2"
-              class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary resize-none"
               @input="updateField(dev.id, 'doorList', ($event.target as HTMLTextAreaElement).value)"
             />
           </div>
@@ -216,12 +216,12 @@ async function updateRio(dev: RioDevice) {
           <div class="flex gap-2 pt-1">
             <button
               type="button"
-              class="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 text-blue-700 hover:bg-blue-50 transition"
+              class="px-3 py-1.5 text-xs font-medium rounded-lg border border-xp-primary text-xp-primary hover:bg-xp-light-hover transition"
               @click="pingDevice(dev)"
             >Ping</button>
             <button
               type="button"
-              class="px-3 py-1.5 text-xs font-medium rounded-md border border-green-300 text-green-700 hover:bg-green-50 transition"
+              class="px-3 py-1.5 text-xs font-medium rounded-lg border border-green-300 text-xp-success hover:bg-green-50 transition"
               @click="updateRio(dev)"
             >Update RIO Readers</button>
           </div>
@@ -235,7 +235,7 @@ async function updateRio(dev: RioDevice) {
 
     <button
       type="button"
-      class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium cursor-pointer w-fit"
+      class="flex items-center gap-2 text-sm text-xp-primary hover:text-xp-primary-hover font-medium cursor-pointer w-fit"
       @click="addDevice"
     >
       <span class="text-lg leading-none">+</span> Add CloudLink Device

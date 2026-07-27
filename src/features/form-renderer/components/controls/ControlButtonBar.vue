@@ -57,7 +57,7 @@ function handleContextMenuItem(handler: string) {
       v-for="btn in buttons"
       :key="btn.id"
       type="button"
-      class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 transition"
+      class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 transition"
       :class="isButtonEnabled(btn)
         ? 'cursor-pointer hover:bg-gray-50'
         : 'opacity-50 cursor-not-allowed pointer-events-none'"
@@ -91,7 +91,7 @@ function handleContextMenuItem(handler: string) {
       @mousedown="closeContextMenu"
     >
       <div
-        class="absolute bg-white border border-gray-200 rounded shadow-lg py-1 min-w-[160px] text-sm"
+        class="absolute bg-white border border-gray-200 rounded shadow-xp py-1 min-w-[160px] text-sm"
         :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }"
         @mousedown.stop
       >

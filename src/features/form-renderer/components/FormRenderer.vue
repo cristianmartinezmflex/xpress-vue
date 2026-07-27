@@ -62,18 +62,18 @@ function onUpdateState(id: string, value: any) {
   <div class="flex flex-col h-full">
 
     <!-- Tab bar -->
-    <div v-if="showTabs" class="flex border-b border-gray-200 bg-white">
+    <div v-if="showTabs" class="flex items-end gap-px bg-gray-100">
       <button
         v-for="(tab, idx) in visibleTabs"
         :key="tab.title"
         type="button"
-        class="px-5 py-3 text-sm font-medium border-b-2 transition"
+        class="flex-1 px-5 text-sm text-center transition border border-gray-300 rounded-t-lg"
         :class="[
           !isTabEnabled(tab)
-            ? 'border-transparent text-gray-300 cursor-not-allowed'
+            ? 'py-2.5 font-medium text-gray-300 cursor-not-allowed'
             : activeTab === idx
-              ? 'border-blue-500 text-blue-600 cursor-pointer'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer'
+              ? 'py-3.5 font-bold bg-white text-gray-900 cursor-pointer'
+              : 'py-2.5 font-medium text-gray-500 hover:bg-gray-200 cursor-pointer'
         ]"
         :disabled="!isTabEnabled(tab)"
         @click="isTabEnabled(tab) && (activeTab = idx)"
@@ -86,21 +86,21 @@ function onUpdateState(id: string, value: any) {
     <div class="flex items-center justify-end gap-2 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
       <button
         type="button"
-        class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
+        class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
         @click="emit('action', 'btn_test_connect', 'dm_shared_testConnection')"
       >
         Test Connect
       </button>
       <button
         type="button"
-        class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
+        class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
         @click="emit('action', 'btn_defaults', 'setDefaults')"
       >
         Defaults
       </button>
       <button
         type="button"
-        class="px-4 py-2 text-sm font-medium rounded-md border border-blue-500 bg-blue-500 text-white hover:bg-blue-600 transition cursor-pointer"
+        class="px-4 py-2 text-sm font-medium rounded-lg border border-xp-primary bg-xp-primary text-white hover:bg-xp-primary-hover transition cursor-pointer"
         @click="emit('action', 'btn_save', 'dm_shared_save')"
       >
         Save

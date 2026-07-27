@@ -105,7 +105,7 @@ onMounted(async () => {
           v-for="[key, m] in Object.entries(DM_META)"
           :key="key"
           type="button"
-          class="group text-left bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-blue-300 transition cursor-pointer"
+          class="group text-left bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-xp-primary transition cursor-pointer"
           @click="router.push(`/form/${key}`)"
         >
           <div class="flex items-start justify-between">
@@ -115,11 +115,11 @@ onMounted(async () => {
             </span>
           </div>
           <div class="flex-1">
-            <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition">
+            <h2 class="text-base font-semibold text-gray-900 group-hover:text-xp-primary transition">
               {{ m.badge }}
             </h2>
           </div>
-          <div class="flex items-center gap-1 text-sm font-medium text-blue-600 group-hover:gap-2 transition-all">
+          <div class="flex items-center gap-1 text-sm font-medium text-xp-primary group-hover:gap-2 transition-all">
             Configure
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -135,7 +135,7 @@ onMounted(async () => {
         v-for="dm in dataManagers"
         :key="dm.dm_guid"
         type="button"
-        class="group text-left bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-blue-300 transition cursor-pointer"
+        class="group text-left bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-xp-primary transition cursor-pointer"
         @click="navigateToDm(dm)"
       >
         <div class="flex items-start justify-between">
@@ -145,12 +145,12 @@ onMounted(async () => {
           </span>
         </div>
         <div class="flex-1">
-          <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition">
+          <h2 class="text-base font-semibold text-gray-900 group-hover:text-xp-primary transition">
             {{ dm.data_manager_name }}
           </h2>
           <p v-if="dm.id_prefix" class="mt-0.5 text-xs text-gray-400">Prefix: {{ dm.id_prefix }}</p>
         </div>
-        <div class="flex items-center gap-1 text-sm font-medium text-blue-600 group-hover:gap-2 transition-all">
+        <div class="flex items-center gap-1 text-sm font-medium text-xp-primary group-hover:gap-2 transition-all">
           Configure
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />

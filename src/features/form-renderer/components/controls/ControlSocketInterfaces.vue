@@ -110,7 +110,7 @@ function toggleExpand(idx: number) {
 
 <template>
   <div class="flex flex-col gap-3">
-    <span v-if="title" class="text-sm font-medium text-gray-700">{{ title }}</span>
+    <span v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</span>
 
     <!-- Row list -->
     <div v-if="rows.length > 0" class="flex flex-col gap-2">
@@ -137,7 +137,7 @@ function toggleExpand(idx: number) {
           <span v-if="row.IPAddress" class="text-xs text-gray-400">{{ row.IPAddress }}:{{ row.Port }}</span>
           <button
             type="button"
-            class="ml-2 text-red-400 hover:text-red-600 text-xs px-2"
+            class="ml-2 text-xp-red hover:text-xp-red-hover text-xs px-2"
             @click.stop="removeRow(idx)"
           >✕</button>
         </div>
@@ -146,34 +146,34 @@ function toggleExpand(idx: number) {
         <div v-if="expanded.has(idx)" class="p-3 grid grid-cols-2 gap-3 border-t border-gray-100">
           <div class="flex flex-col gap-1">
             <label class="text-xs text-gray-500">Name</label>
-            <input :value="row.Name" class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" @input="updateField(idx, 'Name', ($event.target as HTMLInputElement).value)" />
+            <input :value="row.Name" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Name', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-xs text-gray-500">IP Address</label>
-            <input :value="row.IPAddress" class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" @input="updateField(idx, 'IPAddress', ($event.target as HTMLInputElement).value)" />
+            <input :value="row.IPAddress" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'IPAddress', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-xs text-gray-500">Port</label>
-            <input :value="row.Port" class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" @input="updateField(idx, 'Port', ($event.target as HTMLInputElement).value)" />
+            <input :value="row.Port" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Port', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-xs text-gray-500">Badge Type External ID</label>
-            <input :value="row.BadgeTypeExternalId" class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" @input="updateField(idx, 'BadgeTypeExternalId', ($event.target as HTMLInputElement).value)" />
+            <input :value="row.BadgeTypeExternalId" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'BadgeTypeExternalId', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-xs text-gray-500">Username</label>
-            <input :value="row.Username" class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" @input="updateField(idx, 'Username', ($event.target as HTMLInputElement).value)" />
+            <input :value="row.Username" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Username', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-xs text-gray-500">Password</label>
-            <input type="password" :value="row.Password" class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" @input="updateField(idx, 'Password', ($event.target as HTMLInputElement).value)" />
+            <input type="password" :value="row.Password" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Password', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="col-span-2 flex items-center gap-2">
             <input
               type="checkbox"
               :id="`sh-${idx}`"
               :checked="row.SendHeartbeat"
-              class="w-4 h-4 accent-blue-600"
+              class="w-4 h-4 accent-xp-primary"
               @change="updateField(idx, 'SendHeartbeat', ($event.target as HTMLInputElement).checked)"
             />
             <label :for="`sh-${idx}`" class="text-sm text-gray-700 cursor-pointer">Send Heartbeat</label>
@@ -189,7 +189,7 @@ function toggleExpand(idx: number) {
     <!-- Add button -->
     <button
       type="button"
-      class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium cursor-pointer w-fit"
+      class="flex items-center gap-2 text-sm text-xp-primary hover:text-xp-primary-hover font-medium cursor-pointer w-fit"
       @click="addRow"
     >
       <span class="text-lg leading-none">+</span> Add Socket Interface
