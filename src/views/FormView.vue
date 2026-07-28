@@ -21,30 +21,22 @@ const saving       = ref(false)
 const saveResult   = ref<'ok' | 'error' | null>(null)
 const formRenderer = ref<InstanceType<typeof FormRenderer> | null>(null)
 
-const schemaMap: Record<string, () => Promise<any>> = {
-  'example':          () => import('@/data/example.json'),
-  'galaxy-rest':      () => import('@/data/galaxy-rest.json'),
-  'on-guard':         () => import('@/data/on-guard.json'),
-  'cloud-identity':   () => import('@/data/cloud-identity.json'),
-  'avigilon':         () => import('@/data/avigilon-acm.json'),
-  'aeos':             () => import('@/data/aeos.json'),
-  'genetec':          () => import('@/data/genetec.json'),
-  'rs2-rest':         () => import('@/data/rs2-rest.json'),
+// Auto-discover every schema in src/data by filename — no manual registration needed.
+// Route key === filename without extension (e.g. /form/genetec → data/genetec.json).
+const schemaModules = import.meta.glob<{ default: FormSchema }>('@/data/*.json')
+const schemaByKey: Record<string, () => Promise<{ default: FormSchema }>> = {}
+for (const path in schemaModules) {
+  const key = path.split('/').pop()!.replace(/\.json$/, '')
+  schemaByKey[key] = schemaModules[path]
 }
 
-const title = computed(() => {
-  const map: Record<string, string> = {
-    'example':        'Example',
-    'galaxy-rest':    'Galaxy REST Data Manager',
-    'on-guard':       'OnGuard Data Manager',
-    'cloud-identity': 'Cloud Identity Sync (Demo)',
-    'avigilon':       'Avigilon ACM Data Manager',
-    'aeos':           'Nedap AEOS Data Manager',
-    'genetec':        'Genetec Data Manager',
-    'rs2-rest':       'RS2 REST Data Manager',
-  }
-  return map[route.params.schema as string] ?? 'Form'
-})
+function prettifyKey(key: string): string {
+  return key.split(/[-_]/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+}
+
+const title = computed(() =>
+  schema.value?.title ?? prettifyKey((route.params.schema as string) ?? 'Form'),
+)
 
 async function loadSchema(key: string) {
   loading.value  = true
@@ -53,7 +45,7 @@ async function loadSchema(key: string) {
   dmValues.value = undefined
   apiError.value = null
 
-  const loader = schemaMap[key]
+  const loader = schemaByKey[key]
   if (!loader) { notFound.value = true; loading.value = false; return }
 
   const mod    = await loader()

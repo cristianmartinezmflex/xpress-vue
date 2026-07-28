@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import type { FormSchema } from '@/features/form-renderer/types/schema'
 
 const DM_SERVICE_BASE = 'http://localhost:30011'
 
@@ -9,54 +10,41 @@ const loading = ref(true)
 const error   = ref<string | null>(null)
 
 interface DataManagerItem {
-  dm_guid:              string
-  data_manager_type:    number
-  data_manager_name:    string
-  id_prefix:            string
-  enabled:              boolean
+  dm_guid:           string
+  data_manager_type: number
+  data_manager_name: string
+  id_prefix:         string
+  enabled:           boolean
 }
 
 const dataManagers = ref<DataManagerItem[]>([])
 
-// Maps data_manager_type int → Vue schema key (only types with a JSON schema defined)
-const DM_TYPE_SCHEMA: Record<number, string> = {
-  1:  'on-guard',
-  45: 'avigilon',
-  16: 'genetec',
-  51: 'rs2-rest',
-  // 61: 'galaxy-rest', // hidden for now
-  62: 'aeos',
-}
+// Auto-discover every schema in ./data. The filename (without extension) is matched against the
+// database DM's `data_manager_name`, so adding a DM only needs a new ./data/<name>.json.
+interface SchemaEntry { key: string; title: string }
+const schemaModules = import.meta.glob<{ default: FormSchema }>('@/data/*.json', { eager: true })
+const allSchemas: SchemaEntry[] = Object.entries(schemaModules).map(([path, mod]) => {
+  const key = path.split('/').pop()!.replace(/\.json$/, '')
+  return { key, title: mod.default.title ?? key }
+})
 
-// Icon/badge for API-loaded DMs (keyed by schema key)
-const DM_META: Record<string, { icon: string; badge: string; badgeColor: string }> = {
-  'on-guard':    { icon: '🛡️', badge: 'OnGuard',      badgeColor: 'bg-green-100 text-green-700'  },
-  'avigilon':    { icon: '📷', badge: 'Avigilon ACM',  badgeColor: 'bg-orange-100 text-orange-700' },
-  'genetec':     { icon: '🔷', badge: 'Genetec',        badgeColor: 'bg-indigo-100 text-indigo-700'  },
-  'rs2-rest':    { icon: '🔐', badge: 'RS2 REST',       badgeColor: 'bg-rose-100 text-rose-700'       },
-  'aeos':        { icon: '🔒', badge: 'Nedap AEOS',    badgeColor: 'bg-teal-100 text-teal-700'     },
-  'galaxy-rest': { icon: '🔗', badge: 'Galaxy REST',   badgeColor: 'bg-blue-100 text-blue-700'    },
-}
+const norm = (s: string) => s.trim().toLowerCase()
+const schemaByName: Record<string, SchemaEntry> = Object.fromEntries(allSchemas.map((s) => [norm(s.key), s]))
 
-// Local/demo schemas — always shown regardless of API state
-// Set `guid` to a real DM GUID from the service to enable sync actions.
-const LOCAL_SCHEMAS: Array<{ key: string; label: string; icon: string; badge: string; badgeColor: string; guid?: string }> = [
-  { key: 'cloud-identity', label: 'Cloud Identity Sync', icon: '☁️', badge: 'Demo', badgeColor: 'bg-purple-100 text-purple-700', guid: '2e97964f-92fd-449d-b283-643847efae51' },
-]
+// Merge DB list with ./data schemas by name:
+//   - DB DM whose name matches a schema  → first section ("Data Managers")
+//   - schema with no matching DB DM       → second section ("Demo & Showcase")
+const matchedDms = computed(() =>
+  dataManagers.value
+    .map((dm) => ({ dm, schema: schemaByName[norm(dm.data_manager_name)] }))
+    .filter((x): x is { dm: DataManagerItem; schema: SchemaEntry } => !!x.schema),
+)
 
-function schemaKey(dm: DataManagerItem): string | null {
-  return DM_TYPE_SCHEMA[dm.data_manager_type] ?? null
-}
+const dbNames = computed(() => new Set(dataManagers.value.map((dm) => norm(dm.data_manager_name))))
+const demoSchemas = computed(() => allSchemas.filter((s) => !dbNames.value.has(norm(s.key))))
 
-function meta(dm: DataManagerItem) {
-  const key = schemaKey(dm)
-  return key ? DM_META[key] : { icon: '⚙️', badge: 'Data Manager', badgeColor: 'bg-gray-100 text-gray-600' }
-}
-
-function navigateToDm(dm: DataManagerItem) {
-  const key = schemaKey(dm)
-  if (!key) return
-  router.push({ path: `/form/${key}`, query: { guid: dm.dm_guid } })
+function openSchema(key: string, guid?: string) {
+  router.push({ path: `/form/${key}`, query: guid ? { guid } : {} })
 }
 
 onMounted(async () => {
@@ -67,9 +55,7 @@ onMounted(async () => {
       return
     }
     const data: DataManagerItem[] = await res.json()
-    dataManagers.value = data
-      .filter(dm => schemaKey(dm) !== null)
-      .sort((a, b) => a.data_manager_name.localeCompare(b.data_manager_name))
+    dataManagers.value = data.sort((a, b) => a.data_manager_name.localeCompare(b.data_manager_name))
   } catch {
     error.value = `No se pudo conectar al servicio en ${DM_SERVICE_BASE}`
   } finally {
@@ -92,110 +78,71 @@ onMounted(async () => {
       Loading data managers...
     </div>
 
-    <!-- Error -->
-    <div v-else-if="error" class="max-w-4xl mx-auto">
-      <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-        {{ error }} — mostrando configuración estática.
-      </div>
+    <template v-else>
+      <!-- First section: Data Managers that come from the database (matched to a ./data schema) -->
+      <div class="max-w-4xl mx-auto">
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Data Managers</p>
 
-      <!-- Fallback: static cards -->
-      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <button
-          v-for="[key, m] in Object.entries(DM_META)"
-          :key="key"
-          type="button"
-          class="group text-left bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-blue-300 transition cursor-pointer"
-          @click="router.push(`/form/${key}`)"
-        >
-          <div class="flex items-start justify-between">
-            <span class="text-3xl">{{ m.icon }}</span>
-            <span class="text-xs font-medium px-2 py-1 rounded-full" :class="m.badgeColor">
-              {{ m.badge }}
-            </span>
-          </div>
-          <div class="flex-1">
-            <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition">
-              {{ m.badge }}
-            </h2>
-          </div>
-          <div class="flex items-center gap-1 text-sm font-medium text-blue-600 group-hover:gap-2 transition-all">
-            Configure
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-        </button>
-      </div>
-    </div>
-
-    <!-- Cards from API -->
-    <div v-else class="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      <button
-        v-for="dm in dataManagers"
-        :key="dm.dm_guid"
-        type="button"
-        class="group text-left bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-blue-300 transition cursor-pointer"
-        @click="navigateToDm(dm)"
-      >
-        <div class="flex items-start justify-between">
-          <span class="text-3xl">{{ meta(dm).icon }}</span>
-          <span class="text-xs font-medium px-2 py-1 rounded-full" :class="meta(dm).badgeColor">
-            {{ meta(dm).badge }}
-          </span>
+        <div v-if="error" class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 mb-4">
+          {{ error }}
         </div>
-        <div class="flex-1">
-          <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition">
-            {{ dm.data_manager_name }}
-          </h2>
-          <p v-if="dm.id_prefix" class="mt-0.5 text-xs text-gray-400">Prefix: {{ dm.id_prefix }}</p>
-        </div>
-        <div class="flex items-center gap-1 text-sm font-medium text-blue-600 group-hover:gap-2 transition-all">
-          Configure
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </button>
 
-      <div
-        v-if="dataManagers.length === 0"
-        class="col-span-full text-center text-sm text-gray-400 py-16"
-      >
-        No hay data managers habilitados configurados.
-      </div>
-    </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <button
+            v-for="{ dm, schema } in matchedDms"
+            :key="dm.dm_guid"
+            type="button"
+            class="group text-left bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-blue-300 transition cursor-pointer"
+            @click="openSchema(schema.key, dm.dm_guid)"
+          >
+            <span class="text-3xl">⚙️</span>
+            <div class="flex-1">
+              <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition">
+                {{ dm.data_manager_name }}
+              </h2>
+              <p v-if="dm.id_prefix" class="mt-0.5 text-xs text-gray-400">Prefix: {{ dm.id_prefix }}</p>
+            </div>
+            <div class="flex items-center gap-1 text-sm font-medium text-blue-600 group-hover:gap-2 transition-all">
+              Configure
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </button>
 
-    <!-- Local / demo schemas — always visible -->
-    <div v-if="!loading" class="max-w-4xl mx-auto mt-8">
-      <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Demo & Showcase</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <button
-          v-for="s in LOCAL_SCHEMAS"
-          :key="s.key"
-          type="button"
-          class="group text-left bg-white rounded-xl border border-dashed border-gray-300 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-purple-300 transition cursor-pointer"
-          @click="router.push({ path: `/form/${s.key}`, query: s.guid ? { guid: s.guid } : {} })"
-        >
-          <div class="flex items-start justify-between">
-            <span class="text-3xl">{{ s.icon }}</span>
-            <span class="text-xs font-medium px-2 py-1 rounded-full" :class="s.badgeColor">
-              {{ s.badge }}
-            </span>
+          <div v-if="matchedDms.length === 0" class="col-span-full text-sm text-gray-400 py-8">
+            No hay data managers de la base con un schema en ./data.
           </div>
-          <div class="flex-1">
-            <h2 class="text-base font-semibold text-gray-900 group-hover:text-purple-600 transition">
-              {{ s.label }}
-            </h2>
-          </div>
-          <div class="flex items-center gap-1 text-sm font-medium text-purple-600 group-hover:gap-2 transition-all">
-            Configure
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-        </button>
+        </div>
       </div>
-    </div>
+
+      <!-- Demo & Showcase: schemas in ./data with no matching database DM -->
+      <div v-if="demoSchemas.length" class="max-w-4xl mx-auto mt-10">
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Demo &amp; Showcase</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <button
+            v-for="s in demoSchemas"
+            :key="s.key"
+            type="button"
+            class="group text-left bg-white rounded-xl border border-dashed border-gray-300 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-purple-300 transition cursor-pointer"
+            @click="openSchema(s.key)"
+          >
+            <span class="text-3xl">🧩</span>
+            <div class="flex-1">
+              <h2 class="text-base font-semibold text-gray-900 group-hover:text-purple-600 transition">
+                {{ s.title }}
+              </h2>
+            </div>
+            <div class="flex items-center gap-1 text-sm font-medium text-purple-600 group-hover:gap-2 transition-all">
+              Configure
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
+    </template>
 
   </div>
 </template>

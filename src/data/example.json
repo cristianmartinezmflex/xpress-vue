@@ -1,4 +1,5 @@
 {
+  "title": "Example",
   "tabs": [
     {
       "title": "Sync",
@@ -30,7 +31,10 @@
                       "onClick": "dm_shared_runCustomSync",
                       "tooltip": "Run a custom sync operation defined by this data manager. Right-click to edit the custom sync tables.",
                       "rightClickMenu": [
-                        { "label": "Edit Custom Sync", "onClick": "dm_shared_editCustomSync" }
+                        {
+                          "label": "Edit Custom Sync",
+                          "onClick": "dm_shared_editCustomSync"
+                        }
                       ]
                     }
                   ]
@@ -103,8 +107,14 @@
                   "type": "select",
                   "title": "Sync Type (select)",
                   "values": [
-                    { "text": "OpenAccess", "value": 17 },
-                    { "text": "DataConduit", "value": 18 }
+                    {
+                      "text": "OpenAccess",
+                      "value": 17
+                    },
+                    {
+                      "text": "DataConduit",
+                      "value": 18
+                    }
                   ],
                   "default": 17
                 },
@@ -113,8 +123,14 @@
                   "type": "radio",
                   "title": "Sync Type (radio)",
                   "values": [
-                    { "text": "OpenAccess", "value": 17 },
-                    { "text": "DataConduit", "value": 18 }
+                    {
+                      "text": "OpenAccess",
+                      "value": 17
+                    },
+                    {
+                      "text": "DataConduit",
+                      "value": 18
+                    }
                   ],
                   "default": 17
                 },
@@ -152,8 +168,14 @@
                   "value_title": "Destination Columns",
                   "value_header": "XPressEntry Field",
                   "default": [
-                    { "key": "Data3", "value": "SOMEXPEUDF (UDF24)" },
-                    { "key": "Data5", "value": "XPE UDF 2 (UDF25)" }
+                    {
+                      "key": "Data3",
+                      "value": "SOMEXPEUDF (UDF24)"
+                    },
+                    {
+                      "key": "Data5",
+                      "value": "XPE UDF 2 (UDF25)"
+                    }
                   ]
                 }
               ]

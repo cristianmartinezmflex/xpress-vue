@@ -114,7 +114,17 @@ export interface Tab {
   display?: DisplayProp
 }
 
+export interface SchemaMeta {
+  icon?:       string
+  badge?:      string
+  badgeColor?: string
+}
+
 export interface FormSchema {
+  /** Display title shown in the form header. Falls back to a prettified schema key if omitted. */
+  title?: string
+  /** Card presentation (icon/badge) used on the Home listing. */
+  meta?: SchemaMeta
   tabs: Tab[]
   customSyncTables?: string[]
 }

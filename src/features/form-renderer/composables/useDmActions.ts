@@ -1,49 +1,36 @@
 // useDmActions — resolves a JSON `onClick` handler name to its implementation and runs it.
 //
-// Resolution is BY PREFIX:
-//   "dm_shared_{fn}"  → dm-shared-actions.ts  (actions shared by every Data Manager)
-//   "{dm}_{fn}"       → the per-DM module registered under "{dm}" below
-//                       e.g. "genetec_syncDoors" → genetec.ts, "onguard_updatePanelList" → on-guard.ts
+// Every action module in ../actions/*.ts is auto-registered: each exported function is keyed
+// by its own name, which is exactly the `onClick` value used in the schema JSON. The naming
+// convention stays prefix-based:
+//   "dm_shared_{fn}" → dm-shared-actions.ts   (shared by every Data Manager)
+//   "{dm}_{fn}"       → <dm>.ts                (that Data Manager's specific actions)
 //
-// To add actions for a new Data Manager: create actions/<dm>.ts with `<prefix>_` functions
-// and register the module under its prefix in DM_ACTION_MODULES. Nothing else changes —
-// the view and FormRenderer stay generic.
+// To add actions for a new Data Manager, just drop a file in ../actions/ that exports
+// `{prefix}_` functions — no registration needed here or anywhere else.
 
-import * as shared    from '../actions/dm-shared-actions'
-import * as genetec   from '../actions/genetec'
-import * as onguard   from '../actions/on-guard'
-import * as aeos      from '../actions/aeos'
-import * as avigilon  from '../actions/avigilon'
-import * as rs2       from '../actions/rs2-rest'
 import type { ActionContext, ActionFn } from '../actions/action-context'
 
 export type { ActionContext, ActionFn }
 
-const SHARED_PREFIX = 'dm_shared_'
+// Eagerly import every action module so their exported functions can be registered by name.
+const actionModules = import.meta.glob<Record<string, unknown>>('../actions/*.ts', { eager: true })
 
-// prefix (the token before the first "_" in the handler name) → action module
-const DM_ACTION_MODULES: Record<string, Record<string, unknown>> = {
-  genetec,
-  onguard,
-  aeos,
-  avigilon,
-  rs2,
-}
-
-function resolve(handler: string): ActionFn | undefined {
-  if (handler.startsWith(SHARED_PREFIX)) {
-    return (shared as Record<string, unknown>)[handler] as ActionFn | undefined
+const actionRegistry: Record<string, ActionFn> = {}
+for (const path in actionModules) {
+  const mod = actionModules[path]
+  for (const name in mod) {
+    if (typeof mod[name] === 'function') {
+      actionRegistry[name] = mod[name] as ActionFn
+    }
   }
-  const prefix = handler.slice(0, handler.indexOf('_'))
-  const mod = DM_ACTION_MODULES[prefix]
-  return mod ? (mod[handler] as ActionFn | undefined) : undefined
 }
 
 export function useDmActions(getContext: () => ActionContext) {
   async function dispatch(handler: string, payload?: unknown): Promise<void> {
-    const fn = resolve(handler)
+    const fn = actionRegistry[handler]
     if (!fn) {
-      console.warn(`[useDmActions] No action found for "${handler}". Add it to dm-shared-actions.ts (dm_shared_*) or the matching per-DM module.`)
+      console.warn(`[useDmActions] No action found for "${handler}". Export a function named "${handler}" from a file in features/form-renderer/actions/.`)
       return
     }
     await fn({ ...getContext(), payload })

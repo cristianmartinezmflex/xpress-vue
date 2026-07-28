@@ -1,7 +1,13 @@
 {
-  "customSyncTables": ["USERS", "BADGES", "GROUPS", "GROUPS_USERS", "COMPANIES"],
+  "title": "Cloud Identity Sync (Demo)",
+  "customSyncTables": [
+    "USERS",
+    "BADGES",
+    "GROUPS",
+    "GROUPS_USERS",
+    "COMPANIES"
+  ],
   "tabs": [
-
     {
       "title": "Settings",
       "sections": [
@@ -10,10 +16,30 @@
           "columns": [
             {
               "controls": [
-                { "id": "api_url",       "type": "text",     "title": "API URL",       "default": "https://api.cloud-identity.example.com" },
-                { "id": "tenant_id",     "type": "text",     "title": "Tenant ID",     "default": "" },
-                { "id": "client_id",     "type": "text",     "title": "Client ID",     "default": "" },
-                { "id": "client_secret", "type": "password", "title": "Client Secret", "default": "" }
+                {
+                  "id": "api_url",
+                  "type": "text",
+                  "title": "API URL",
+                  "default": "https://api.cloud-identity.example.com"
+                },
+                {
+                  "id": "tenant_id",
+                  "type": "text",
+                  "title": "Tenant ID",
+                  "default": ""
+                },
+                {
+                  "id": "client_id",
+                  "type": "text",
+                  "title": "Client ID",
+                  "default": ""
+                },
+                {
+                  "id": "client_secret",
+                  "type": "password",
+                  "title": "Client Secret",
+                  "default": ""
+                }
               ]
             }
           ]
@@ -23,24 +49,52 @@
           "columns": [
             {
               "controls": [
-                { "id": "sync_enabled",  "type": "boolean",        "title": "Enable automatic sync",   "default": true },
-                { "id": "sync_interval", "type": "number_spinner", "title": "Sync interval (minutes)", "default": 60,
-                  "validations": [{ "type": "min_max", "min": 5, "max": 1440, "error": "5–1440 min" }] },
-                { "id": "environment",   "type": "select",         "title": "Environment",
+                {
+                  "id": "sync_enabled",
+                  "type": "boolean",
+                  "title": "Enable automatic sync",
+                  "default": true
+                },
+                {
+                  "id": "sync_interval",
+                  "type": "number_spinner",
+                  "title": "Sync interval (minutes)",
+                  "default": 60,
+                  "validations": [
+                    {
+                      "type": "min_max",
+                      "min": 5,
+                      "max": 1440,
+                      "error": "5–1440 min"
+                    }
+                  ]
+                },
+                {
+                  "id": "environment",
+                  "type": "select",
+                  "title": "Environment",
                   "values": [
-                    { "text": "Production",  "value": "prod"  },
-                    { "text": "Staging",     "value": "stage" },
-                    { "text": "Development", "value": "dev"   }
+                    {
+                      "text": "Production",
+                      "value": "prod"
+                    },
+                    {
+                      "text": "Staging",
+                      "value": "stage"
+                    },
+                    {
+                      "text": "Development",
+                      "value": "dev"
+                    }
                   ],
                   "default": "prod"
                 }
               ]
             }
           ]
-        },
+        }
       ]
     },
-
     {
       "title": "Enable → Tab",
       "sections": [
@@ -61,7 +115,6 @@
         }
       ]
     },
-
     {
       "title": "Disabled Tab",
       "enable": "enable_tab_demo == true",
@@ -83,7 +136,6 @@
         }
       ]
     },
-
     {
       "title": "Display → Tab",
       "sections": [
@@ -104,7 +156,6 @@
         }
       ]
     },
-
     {
       "title": "Hidden Tab",
       "display": "show_tab_demo == true",
@@ -126,7 +177,6 @@
         }
       ]
     },
-
     {
       "title": "Enable → Section & Field",
       "sections": [
@@ -163,7 +213,12 @@
                   "title": "Field B",
                   "default": 42,
                   "validations": [
-                    { "type": "min_max", "min": 0, "max": 9999, "error": "0–9999" }
+                    {
+                      "type": "min_max",
+                      "min": 0,
+                      "max": 9999,
+                      "error": "0–9999"
+                    }
                   ]
                 },
                 {
@@ -200,7 +255,12 @@
                   "title": "Number field (enable: \"enable_fields_demo == true\")",
                   "default": 100,
                   "validations": [
-                    { "type": "min_max", "min": 1, "max": 1000, "error": "1–1000" }
+                    {
+                      "type": "min_max",
+                      "min": 1,
+                      "max": 1000,
+                      "error": "1–1000"
+                    }
                   ],
                   "enable": "enable_fields_demo == true"
                 },
@@ -209,9 +269,18 @@
                   "type": "select",
                   "title": "Select (enable: \"enable_fields_demo == true\")",
                   "values": [
-                    { "text": "Option A", "value": "a" },
-                    { "text": "Option B", "value": "b" },
-                    { "text": "Option C", "value": "c" }
+                    {
+                      "text": "Option A",
+                      "value": "a"
+                    },
+                    {
+                      "text": "Option B",
+                      "value": "b"
+                    },
+                    {
+                      "text": "Option C",
+                      "value": "c"
+                    }
                   ],
                   "default": "a",
                   "enable": "enable_fields_demo == true"
@@ -222,7 +291,6 @@
         }
       ]
     },
-
     {
       "title": "Display → Section & Field",
       "sections": [
@@ -292,8 +360,14 @@
                   "type": "select",
                   "title": "Select (display: \"show_fields_demo == true\")",
                   "values": [
-                    { "text": "Option X", "value": "x" },
-                    { "text": "Option Y", "value": "y" }
+                    {
+                      "text": "Option X",
+                      "value": "x"
+                    },
+                    {
+                      "text": "Option Y",
+                      "value": "y"
+                    }
                   ],
                   "default": "x",
                   "display": "show_fields_demo == true"
@@ -305,7 +379,12 @@
                   "default": 0,
                   "display": "show_fields_demo == true",
                   "validations": [
-                    { "type": "min_max", "min": 0, "max": 999, "error": "0–999" }
+                    {
+                      "type": "min_max",
+                      "min": 0,
+                      "max": 999,
+                      "error": "0–999"
+                    }
                   ]
                 },
                 {
@@ -321,7 +400,6 @@
         }
       ]
     },
-
     {
       "title": "2 Columns",
       "sections": [
@@ -331,8 +409,18 @@
             {
               "enable": "enable_col_demo == true",
               "controls": [
-                { "id": "col_enable_text",   "type": "text",   "title": "Text field (in left column)",   "default": "" },
-                { "id": "col_enable_number", "type": "number", "title": "Number field (in left column)", "default": 0  }
+                {
+                  "id": "col_enable_text",
+                  "type": "text",
+                  "title": "Text field (in left column)",
+                  "default": ""
+                },
+                {
+                  "id": "col_enable_number",
+                  "type": "number",
+                  "title": "Number field (in left column)",
+                  "default": 0
+                }
               ]
             },
             {
@@ -353,9 +441,26 @@
             {
               "display": "show_col_demo == true",
               "controls": [
-                { "id": "col_display_text",   "type": "text",   "title": "Text field (in left column)",   "default": "Now you see me!" },
-                { "id": "col_display_select", "type": "select", "title": "Select (in left column)",
-                  "values": [{ "text": "Option A", "value": "a" }, { "text": "Option B", "value": "b" }],
+                {
+                  "id": "col_display_text",
+                  "type": "text",
+                  "title": "Text field (in left column)",
+                  "default": "Now you see me!"
+                },
+                {
+                  "id": "col_display_select",
+                  "type": "select",
+                  "title": "Select (in left column)",
+                  "values": [
+                    {
+                      "text": "Option A",
+                      "value": "a"
+                    },
+                    {
+                      "text": "Option B",
+                      "value": "b"
+                    }
+                  ],
                   "default": "a"
                 }
               ]
@@ -377,12 +482,44 @@
           "columns": [
             {
               "controls": [
-                { "id": "col2_text",     "type": "text",           "title": "Text",     "default": "sample text value" },
-                { "id": "col2_password", "type": "password",       "title": "Password", "default": "" },
-                { "id": "col2_number",   "type": "number",         "title": "Number",   "default": 80 },
-                { "id": "col2_spinner",  "type": "number_spinner", "title": "Spinner",  "default": 500,
-                  "validations": [ { "type": "min_max", "min": 1, "max": 9999, "error": "1–9999" } ] },
-                { "id": "col2_boolean",  "type": "boolean",        "title": "Boolean",  "default": true }
+                {
+                  "id": "col2_text",
+                  "type": "text",
+                  "title": "Text",
+                  "default": "sample text value"
+                },
+                {
+                  "id": "col2_password",
+                  "type": "password",
+                  "title": "Password",
+                  "default": ""
+                },
+                {
+                  "id": "col2_number",
+                  "type": "number",
+                  "title": "Number",
+                  "default": 80
+                },
+                {
+                  "id": "col2_spinner",
+                  "type": "number_spinner",
+                  "title": "Spinner",
+                  "default": 500,
+                  "validations": [
+                    {
+                      "type": "min_max",
+                      "min": 1,
+                      "max": 9999,
+                      "error": "1–9999"
+                    }
+                  ]
+                },
+                {
+                  "id": "col2_boolean",
+                  "type": "boolean",
+                  "title": "Boolean",
+                  "default": true
+                }
               ]
             },
             {
@@ -392,9 +529,18 @@
                   "type": "select",
                   "title": "Select",
                   "values": [
-                    { "text": "Option 1", "value": "1" },
-                    { "text": "Option 2", "value": "2" },
-                    { "text": "Option 3", "value": "3" }
+                    {
+                      "text": "Option 1",
+                      "value": "1"
+                    },
+                    {
+                      "text": "Option 2",
+                      "value": "2"
+                    },
+                    {
+                      "text": "Option 3",
+                      "value": "3"
+                    }
                   ],
                   "default": "1"
                 },
@@ -403,9 +549,18 @@
                   "type": "radio",
                   "title": "Radio",
                   "values": [
-                    { "text": "Alpha", "value": "alpha" },
-                    { "text": "Beta",  "value": "beta"  },
-                    { "text": "Gamma", "value": "gamma" }
+                    {
+                      "text": "Alpha",
+                      "value": "alpha"
+                    },
+                    {
+                      "text": "Beta",
+                      "value": "beta"
+                    },
+                    {
+                      "text": "Gamma",
+                      "value": "gamma"
+                    }
                   ],
                   "default": "alpha"
                 }
@@ -427,8 +582,14 @@
                   "value_title": "Target Field",
                   "value_header": "Target",
                   "default": [
-                    { "key": "firstName", "value": "first_name" },
-                    { "key": "lastName",  "value": "last_name"  }
+                    {
+                      "key": "firstName",
+                      "value": "first_name"
+                    },
+                    {
+                      "key": "lastName",
+                      "value": "last_name"
+                    }
                   ]
                 }
               ]
