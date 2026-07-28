@@ -11,7 +11,7 @@ const props = defineProps<{
   guid?:          string
   serviceBase?:   string
 }>()
-const emit = defineEmits<{ action: [id: string, handler: string] }>()
+const emit = defineEmits<{ action: [id: string, handler: string, payload?: unknown] }>()
 
 const activeTab = ref(0)
 
@@ -94,7 +94,7 @@ function onUpdateState(id: string, value: any) {
       <button
         type="button"
         class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
-        @click="emit('action', 'btn_defaults', 'setDefaults')"
+        @click="emit('action', 'btn_defaults', 'dm_shared_setDefaults')"
       >
         Defaults
       </button>
@@ -122,7 +122,7 @@ function onUpdateState(id: string, value: any) {
           :guid="guid"
           :service-base="serviceBase"
           @update:state="onUpdateState"
-          @action="(id, handler) => emit('action', id, handler)"
+          @action="(id, handler, payload) => emit('action', id, handler, payload)"
         />
       </div>
       <div v-else class="flex items-center justify-center h-40 text-gray-400 text-sm">

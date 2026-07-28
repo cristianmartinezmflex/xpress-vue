@@ -32,7 +32,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:state': [id: string, value: any]
-  action: [id: string, handler: string]
+  action: [id: string, handler: string, payload?: unknown]
 }>()
 
 const sectionEnabled  = computed(() => evaluateEnable(props.enable, props.state))
@@ -217,9 +217,9 @@ function isControlVisible(control: Control): boolean {
               v-else-if="control.type === 'rio_devices'"
               :title="control.title"
               :model-value="state[control.id] ?? ''"
-              :guid="guid"
-              :service-base="serviceBase"
+              :buttons="control.buttons ?? []"
               @update:model-value="emit('update:state', control.id, $event)"
+              @action="(id, handler, payload) => emit('action', id, handler, payload)"
             />
 
             <ControlSiteTimezones

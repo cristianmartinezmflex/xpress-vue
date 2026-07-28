@@ -249,8 +249,8 @@
                   "id": "btn_bar_subscription",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_check_subscriptions", "title": "Check XPressEntry Subscriptions", "onClick": "checkSubscriptions", "tooltip": "Verify that XPressEntry software event subscriptions are correctly registered with the OnGuard system." },
-                    { "id": "btn_delete_subscription", "title": "Delete Current Subscription",    "onClick": "deleteSubscription",  "tooltip": "Remove the current XPressEntry software event subscription from the OnGuard system." }
+                    { "id": "btn_check_subscriptions", "title": "Check XPressEntry Subscriptions", "onClick": "onguard_checkSubscriptions", "tooltip": "Verify that XPressEntry software event subscriptions are correctly registered with the OnGuard system." },
+                    { "id": "btn_delete_subscription", "title": "Delete Current Subscription",    "onClick": "onguard_deleteSubscription",  "tooltip": "Remove the current XPressEntry software event subscription from the OnGuard system." }
                   ]
                 }
               ]
@@ -407,7 +407,7 @@
                   "id": "btn_bar_segments",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_update_segment_list", "title": "Update Segment list", "onClick": "updateSegmentList", "tooltip": "Retrieve and refresh the list of available segments from the OnGuard system." }
+                    { "id": "btn_update_segment_list", "title": "Update Segment list", "onClick": "onguard_updateSegmentList", "tooltip": "Retrieve and refresh the list of available segments from the OnGuard system." }
                   ]
                 },
                 { "id": "cardholder_segment", "type": "boolean", "title": "Segment Cardholders", "default": false },
@@ -486,7 +486,7 @@
                   "id": "btn_bar_alarm",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_create_logical_source", "title": "Create Logical Source and Readers", "onClick": "createLogicalSource", "tooltip": "Create a logical source and its associated readers in OnGuard for alarm activity integration." }
+                    { "id": "btn_create_logical_source", "title": "Create Logical Source and Readers", "onClick": "onguard_createLogicalSource", "tooltip": "Create a logical source and its associated readers in OnGuard for alarm activity integration." }
                   ]
                 }
               ]
@@ -518,7 +518,7 @@
                   "id": "btn_bar_panel",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_update_panel_list", "title": "Update Panel List", "onClick": "updatePanelList", "tooltip": "Retrieve and refresh the list of available panels from the OnGuard system." }
+                    { "id": "btn_update_panel_list", "title": "Update Panel List", "onClick": "onguard_updatePanelList", "tooltip": "Retrieve and refresh the list of available panels from the OnGuard system." }
                   ]
                 }
               ]

@@ -130,7 +130,7 @@
                     {
                       "id": "btn_defaults",
                       "title": "Defaults",
-                      "onClick": "setDefaults"
+                      "onClick": "dm_shared_setDefaults"
                     }
                   ]
                 }

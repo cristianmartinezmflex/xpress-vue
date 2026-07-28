@@ -2,15 +2,18 @@
 /**
  * ControlRioDevices
  *
- * Renders the Genetec "rio_list" field as a list of CloudLink (RIO) devices.
- * Each device: { id, name, server, username, password, acceptUntrustedCert, allDoorsOnline, doorList }
+ * Renders a "rio_list" field as a list of CloudLink (RIO) devices. Each device:
+ *   { id, name, server, username, password, acceptUntrustedCert, allDoorsOnline, doorList }
  * State is stored as a JSON array string so it round-trips through the API cleanly.
  *
- * The backend stores rio_list as a Hashtable<int, Base64(DataContractSerializer(RIODevice))>.
- * When saving from Vue, we send a JSON array — the GenetecController handles conversion.
+ * Per-device action buttons (e.g. Ping, Update RIO Readers) are NOT hardcoded here —
+ * they are declared in the schema JSON under the control's `buttons` and dispatched by
+ * prefix like any other action. Clicking one emits `action(id, onClick, device)`, so the
+ * matching DM action (e.g. genetec_updateRio) receives the device as its payload.
  */
 
 import { ref, computed } from 'vue'
+import type { Button } from '../../types/schema'
 
 interface RioDevice {
   id:                 number
@@ -25,15 +28,16 @@ interface RioDevice {
 
 const props = defineProps<{
   title?:     string
-  modelValue: string   // JSON array or empty string
-  guid?:      string
-  serviceBase?: string
+  modelValue: string        // JSON array or empty string
+  buttons?:   Button[]      // per-device action buttons, from the schema JSON
 }>()
-const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+const emit = defineEmits<{
+  'update:modelValue': [value: string]
+  action: [id: string, handler: string, payload?: unknown]
+}>()
 
-const pingStatus = ref<Record<number, string>>({})
-const expanded   = ref<Set<number>>(new Set())
-let   nextId     = 1
+const expanded = ref<Set<number>>(new Set())
+let   nextId   = 1
 
 const devices = computed<RioDevice[]>(() => {
   const val = props.modelValue
@@ -85,38 +89,9 @@ function toggleExpand(id: number) {
   expanded.value = s
 }
 
-async function pingDevice(dev: RioDevice) {
-  if (!props.guid || !props.serviceBase) {
-    pingStatus.value = { ...pingStatus.value, [dev.id]: 'No GUID — cannot ping' }
-    return
-  }
-  pingStatus.value = { ...pingStatus.value, [dev.id]: 'Pinging…' }
-  try {
-    const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/genetec/ping-rio`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ server: dev.server, username: dev.username, password: dev.password, acceptUntrustedCert: dev.acceptUntrustedCert }),
-    })
-    const data = await res.json().catch(() => null)
-    pingStatus.value = { ...pingStatus.value, [dev.id]: res.ok ? 'Ping OK' : (data?.Error ?? `HTTP ${res.status}`) }
-  } catch {
-    pingStatus.value = { ...pingStatus.value, [dev.id]: 'Connection failed' }
-  }
-}
-
-async function updateRio(dev: RioDevice) {
-  if (!props.guid || !props.serviceBase) { alert('No GUID — cannot update RIO.'); return }
-  const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/genetec/update-rio`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ server: dev.server, username: dev.username, password: dev.password, acceptUntrustedCert: dev.acceptUntrustedCert, doorList: dev.doorList, allDoorsOnline: dev.allDoorsOnline }),
-  })
-  if (res.ok) {
-    alert('RIO update complete.')
-  } else {
-    const data = await res.json().catch(() => null)
-    alert(`RIO update failed: ${data?.Error ?? `HTTP ${res.status}`}`)
-  }
+// Dispatch a schema-declared button, passing the device as the action payload.
+function runDeviceAction(btn: Button, dev: RioDevice) {
+  emit('action', btn.id, btn.onClick, dev)
 }
 </script>
 
@@ -146,13 +121,6 @@ async function updateRio(dev: RioDevice) {
             {{ dev.name || dev.server || `Device ${dev.id}` }}
           </span>
           <span v-if="dev.server" class="text-xs text-gray-400">{{ dev.server }}</span>
-          <span
-            v-if="pingStatus[dev.id]"
-            class="text-xs px-2 py-0.5 rounded-full"
-            :class="pingStatus[dev.id] === 'Ping OK' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
-          >
-            {{ pingStatus[dev.id] }}
-          </span>
           <button
             type="button"
             class="ml-2 text-red-400 hover:text-red-600 text-xs px-2"
@@ -212,18 +180,16 @@ async function updateRio(dev: RioDevice) {
             />
           </div>
 
-          <!-- Device actions -->
-          <div class="flex gap-2 pt-1">
+          <!-- Device actions (declared in the schema JSON) -->
+          <div v-if="buttons?.length" class="flex flex-wrap gap-2 pt-1">
             <button
+              v-for="btn in buttons"
+              :key="btn.id"
               type="button"
-              class="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 text-blue-700 hover:bg-blue-50 transition"
-              @click="pingDevice(dev)"
-            >Ping</button>
-            <button
-              type="button"
-              class="px-3 py-1.5 text-xs font-medium rounded-md border border-green-300 text-green-700 hover:bg-green-50 transition"
-              @click="updateRio(dev)"
-            >Update RIO Readers</button>
+              class="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition"
+              :title="btn.tooltip"
+              @click="runDeviceAction(btn, dev)"
+            >{{ btn.title }}</button>
           </div>
         </div>
       </div>

@@ -97,7 +97,11 @@
                 {
                   "id": "rio_list",
                   "type": "rio_devices",
-                  "title": "CloudLink Devices"
+                  "title": "CloudLink Devices",
+                  "buttons": [
+                    { "id": "btn_ping_rio",   "title": "Ping",              "onClick": "genetec_pingRio",   "tooltip": "Test connectivity to this CloudLink (RIO) device." },
+                    { "id": "btn_update_rio", "title": "Update RIO Readers", "onClick": "genetec_updateRio", "tooltip": "Push the current reader/door configuration to this CloudLink (RIO) device." }
+                  ]
                 }
               ]
             }

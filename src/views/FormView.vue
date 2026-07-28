@@ -6,7 +6,6 @@ import DialogMessage    from '@/features/form-renderer/components/DialogMessage.
 import CustomSyncDialog from '@/features/form-renderer/components/CustomSyncDialog.vue'
 import type { FormSchema } from '@/features/form-renderer/types/schema'
 import { useDmActions } from '@/features/form-renderer/composables/useDmActions'
-import { useDialog }   from '@/features/form-renderer/composables/useDialog'
 
 const DM_SERVICE_BASE = 'http://localhost:30011'
 
@@ -82,144 +81,24 @@ async function loadSchema(key: string) {
 
 watch(() => route.params.schema, (key) => loadSchema(key as string), { immediate: true })
 
-const { show: showDialog } = useDialog()
+// The view stays generic: it only wires the runtime context (form state, guid, service base,
+// navigation, reset-to-defaults) and delegates every onClick to the prefix-based dispatcher.
+// All Data-Manager-specific behavior lives in actions/<dm>.ts.
+const { dispatch } = useDmActions(() => ({
+  guid:             route.query.guid as string | undefined,
+  state:            formRenderer.value?.state ?? {},
+  serviceBase:      DM_SERVICE_BASE,
+  schemaKey:        route.params.schema as string,
+  customSyncTables: schema.value?.customSyncTables,
+  navigate:         (path: string) => router.push(path),
+  resetToDefaults:  () => formRenderer.value?.resetToDefaults(),
+}))
 
-// ─── OnGuard-specific helpers ─────────────────────────────────────────────────
-
-async function onGuardPost(subRoute: string, guid: string, body?: object) {
-  const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${guid}/${subRoute}`, {
-    method:  'POST',
-    headers: body ? { 'Content-Type': 'application/json' } : undefined,
-    body:    body ? JSON.stringify(body) : undefined,
-  })
-  return res.json().catch(() => ({ success: false, message: `Service returned ${res.status}` }))
-}
-
-const { dispatch } = useDmActions(
-  () => ({
-    guid:             route.query.guid as string | undefined,
-    state:            formRenderer.value?.state ?? {},
-    serviceBase:      DM_SERVICE_BASE,
-    schemaKey:        route.params.schema as string,
-    customSyncTables: schema.value?.customSyncTables,
-    navigate:         (path: string) => router.push(path),
-  }),
-  {
-    // ── Shared client-side ─────────────────────────────────────────────────
-    'setDefaults': () => {
-      formRenderer.value?.resetToDefaults()
-    },
-
-    // ── OnGuard-specific ───────────────────────────────────────────────────
-    'checkSubscriptions': async (ctx) => {
-      if (!ctx.guid) { showDialog({ success: false, title: 'Check Subscriptions', message: 'No GUID provided.' }); return }
-      const result = await onGuardPost('check-subscriptions', ctx.guid)
-      const subs: string[] = result.data ?? []
-      const detail = subs.length > 0 ? subs.join('\n') : 'No subscriptions found.'
-      showDialog({ success: result.success, title: 'XPressEntry Subscriptions', message: result.message + (subs.length > 0 ? '\n\n' + detail : '') })
-    },
-
-    'deleteSubscription': async (ctx) => {
-      if (!ctx.guid) { showDialog({ success: false, title: 'Delete Subscription', message: 'No GUID provided.' }); return }
-      const desc = (ctx.state['subscription_description'] as string | undefined) ?? ''
-      const result = await onGuardPost('delete-subscription', ctx.guid, { description: desc })
-      showDialog({ success: result.success, title: 'Delete Subscription', message: result.message })
-    },
-
-    'updateSegmentList': async (ctx) => {
-      if (!ctx.guid) { showDialog({ success: false, title: 'Update Segments', message: 'No GUID provided.' }); return }
-      const result = await onGuardPost('update-segments', ctx.guid)
-      showDialog({ success: result.success, title: 'Update Segment List', message: result.message })
-    },
-
-    'updatePanelList': async (ctx) => {
-      if (!ctx.guid) { showDialog({ success: false, title: 'Update Panels', message: 'No GUID provided.' }); return }
-      const result = await onGuardPost('update-panels', ctx.guid)
-      showDialog({ success: result.success, title: 'Update Panel List', message: result.message })
-    },
-
-    'createLogicalSource': async (ctx) => {
-      if (!ctx.guid) { showDialog({ success: false, title: 'Create Logical Source', message: 'No GUID provided.' }); return }
-      const result = await onGuardPost('create-logical-source', ctx.guid)
-      showDialog({ success: result.success, title: 'Create Logical Source & Readers', message: result.message })
-    },
-
-    // ── AEOS-specific ─────────────────────────────────────────────────────
-    'loadAeosUserFields': async (ctx) => {
-      if (!ctx.guid) { showDialog({ success: false, title: 'Load AEOS Fields', message: 'No GUID provided.' }); return }
-      const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${ctx.guid}/aeos/employee-fields`)
-      if (!res.ok) {
-        const body = await res.json().catch(() => null)
-        showDialog({ success: false, title: 'Load AEOS Fields', message: body?.Error ?? `Service returned ${res.status}` })
-        return
-      }
-      const fields: string[] = await res.json()
-      const existing: { key: string; value: string }[] = ctx.state['emp_fields'] ?? []
-      const existingKeys = new Set(existing.map((r) => r.key))
-      const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
-      ctx.state['emp_fields'] = [...existing, ...newRows]
-      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Se cargaron ${newRows.length} campo(s) nuevo(s).` : 'No hay nuevos campos.' })
-    },
-
-    'loadAeosVisitorFields': async (ctx) => {
-      if (!ctx.guid) { showDialog({ success: false, title: 'Load AEOS Fields', message: 'No GUID provided.' }); return }
-      const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${ctx.guid}/aeos/visitor-fields`)
-      if (!res.ok) {
-        const body = await res.json().catch(() => null)
-        showDialog({ success: false, title: 'Load AEOS Fields', message: body?.Error ?? `Service returned ${res.status}` })
-        return
-      }
-      const fields: string[] = await res.json()
-      const existing: { key: string; value: string }[] = ctx.state['visitor_fields'] ?? []
-      const existingKeys = new Set(existing.map((r) => r.key))
-      const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
-      ctx.state['visitor_fields'] = [...existing, ...newRows]
-      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Se cargaron ${newRows.length} campo(s) nuevo(s).` : 'No hay nuevos campos.' })
-    },
-
-    'loadAeosContractorFields': async (ctx) => {
-      if (!ctx.guid) { showDialog({ success: false, title: 'Load AEOS Fields', message: 'No GUID provided.' }); return }
-      const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${ctx.guid}/aeos/contractor-fields`)
-      if (!res.ok) {
-        const body = await res.json().catch(() => null)
-        showDialog({ success: false, title: 'Load AEOS Fields', message: body?.Error ?? `Service returned ${res.status}` })
-        return
-      }
-      const fields: string[] = await res.json()
-      const existing: { key: string; value: string }[] = ctx.state['contractor_fields'] ?? []
-      const existingKeys = new Set(existing.map((r) => r.key))
-      const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
-      ctx.state['contractor_fields'] = [...existing, ...newRows]
-      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Se cargaron ${newRows.length} campo(s) nuevo(s).` : 'No hay nuevos campos.' })
-    },
-
-    // ── Avigilon-specific ──────────────────────────────────────────────────
-    'loadAvigilonFields': async (ctx) => {
-      if (!ctx.guid) { showDialog({ success: false, title: 'Load ACM Fields', message: 'No GUID provided.' }); return }
-      const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${ctx.guid}/avigilon/identity-fields`)
-      if (!res.ok) {
-        const body = await res.json().catch(() => null)
-        showDialog({ success: false, title: 'Load ACM Fields', message: body?.Error ?? `Service returned ${res.status}` })
-        return
-      }
-      const fields: string[] = await res.json()
-      const existing: { key: string; value: string }[] = ctx.state['CustomFields'] ?? []
-      const existingKeys = new Set(existing.map((r) => r.key))
-      const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
-      ctx.state['CustomFields'] = [...existing, ...newRows]
-      const msg = newRows.length > 0
-        ? `Se cargaron ${newRows.length} campo(s) nuevo(s) desde Avigilon ACM.`
-        : 'No hay nuevos campos (todos ya están mapeados).'
-      showDialog({ success: true, title: 'Load ACM Fields', message: msg })
-    },
-  },
-)
-
-async function handleAction(_id: string, handler: string) {
+async function handleAction(_id: string, handler: string, payload?: unknown) {
   saving.value     = true
   saveResult.value = null
   try {
-    await dispatch(handler)
+    await dispatch(handler, payload)
     saveResult.value = 'ok'
   } catch {
     saveResult.value = 'error'
