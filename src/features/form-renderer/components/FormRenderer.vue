@@ -83,7 +83,7 @@ function onUpdateState(id: string, value: any) {
     </div>
 
     <!-- Sticky action bar (generic buttons always visible) -->
-    <div class="flex items-center justify-end gap-2 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
+    <div class="flex items-center justify-center gap-2 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
       <button
         type="button"
         class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
