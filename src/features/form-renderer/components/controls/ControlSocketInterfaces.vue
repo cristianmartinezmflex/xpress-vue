@@ -8,29 +8,49 @@
  * On save the parent serializes state as-is (the string value) — so we manage
  * the raw XML string ourselves here via a parsed intermediate representation.
  *
- * SocketInterfaceModel fields (from WinForms ctlSocketInterface):
- *   Name, IPAddress, Port, BadgeTypeExternalId, Username, Password, SendHeartbeat
+ * SocketInterfaceModel fields match the current AEOS desktop client (ctlSocketInterface):
+ *   AEPUIP, Port, AEPUName, Username, Password, Prefix, CardType
  */
 
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 interface SocketRow {
-  Name:                string
-  IPAddress:           string
-  Port:                string
-  BadgeTypeExternalId: string
-  Username:            string
-  Password:            string
-  SendHeartbeat:       boolean
+  AEPUIP:   string
+  Port:     string
+  AEPUName: string
+  Username: string
+  Password: string
+  Prefix:   string
+  CardType: string
 }
+
+interface DynamicOption { id: number | string; name: string }
 
 const SEPARATOR = '\x08'
 
 const props = defineProps<{
-  title?:     string
-  modelValue: string   // vbBack-separated XML strings
+  title?:       string
+  modelValue:   string   // vbBack-separated XML strings
+  guid?:        string
+  serviceBase?: string
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+
+// ─── Card Type options (shared across all rows) ───────────────────────────────
+
+const cardTypeOptions = ref<DynamicOption[]>([])
+const cardTypeError   = ref('')
+
+onMounted(async () => {
+  if (!props.guid || !props.serviceBase) return
+  try {
+    const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/aeos/badge-types`)
+    if (!res.ok) { cardTypeError.value = `Error ${res.status}`; return }
+    cardTypeOptions.value = await res.json()
+  } catch {
+    cardTypeError.value = 'Could not load'
+  }
+})
 
 // ─── Parse XML string → SocketRow ────────────────────────────────────────────
 
@@ -41,13 +61,13 @@ function parseXml(xml: string): SocketRow | null {
     if (doc.querySelector('parsererror')) return null
     const get = (tag: string) => doc.querySelector(tag)?.textContent ?? ''
     return {
-      Name:                get('Name'),
-      IPAddress:           get('IPAddress'),
-      Port:                get('Port'),
-      BadgeTypeExternalId: get('BadgeTypeExternalId'),
-      Username:            get('Username'),
-      Password:            get('Password'),
-      SendHeartbeat:       get('SendHeartbeat').toLowerCase() === 'true',
+      AEPUIP:   get('AEPUIP'),
+      Port:     get('Port'),
+      AEPUName: get('AEPUName'),
+      Username: get('Username'),
+      Password: get('Password'),
+      Prefix:   get('Prefix'),
+      CardType: get('CardType'),
     }
   } catch {
     return null
@@ -57,13 +77,13 @@ function parseXml(xml: string): SocketRow | null {
 function rowToXml(row: SocketRow): string {
   return `<?xml version="1.0" encoding="utf-16"?>\n` +
     `<SocketInterfaceModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">\n` +
-    `  <Name>${escXml(row.Name)}</Name>\n` +
-    `  <IPAddress>${escXml(row.IPAddress)}</IPAddress>\n` +
+    `  <AEPUIP>${escXml(row.AEPUIP)}</AEPUIP>\n` +
     `  <Port>${escXml(row.Port)}</Port>\n` +
-    `  <BadgeTypeExternalId>${escXml(row.BadgeTypeExternalId)}</BadgeTypeExternalId>\n` +
+    `  <AEPUName>${escXml(row.AEPUName)}</AEPUName>\n` +
     `  <Username>${escXml(row.Username)}</Username>\n` +
     `  <Password>${escXml(row.Password)}</Password>\n` +
-    `  <SendHeartbeat>${row.SendHeartbeat}</SendHeartbeat>\n` +
+    `  <Prefix>${escXml(row.Prefix)}</Prefix>\n` +
+    `  <CardType>${escXml(row.CardType)}</CardType>\n` +
     `</SocketInterfaceModel>`
 }
 
@@ -87,14 +107,14 @@ function emitRows(next: SocketRow[]) {
 }
 
 function addRow() {
-  emitRows([...rows.value, { Name: '', IPAddress: '', Port: '8035', BadgeTypeExternalId: '', Username: '', Password: '', SendHeartbeat: false }])
+  emitRows([...rows.value, { AEPUIP: '', Port: '8035', AEPUName: '', Username: '', Password: '', Prefix: '', CardType: '' }])
 }
 
 function removeRow(idx: number) {
   emitRows(rows.value.filter((_, i) => i !== idx))
 }
 
-function updateField(idx: number, field: keyof SocketRow, val: string | boolean) {
+function updateField(idx: number, field: keyof SocketRow, val: string) {
   const next = rows.value.map((r, i) => i === idx ? { ...r, [field]: val } : r)
   emitRows(next)
 }
@@ -111,6 +131,9 @@ function toggleExpand(idx: number) {
 <template>
   <div class="flex flex-col gap-3">
     <span v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</span>
+    <p class="text-xs text-gray-400">
+      Click Card Type to see the prefix mappings for the identifier types, or find them in the access point descriptions manual.
+    </p>
 
     <!-- Row list -->
     <div v-if="rows.length > 0" class="flex flex-col gap-2">
@@ -132,9 +155,9 @@ function toggleExpand(idx: number) {
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
           </svg>
           <span class="text-sm font-medium text-gray-700 flex-1">
-            {{ row.Name || row.IPAddress || `Interface ${idx + 1}` }}
+            {{ row.AEPUName || row.AEPUIP || `Interface ${idx + 1}` }}
           </span>
-          <span v-if="row.IPAddress" class="text-xs text-gray-400">{{ row.IPAddress }}:{{ row.Port }}</span>
+          <span v-if="row.AEPUIP" class="text-xs text-gray-400">{{ row.AEPUIP }}:{{ row.Port }}</span>
           <button
             type="button"
             class="ml-2 text-xp-red hover:text-xp-red-hover text-xs px-2"
@@ -145,20 +168,16 @@ function toggleExpand(idx: number) {
         <!-- Expanded fields -->
         <div v-if="expanded.has(idx)" class="p-3 grid grid-cols-2 gap-3 border-t border-gray-100">
           <div class="flex flex-col gap-1">
-            <label class="text-xs text-gray-500">Name</label>
-            <input :value="row.Name" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Name', ($event.target as HTMLInputElement).value)" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-xs text-gray-500">IP Address</label>
-            <input :value="row.IPAddress" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'IPAddress', ($event.target as HTMLInputElement).value)" />
+            <label class="text-xs text-gray-500">AEPU IP</label>
+            <input :value="row.AEPUIP" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'AEPUIP', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-xs text-gray-500">Port</label>
             <input :value="row.Port" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Port', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="flex flex-col gap-1">
-            <label class="text-xs text-gray-500">Badge Type External ID</label>
-            <input :value="row.BadgeTypeExternalId" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'BadgeTypeExternalId', ($event.target as HTMLInputElement).value)" />
+            <label class="text-xs text-gray-500">AEPU Name</label>
+            <input :value="row.AEPUName" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'AEPUName', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-xs text-gray-500">Username</label>
@@ -168,15 +187,17 @@ function toggleExpand(idx: number) {
             <label class="text-xs text-gray-500">Password</label>
             <input type="password" :value="row.Password" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Password', ($event.target as HTMLInputElement).value)" />
           </div>
-          <div class="col-span-2 flex items-center gap-2">
-            <input
-              type="checkbox"
-              :id="`sh-${idx}`"
-              :checked="row.SendHeartbeat"
-              class="w-4 h-4 accent-xp-primary"
-              @change="updateField(idx, 'SendHeartbeat', ($event.target as HTMLInputElement).checked)"
-            />
-            <label :for="`sh-${idx}`" class="text-sm text-gray-700 cursor-pointer">Send Heartbeat</label>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs text-gray-500">Prefix</label>
+            <input :value="row.Prefix" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Prefix', ($event.target as HTMLInputElement).value)" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs text-gray-500">Card Type</label>
+            <select :value="row.CardType" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @change="updateField(idx, 'CardType', ($event.target as HTMLSelectElement).value)">
+              <option value="">— Select —</option>
+              <option v-for="opt in cardTypeOptions" :key="opt.id" :value="opt.id">{{ opt.name }}</option>
+            </select>
+            <p v-if="cardTypeError" class="text-xs text-xp-orange">{{ cardTypeError }}</p>
           </div>
         </div>
       </div>
@@ -196,4 +217,3 @@ function toggleExpand(idx: number) {
     </button>
   </div>
 </template>
-

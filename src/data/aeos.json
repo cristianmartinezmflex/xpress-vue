@@ -28,7 +28,7 @@
       "title": "General",
       "sections": [
         {
-          "title": "Connection",
+          "title": "",
           "columns": [
             {
               "controls": [
@@ -41,7 +41,7 @@
           ]
         },
         {
-          "title": "Options",
+          "title": "",
           "columns": [
             {
               "controls": [
@@ -125,7 +125,7 @@
             {
               "controls": [
                 { "id": "enable_event_filter", "type": "boolean", "title": "Enable Events Filter", "default": false },
-                { "id": "event_filter",        "type": "text",    "title": "Filter Name",          "default": "" }
+                { "id": "event_filter",        "type": "text",    "title": "Filter Name",          "default": "", "enable": "enable_event_filter == true" }
               ]
             }
           ]
@@ -137,8 +137,8 @@
               "controls": [
                 { "id": "search_users_in_events_with_name",   "type": "boolean",        "title": "Enable User Search with Name",             "default": true  },
                 { "id": "enable_user_event_filter",           "type": "boolean",        "title": "Enable User Filter for Events",            "default": false },
-                { "id": "user_event_filter",                  "type": "text",           "title": "User Event Filter",                        "default": "" },
-                { "id": "events_user_search_limit", "type": "select", "title": "Events User Search Limit", "default": "Visitor", "values": [{ "text": "Visitor", "value": "Visitor" }, { "text": "Employee", "value": "Employee" }, { "text": "Contractor", "value": "Contractor" }] },
+                { "id": "user_event_filter", "type": "select", "title": "User Event Filter", "default": "Visitor", "enable": "enable_user_event_filter == true", "values": [{ "text": "Visitor", "value": "Visitor" }, { "text": "Employee", "value": "Employee" }, { "text": "Contractor", "value": "Contractor" }] },
+                { "id": "events_user_search_limit",            "type": "number_spinner", "title": "Events User Search Limit",                 "default": 5,     "validations": [{ "type": "min_max", "min": 0, "max": 9999, "error": "Must be 0 or greater" }] },
                 { "id": "modification_date_filter_mins",      "type": "number_spinner", "title": "Modification Range Filter (Minutes)",      "default": 0,   "validations": [{ "type": "min_max", "min": 0, "max": 9999, "error": "Must be 0 or greater" }] },
                 { "id": "delete_user_in_badge_delete_events", "type": "boolean",        "title": "Delete Users Only in Badge Delete Events", "default": false }
               ]
