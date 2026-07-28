@@ -28,7 +28,7 @@
       "title": "General",
       "sections": [
         {
-          "title": "SDK Connection",
+          "title": "Genetec Security Center Login",
           "columns": [
             {
               "controls": [
@@ -46,33 +46,50 @@
               "controls": [
                 { "id": "related_data",                  "type": "boolean",        "title": "Download Related Data",            "default": true },
                 { "id": "update_cardholder_occupancy",   "type": "boolean",        "title": "Update Cardholder Occupancy",      "default": true },
-                { "id": "use_raw_data",                  "type": "boolean",        "title": "Use Raw Data",                     "default": false },
-                { "id": "page_size",                     "type": "number_spinner", "title": "Page Size",                        "default": 10000, "validations": [{ "type": "min_max", "min": 1, "max": 100000, "error": "Must be between 1 and 100000" }] },
-                { "id": "min_hours_of_activities_to_pull","type": "number_spinner","title": "Min Hours of Activities to Pull",  "default": 4 }
+                { "id": "cardholder_events",    "type": "boolean", "title": "Cardholder Software Events",   "default": true },
+                { "id": "credential_events",    "type": "boolean", "title": "Credential Software Events",   "default": true },
+                { "id": "access_rule_events",   "type": "boolean", "title": "Access Rule Software Events",  "default": true }
               ]
             },
             {
               "controls": [
-                { "id": "rio_enabled",       "type": "boolean",        "title": "Enable CloudLink (RIO)",    "default": true },
-                { "id": "rio_reader_timeout","type": "number_spinner", "title": "RIO Reader Timeout (ms)",   "default": 3000 }
+                { "id": "use_raw_data",                  "type": "boolean",        "title": "Use Raw Badge Data from Genetec",                     "default": false },
+                { "id": "page_size",                     "type": "number_spinner", "title": "SDK Page Size",                        "default": 10000, "validations": [{ "type": "min_max", "min": 1, "max": 100000, "error": "Must be between 1 and 100000" }] }
               ]
             }
           ]
         },
         {
-          "title": "Custom Card Format",
+          "title": "Custom Card Formatting",
           "columns": [
             {
               "controls": [
-                { "id": "custom_card_format",  "type": "boolean",        "title": "Use Custom Card Format", "default": false }
+                { "id": "custom_card_format", "type": "boolean", "title": "Custom Card Format", "default": false }
               ]
             },
             {
               "controls": [
-                { "id": "card_num_start_bit",  "type": "number_spinner", "title": "Card Number Start Bit",  "default": 0, "enable": "custom_card_format == true" },
-                { "id": "card_num_bit_length", "type": "number_spinner", "title": "Card Number Bit Length",  "default": 0, "enable": "custom_card_format == true" },
-                { "id": "fc_start_bit",        "type": "number_spinner", "title": "Facility Code Start Bit","default": 0, "enable": "custom_card_format == true" },
-                { "id": "fc_bit_length",       "type": "number_spinner", "title": "Facility Code Bit Length","default": 0, "enable": "custom_card_format == true" }
+                { "id": "card_num_start_bit",  "type": "number_spinner", "title": "Card # Start Bit",  "default": 0, "validations": [{ "type": "min_max", "min": 0, "max": 99999, "error": "Must be 0 or greater" }] },
+                { "id": "fc_start_bit",        "type": "number_spinner", "title": "FC Start Bit",      "default": 0, "validations": [{ "type": "min_max", "min": 0, "max": 99999, "error": "Must be 0 or greater" }] },
+                { "id": "card_num_bit_length", "type": "number_spinner", "title": "Card # Bit Length", "default": 0, "validations": [{ "type": "min_max", "min": 0, "max": 99999, "error": "Must be 0 or greater" }] },
+                { "id": "fc_bit_length",       "type": "number_spinner", "title": "FC Bit Length",     "default": 0, "validations": [{ "type": "min_max", "min": 0, "max": 99999, "error": "Must be 0 or greater" }] }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "CustomFields",
+                  "type": "keyvalue",
+                  "title": "",
+                  "key_header": "ACM Identity Field",
+                  "value_header": "XPressEntry UDF Field",
+                  "default": []
+                }
               ]
             }
           ]
@@ -143,13 +160,6 @@
                 { "id": "credential_event_name",         "type": "text", "title": "Credential Event Name",        "default": "" },
                 { "id": "credential_event_name_denied",  "type": "text", "title": "Credential Denied Event Name", "default": "" },
                 { "id": "zone_event_name",               "type": "text", "title": "Zone / Area Event Name",       "default": "" }
-              ]
-            },
-            {
-              "controls": [
-                { "id": "cardholder_events",    "type": "boolean", "title": "Cardholder Software Events",   "default": true },
-                { "id": "credential_events",    "type": "boolean", "title": "Credential Software Events",   "default": true },
-                { "id": "access_rule_events",   "type": "boolean", "title": "Access Rule Software Events",  "default": true }
               ]
             }
           ]
