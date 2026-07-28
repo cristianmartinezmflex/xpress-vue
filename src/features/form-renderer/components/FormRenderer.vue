@@ -62,18 +62,18 @@ function onUpdateState(id: string, value: any) {
   <div class="flex flex-col h-full">
 
     <!-- Tab bar -->
-    <div v-if="showTabs" class="flex items-end gap-px bg-gray-100">
+    <div v-if="showTabs" class="flex items-stretch gap-px bg-white pt-2">
       <button
         v-for="(tab, idx) in visibleTabs"
         :key="tab.title"
         type="button"
-        class="flex-1 px-5 text-sm text-center transition border border-gray-300 rounded-t-lg"
+        class="flex-1 flex items-center justify-center px-5 py-2.5 text-sm text-center leading-tight transition border border-gray-300 rounded-t-lg"
         :class="[
           !isTabEnabled(tab)
-            ? 'py-2.5 font-medium text-gray-300 cursor-not-allowed'
+            ? 'font-medium text-gray-300 bg-gray-100 cursor-not-allowed'
             : activeTab === idx
-              ? 'py-3.5 font-bold bg-white text-gray-900 cursor-pointer'
-              : 'py-2.5 font-medium text-gray-500 hover:bg-gray-200 cursor-pointer'
+              ? '-mt-2 font-bold bg-white text-gray-900 border-b-white cursor-pointer'
+              : 'font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 cursor-pointer'
         ]"
         :disabled="!isTabEnabled(tab)"
         @click="isTabEnabled(tab) && (activeTab = idx)"

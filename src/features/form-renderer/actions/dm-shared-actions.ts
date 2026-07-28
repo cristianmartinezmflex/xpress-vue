@@ -80,7 +80,7 @@ export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: Ac
     headers: JSON_HEADERS,
     body: JSON.stringify(body),
   })
-  if (!res.ok) alert(`Error al guardar: el servicio devolvió ${res.status}`)
+  if (!res.ok) alert(`Error saving: service returned ${res.status}`)
 }
 
 // ─── Sync (fire & forget) ─────────────────────────────────────────────────────
@@ -90,7 +90,7 @@ export async function dm_shared_runFullSync({ guid, serviceBase }: ActionContext
   const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync?syncType=FULL_SYNC`, {
     method: 'POST',
   })
-  if (!res.ok) alert(`Error al iniciar full sync: el servicio devolvió ${res.status}`)
+  if (!res.ok) alert(`Error starting full sync: service returned ${res.status}`)
 }
 
 export async function dm_shared_runPartialSync({ guid, serviceBase }: ActionContext): Promise<void> {
@@ -98,7 +98,7 @@ export async function dm_shared_runPartialSync({ guid, serviceBase }: ActionCont
   const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync?syncType=PARTIAL_SYNC`, {
     method: 'POST',
   })
-  if (!res.ok) alert(`Error al iniciar partial sync: el servicio devolvió ${res.status}`)
+  if (!res.ok) alert(`Error starting partial sync: service returned ${res.status}`)
 }
 
 export function dm_shared_runCustomSync({ guid, state, serviceBase, customSyncTables }: ActionContext): void {
@@ -111,7 +111,7 @@ export function dm_shared_runCustomSync({ guid, state, serviceBase, customSyncTa
       headers: JSON_HEADERS,
       body: JSON.stringify(tables),
     })
-    if (!res.ok) alert(`Error al iniciar custom sync: el servicio devolvió ${res.status}`)
+    if (!res.ok) alert(`Error starting custom sync: service returned ${res.status}`)
   }, customSyncTables)
 }
 
@@ -124,7 +124,7 @@ export async function dm_shared_runFullSyncForResult({ guid, serviceBase }: Acti
   })
   if (!res.ok) {
     const result = await res.json().catch(() => null)
-    alert(`Sync falló: ${result?.Error ?? `El servicio devolvió ${res.status}`}`)
+    alert(`Sync failed: ${result?.Error ?? `Service returned ${res.status}`}`)
   }
 }
 
@@ -135,7 +135,7 @@ export async function dm_shared_runPartialSyncForResult({ guid, serviceBase }: A
   })
   if (!res.ok) {
     const result = await res.json().catch(() => null)
-    alert(`Sync falló: ${result?.Error ?? `El servicio devolvió ${res.status}`}`)
+    alert(`Sync failed: ${result?.Error ?? `Service returned ${res.status}`}`)
   }
 }
 
@@ -144,7 +144,7 @@ export async function dm_shared_runPartialSyncForResult({ guid, serviceBase }: A
 export async function dm_shared_getSyncStatus({ guid, serviceBase }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided — cannot get sync status.'); return }
   const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync-status`)
-  if (!res.ok) { alert(`Error obteniendo status: el servicio devolvió ${res.status}`); return }
+  if (!res.ok) { alert(`Error getting status: service returned ${res.status}`); return }
   const result = await res.json()
   alert(`Sync status: ${JSON.stringify(result, null, 2)}`)
 }
@@ -156,7 +156,7 @@ export async function dm_shared_cancelSync({ guid, serviceBase }: ActionContext)
   const res = await fetch(`${serviceBase}/api/data-managers/${guid}/cancel-sync?syncType=FULL_SYNC`, {
     method: 'POST',
   })
-  if (!res.ok) alert(`Error al cancelar sync: el servicio devolvió ${res.status}`)
+  if (!res.ok) alert(`Error cancelling sync: service returned ${res.status}`)
 }
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
@@ -263,7 +263,7 @@ export function dm_shared_editCustomSync({ guid, state, serviceBase, customSyncT
 
 export async function dm_shared_sendActivitySync({ serviceBase }: ActionContext): Promise<void> {
   const res = await fetch(`${serviceBase}/api/data-managers/send-activity-sync`, { method: 'POST' })
-  if (!res.ok) alert(`Error en activity sync: el servicio devolvió ${res.status}`)
+  if (!res.ok) alert(`Error in activity sync: service returned ${res.status}`)
 }
 
 // ─── Genetec-specific actions ─────────────────────────────────────────────────

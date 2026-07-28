@@ -25,7 +25,7 @@ onMounted(async () => {
     if (!res.ok) { fetchErr.value = `Error ${res.status}`; return }
     options.value = await res.json()
   } catch {
-    fetchErr.value = 'No se pudo cargar'
+    fetchErr.value = 'Could not load'
   } finally {
     loading.value = false
   }
@@ -65,7 +65,7 @@ function clearAll() {
     <span v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</span>
 
     <div v-if="loading" class="text-sm text-gray-400">Loading...</div>
-    <div v-else-if="fetchErr" class="text-sm text-xp-orange">{{ fetchErr }} — no se pudo cargar la lista</div>
+    <div v-else-if="fetchErr" class="text-sm text-xp-orange">{{ fetchErr }} — could not load the list</div>
 
     <template v-else>
       <!-- Select All / Clear All -->

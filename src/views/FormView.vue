@@ -160,7 +160,7 @@ const { dispatch } = useDmActions(
       const existingKeys = new Set(existing.map((r) => r.key))
       const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
       ctx.state['emp_fields'] = [...existing, ...newRows]
-      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Se cargaron ${newRows.length} campo(s) nuevo(s).` : 'No hay nuevos campos.' })
+      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Loaded ${newRows.length} new field(s).` : 'No new fields.' })
     },
 
     'loadAeosVisitorFields': async (ctx) => {
@@ -176,7 +176,7 @@ const { dispatch } = useDmActions(
       const existingKeys = new Set(existing.map((r) => r.key))
       const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
       ctx.state['visitor_fields'] = [...existing, ...newRows]
-      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Se cargaron ${newRows.length} campo(s) nuevo(s).` : 'No hay nuevos campos.' })
+      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Loaded ${newRows.length} new field(s).` : 'No new fields.' })
     },
 
     'loadAeosContractorFields': async (ctx) => {
@@ -192,7 +192,7 @@ const { dispatch } = useDmActions(
       const existingKeys = new Set(existing.map((r) => r.key))
       const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
       ctx.state['contractor_fields'] = [...existing, ...newRows]
-      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Se cargaron ${newRows.length} campo(s) nuevo(s).` : 'No hay nuevos campos.' })
+      showDialog({ success: true, title: 'Load AEOS Fields', message: newRows.length > 0 ? `Loaded ${newRows.length} new field(s).` : 'No new fields.' })
     },
 
     // ── Avigilon-specific ──────────────────────────────────────────────────
@@ -210,8 +210,8 @@ const { dispatch } = useDmActions(
       const newRows = fields.filter((f) => !existingKeys.has(f)).map((f) => ({ key: f, value: '' }))
       ctx.state['CustomFields'] = [...existing, ...newRows]
       const msg = newRows.length > 0
-        ? `Se cargaron ${newRows.length} campo(s) nuevo(s) desde Avigilon ACM.`
-        : 'No hay nuevos campos (todos ya están mapeados).'
+        ? `Loaded ${newRows.length} new field(s) from Avigilon ACM.`
+        : 'No new fields (all already mapped).'
       showDialog({ success: true, title: 'Load ACM Fields', message: msg })
     },
   },
@@ -254,19 +254,19 @@ async function handleAction(_id: string, handler: string) {
         v-if="saving"
         class="ml-auto text-xs text-xp-primary font-medium px-2 py-0.5 rounded-full bg-blue-50 border border-xp-primary/30"
       >
-        Guardando...
+        Saving...
       </span>
       <span
         v-else-if="saveResult === 'ok'"
         class="ml-auto text-xs text-xp-success font-medium px-2 py-0.5 rounded-full bg-green-50 border border-green-200"
       >
-        Guardado correctamente
+        Saved successfully
       </span>
       <span
         v-else-if="saveResult === 'error'"
         class="ml-auto text-xs text-xp-red font-medium px-2 py-0.5 rounded-full bg-red-50 border border-red-200"
       >
-        Error al guardar
+        Error saving
       </span>
 
       <!-- Load indicator -->

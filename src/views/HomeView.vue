@@ -64,7 +64,7 @@ onMounted(async () => {
   try {
     const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers`)
     if (!res.ok) {
-      error.value = `El servicio respondió ${res.status}`
+      error.value = `The service responded ${res.status}`
       return
     }
     const data: DataManagerItem[] = await res.json()
@@ -72,7 +72,7 @@ onMounted(async () => {
       .filter(dm => schemaKey(dm) !== null)
       .sort((a, b) => a.data_manager_name.localeCompare(b.data_manager_name))
   } catch {
-    error.value = `No se pudo conectar al servicio en ${DM_SERVICE_BASE}`
+    error.value = `Could not connect to the service at ${DM_SERVICE_BASE}`
   } finally {
     loading.value = false
   }
@@ -96,7 +96,7 @@ onMounted(async () => {
     <!-- Error -->
     <div v-else-if="error" class="max-w-4xl mx-auto">
       <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-        {{ error }} — mostrando configuración estática.
+        {{ error }} — showing static configuration.
       </div>
 
       <!-- Fallback: static cards -->
@@ -162,7 +162,7 @@ onMounted(async () => {
         v-if="dataManagers.length === 0"
         class="col-span-full text-center text-sm text-gray-400 py-16"
       >
-        No hay data managers habilitados configurados.
+        No enabled data managers configured.
       </div>
     </div>
 

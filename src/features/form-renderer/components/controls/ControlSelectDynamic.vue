@@ -27,7 +27,7 @@ onMounted(async () => {
     const data: DynamicOption[] = await res.json()
     options.value = data
   } catch {
-    fetchErr.value = 'No se pudo cargar'
+    fetchErr.value = 'Could not load'
   } finally {
     loading.value = false
   }
