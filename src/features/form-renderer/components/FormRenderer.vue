@@ -1,9 +1,34 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { FormSchema, Control } from '../types/schema'
+import type { FormSchema, Control, Button, Tab } from '../types/schema'
 import { useFormState } from '../composables/useFormState'
 import { evaluateEnable, evaluateDisplay } from '../composables/useDisabled'
 import FormSection from './FormSection.vue'
+
+// Sync operations are common to EVERY Data Manager, so the whole "Sync" tab is fixed here
+// in the component (prepended to the DM's own tabs) instead of being declared in each DM JSON.
+const COMMON_SYNC_BUTTONS: Button[] = [
+  { id: 'btn_partial_sync', title: 'Partial Sync Now', onClick: 'dm_shared_runPartialSync', tooltip: 'Pull the latest table changes from the external system. Partial syncs are incremental changes to Users and Badges, if allowed by the external system\'s API.' },
+  { id: 'btn_full_sync',    title: 'Full Sync Now',    onClick: 'dm_shared_runFullSync',    tooltip: 'Pull all records from the external system. Replaces the full local dataset with the current state of the external system.' },
+  { id: 'btn_custom_sync',  title: 'Custom Sync Now',  onClick: 'dm_shared_runCustomSync',  tooltip: 'Run a custom sync operation defined by this data manager. Right-click to edit the custom sync tables.', rightClickMenu: [{ label: 'Edit Custom Sync', onClick: 'dm_shared_editCustomSync' }] },
+]
+
+const SYNC_TAB: Tab = {
+  title: 'Sync',
+  sections: [
+    {
+      title: 'Sync Operations',
+      columns: [
+        {
+          controls: [
+            { id: 'sync_buttons', type: 'button_bar', buttons: COMMON_SYNC_BUTTONS },
+            { id: 'sync_log',     type: 'log_view' },
+          ],
+        },
+      ],
+    },
+  ],
+}
 
 const props = defineProps<{
   schema:         FormSchema
@@ -15,8 +40,11 @@ const emit = defineEmits<{ action: [id: string, handler: string, payload?: unkno
 
 const activeTab = ref(0)
 
+// The fixed generic Sync tab always comes first, then the Data Manager's own tabs.
+const allTabs = computed<Tab[]>(() => [SYNC_TAB, ...props.schema.tabs])
+
 const visibleTabs = computed(() =>
-  props.schema.tabs.filter((tab) =>
+  allTabs.value.filter((tab) =>
     evaluateDisplay(tab.display, state) &&
     tab.sections?.some((s) => s.columns?.some((col) => col.controls?.length > 0))
   ),
@@ -41,7 +69,7 @@ defineExpose({ state, resetToDefaults })
 
 const controlMap = computed<Record<string, Control>>(() => {
   const map: Record<string, Control> = {}
-  props.schema.tabs.forEach((tab) =>
+  allTabs.value.forEach((tab) =>
     tab.sections?.forEach((section) =>
       section.columns?.forEach((col) =>
         col.controls?.forEach((ctrl) => { map[ctrl.id] = ctrl })
@@ -82,8 +110,8 @@ function onUpdateState(id: string, value: any) {
       </button>
     </div>
 
-    <!-- Sticky action bar (generic buttons always visible) -->
-    <div class="flex items-center justify-end gap-2 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
+    <!-- Sticky action bar: settings actions common to every DM (fixed here), right-aligned -->
+    <div class="flex flex-wrap items-center justify-end gap-2 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
       <button
         type="button"
         class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
