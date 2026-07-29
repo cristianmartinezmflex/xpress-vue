@@ -26,7 +26,7 @@ async function loadFieldsInto(
   show({
     success: true,
     title: 'Load AEOS Fields',
-    message: newRows.length > 0 ? `Se cargaron ${newRows.length} campo(s) nuevo(s).` : 'No hay nuevos campos.',
+    message: newRows.length > 0 ? `Loaded ${newRows.length} new field(s).` : 'No new fields.',
   })
 }
 

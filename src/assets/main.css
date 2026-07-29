@@ -1,1 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --color-xp-primary: #006990;
+  --color-xp-primary-hover: #0082b2;
+  --color-xp-dark-blue: #122632;
+  --color-xp-label: #3f7596;
+  --color-xp-gray: #666666;
+  --color-xp-gray-hover: #9c9c9c;
+  --color-xp-light-hover: #bfe0f7;
+  --color-xp-red: #e31b23;
+  --color-xp-red-hover: #c8191f;
+  --color-xp-orange: #f78e1e;
+  --color-xp-yellow: #ffde00;
+  --color-xp-success: #19894a;
+  --color-xp-success-hover: #157a40;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-xp: 5px 5px 0px 0px rgba(102, 102, 102, 0.1);
+}

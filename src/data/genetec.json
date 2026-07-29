@@ -26,7 +26,11 @@
                   "type": "text",
                   "title": "Username",
                   "default": "admin"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "password",
                   "type": "password",
@@ -305,7 +309,11 @@
                   "type": "text",
                   "title": "Custom Credential Field 2",
                   "default": ""
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "custom_credential_field_3",
                   "type": "text",

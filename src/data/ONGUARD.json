@@ -36,7 +36,11 @@
                   "type": "text",
                   "title": "Username",
                   "default": "nathaniel"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "password",
                   "type": "password",
@@ -78,7 +82,11 @@
                   "default": "",
                   "disabled": true,
                   "value_from": "remote_namespace"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "large_user_table",
                   "type": "boolean",
@@ -198,7 +206,11 @@
                       "error": "Must be between 1 and 65535"
                     }
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "open_access_directory_name",
                   "type": "select",
@@ -310,7 +322,11 @@
                   "type": "boolean",
                   "title": "Delete Software Events Upon Processing",
                   "default": true
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "async_event_handling",
                   "type": "boolean",
@@ -393,7 +409,11 @@
                   "type": "boolean",
                   "title": "Ignore Empty Reader Area",
                   "default": true
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "onguard_hazard_safe_areas",
                   "type": "boolean",
@@ -462,7 +482,11 @@
                   "type": "boolean",
                   "title": "Deactivate Badges by Date/Time",
                   "default": true
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "only_cardholders_with_badges",
                   "type": "boolean",
@@ -522,7 +546,11 @@
                   "type": "text",
                   "title": "Visitor ID Field",
                   "default": ""
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "visitor_company_field",
                   "type": "text",
@@ -549,7 +577,11 @@
                   "type": "text",
                   "title": "Watch List Field",
                   "default": ""
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "watch_list_table",
                   "type": "text",
@@ -576,7 +608,11 @@
                   "type": "text",
                   "title": "DataConduIT Source",
                   "default": ""
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "dataconduit_door_prefix",
                   "type": "text",
@@ -648,7 +684,11 @@
                   "type": "boolean",
                   "title": "Sync Fingerprints from OnGuard",
                   "default": false
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "fingerprint_type_ids",
                   "type": "text",
@@ -669,7 +709,11 @@
                   "type": "text",
                   "title": "Companies Custom List",
                   "default": "Department"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "companies_reference",
                   "type": "text",
@@ -696,7 +740,11 @@
                   "type": "boolean",
                   "title": "Enable Record Deletion",
                   "default": true
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "safety_delete_threshold",
                   "type": "number_spinner",
@@ -743,7 +791,11 @@
                   "type": "boolean",
                   "title": "Temporary",
                   "default": false
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "badge_type_vehicle",
                   "type": "boolean",
@@ -882,7 +934,11 @@
                   "title": "User Gender Field",
                   "default": "",
                   "enable": "enable_user_gender_mappings == true"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "value_male",
                   "type": "text",
@@ -939,7 +995,11 @@
                   "title": "Vehicle",
                   "default": false,
                   "enable": "enable_vehicle_mappings == true"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "vehicle_lic_plate_field",
                   "type": "text",

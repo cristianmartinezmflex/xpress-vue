@@ -22,8 +22,8 @@ const { state, close } = useDialog()
           <div class="flex items-center gap-3">
             <div
               :class="state.success
-                ? 'bg-green-100 text-green-600'
-                : 'bg-red-100 text-red-600'"
+                ? 'bg-green-100 text-xp-success'
+                : 'bg-red-100 text-xp-red'"
               class="flex items-center justify-center w-9 h-9 rounded-full shrink-0"
             >
               <!-- Check -->
@@ -47,8 +47,8 @@ const { state, close } = useDialog()
               type="button"
               class="px-4 py-1.5 text-sm font-medium rounded-lg cursor-pointer transition"
               :class="state.success
-                ? 'bg-green-600 hover:bg-green-700 text-white'
-                : 'bg-red-600 hover:bg-red-700 text-white'"
+                ? 'bg-xp-success hover:bg-xp-success-hover text-white'
+                : 'bg-xp-red hover:bg-xp-red-hover text-white'"
               @click="close"
             >
               OK

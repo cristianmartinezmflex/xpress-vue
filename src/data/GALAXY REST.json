@@ -38,7 +38,11 @@
                   "type": "text",
                   "title": "User Name",
                   "default": ""
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "password",
                   "type": "password",
@@ -117,7 +121,11 @@
                       "error": "Must be between 0 and 60000"
                     }
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "data_check_interval",
                   "type": "number_spinner",
@@ -174,7 +182,11 @@
                   "type": "boolean",
                   "title": "Verbose API Data",
                   "default": false
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "pull_companies",
                   "type": "boolean",

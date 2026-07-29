@@ -25,7 +25,7 @@ onMounted(async () => {
     if (!res.ok) { fetchErr.value = `Error ${res.status}`; return }
     options.value = await res.json()
   } catch {
-    fetchErr.value = 'No se pudo cargar'
+    fetchErr.value = 'Could not load'
   } finally {
     loading.value = false
   }
@@ -62,29 +62,29 @@ function clearAll() {
 
 <template>
   <div class="flex flex-col gap-2">
-    <span v-if="title" class="text-sm font-medium text-gray-700">{{ title }}</span>
+    <span v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</span>
 
     <div v-if="loading" class="text-sm text-gray-400">Loading...</div>
-    <div v-else-if="fetchErr" class="text-sm text-amber-500">{{ fetchErr }} — no se pudo cargar la lista</div>
+    <div v-else-if="fetchErr" class="text-sm text-xp-orange">{{ fetchErr }} — could not load the list</div>
 
     <template v-else>
       <!-- Select All / Clear All -->
       <div class="flex gap-2">
         <button
           type="button"
-          class="text-xs text-blue-600 hover:underline cursor-pointer"
+          class="text-xs text-xp-primary hover:underline cursor-pointer"
           @click="selectAll"
         >Select All</button>
         <span class="text-xs text-gray-300">|</span>
         <button
           type="button"
-          class="text-xs text-blue-600 hover:underline cursor-pointer"
+          class="text-xs text-xp-primary hover:underline cursor-pointer"
           @click="clearAll"
         >Clear All</button>
       </div>
 
       <!-- Checkbox list -->
-      <div class="border border-gray-200 rounded-md overflow-hidden max-h-64 overflow-y-auto">
+      <div class="border border-gray-200 rounded-lg overflow-hidden max-h-64 overflow-y-auto">
         <label
           v-for="opt in options"
           :key="opt.id"
@@ -93,7 +93,7 @@ function clearAll() {
           <input
             type="checkbox"
             :checked="isChecked(opt.id)"
-            class="w-4 h-4 rounded accent-blue-600"
+            class="w-4 h-4 rounded accent-xp-primary"
             @change="toggle(opt.id)"
           />
           <span class="text-sm text-gray-800">{{ opt.name }}</span>

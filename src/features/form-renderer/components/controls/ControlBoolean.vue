@@ -9,7 +9,7 @@ defineEmits<{ 'update:modelValue': [value: boolean] }>()
       type="checkbox"
       :checked="modelValue"
       :disabled="disabled"
-      class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+      class="w-4 h-4 rounded border-gray-300 text-xp-primary focus:ring-xp-primary"
       @change="!disabled && $emit('update:modelValue', ($event.target as HTMLInputElement).checked)"
     />
     <span v-if="title" class="text-sm text-gray-700">{{ title }}</span>

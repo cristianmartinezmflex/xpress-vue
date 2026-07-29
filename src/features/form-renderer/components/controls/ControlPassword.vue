@@ -9,13 +9,13 @@ const show = ref(false)
 
 <template>
   <div class="flex flex-col gap-1">
-    <label v-if="title" class="text-sm font-medium text-gray-700">{{ title }}</label>
+    <label v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</label>
     <div class="relative flex items-center">
       <input
         :type="show ? 'text' : 'password'"
         :value="modelValue"
-        class="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        :class="{ 'border-red-500': error }"
+        class="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-xp-primary"
+        :class="{ 'border-xp-red': error }"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       />
       <button
@@ -35,6 +35,6 @@ const show = ref(false)
         </svg>
       </button>
     </div>
-    <p v-if="error" class="text-xs text-red-500">{{ error }}</p>
+    <p v-if="error" class="text-xs text-xp-red">{{ error }}</p>
   </div>
 </template>

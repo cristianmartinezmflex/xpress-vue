@@ -27,7 +27,7 @@ onMounted(async () => {
     const data: DynamicOption[] = await res.json()
     options.value = data
   } catch {
-    fetchErr.value = 'No se pudo cargar'
+    fetchErr.value = 'Could not load'
   } finally {
     loading.value = false
   }
@@ -42,11 +42,11 @@ function onChange(e: Event) {
 
 <template>
   <div class="flex flex-col gap-1">
-    <label v-if="title" class="text-sm font-medium text-gray-700">{{ title }}</label>
+    <label v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</label>
     <select
       :value="modelValue"
-      class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-      :class="{ 'border-red-500': error }"
+      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
+      :class="{ 'border-xp-red': error }"
       :disabled="loading"
       @change="onChange"
     >
@@ -58,7 +58,7 @@ function onChange(e: Event) {
         :value="opt.id"
       >{{ opt.name }}</option>
     </select>
-    <p v-if="fetchErr" class="text-xs text-amber-500">{{ fetchErr }} — enter ID manually</p>
-    <p v-if="error"    class="text-xs text-red-500">{{ error }}</p>
+    <p v-if="fetchErr" class="text-xs text-xp-orange">{{ fetchErr }} — enter ID manually</p>
+    <p v-if="error"    class="text-xs text-xp-red">{{ error }}</p>
   </div>
 </template>

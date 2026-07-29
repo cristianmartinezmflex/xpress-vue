@@ -26,7 +26,11 @@
                   "type": "text",
                   "title": "Port",
                   "default": "8443"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "login",
                   "type": "text",
@@ -248,7 +252,11 @@
                   "type": "boolean",
                   "title": "Enable Events Filter",
                   "default": false
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "event_filter",
                   "type": "text",
@@ -281,7 +289,11 @@
                   "type": "text",
                   "title": "User Event Filter",
                   "default": ""
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "events_user_search_limit",
                   "type": "select",
@@ -342,7 +354,11 @@
                   "type": "boolean",
                   "title": "Download Pictures in User Events",
                   "default": true
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "process_users_in_badge_issue_events",
                   "type": "boolean",

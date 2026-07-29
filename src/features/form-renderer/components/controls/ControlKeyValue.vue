@@ -66,7 +66,7 @@ function updateRow(index: number, field: 'key' | 'value', val: string) {
 
 <template>
   <div class="flex flex-col gap-3">
-    <span v-if="title" class="text-sm font-medium text-gray-700">{{ title }}</span>
+    <span v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</span>
 
     <!-- Filter row -->
     <div class="flex gap-3 items-end">
@@ -74,7 +74,7 @@ function updateRow(index: number, field: 'key' | 'value', val: string) {
         <label class="text-xs text-gray-500">{{ keyTitle ?? 'Source Columns' }}</label>
         <select
           v-model="filterKey"
-          class="rounded-md border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
         >
           <option value="">All</option>
           <option v-for="k in keyOptions" :key="k" :value="k">{{ k }}</option>
@@ -84,7 +84,7 @@ function updateRow(index: number, field: 'key' | 'value', val: string) {
         <label class="text-xs text-gray-500">{{ valueTitle ?? 'Destination Columns' }}</label>
         <select
           v-model="filterValue"
-          class="rounded-md border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
         >
           <option value="">All</option>
           <option v-for="v in valueOptions" :key="v" :value="v">{{ v }}</option>
@@ -93,7 +93,7 @@ function updateRow(index: number, field: 'key' | 'value', val: string) {
       <button
         type="button"
         class="flex items-center justify-center w-9 h-9 rounded-full text-white font-bold transition self-end leading-none"
-        :class="hasEmptyRow ? 'bg-green-300 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600 cursor-pointer'"
+        :class="hasEmptyRow ? 'bg-green-300 cursor-not-allowed' : 'bg-xp-success hover:bg-xp-success-hover cursor-pointer'"
         style="font-size: 22px; padding-bottom: 1px;"
         :title="hasEmptyRow ? 'Complete the empty row first' : 'Add row'"
         :disabled="hasEmptyRow"
@@ -102,7 +102,7 @@ function updateRow(index: number, field: 'key' | 'value', val: string) {
     </div>
 
     <!-- Table -->
-    <div class="border border-gray-200 rounded-md overflow-hidden">
+    <div class="border border-gray-200 rounded-lg overflow-hidden">
       <table class="w-full text-sm">
         <thead class="bg-gray-50 border-b border-gray-200">
           <tr>
@@ -116,7 +116,7 @@ function updateRow(index: number, field: 'key' | 'value', val: string) {
             v-for="(row, idx) in filtered"
             :key="idx"
             class="border-b border-gray-100 last:border-0 cursor-pointer"
-            :class="selectedRow === idx ? 'bg-blue-50' : 'hover:bg-gray-50'"
+            :class="selectedRow === idx ? 'bg-xp-light-hover/30' : 'hover:bg-gray-50'"
             @click="selectedRow = idx"
           >
             <td class="px-3 py-2">
@@ -144,7 +144,7 @@ function updateRow(index: number, field: 'key' | 'value', val: string) {
             <td class="px-3 py-2 text-center">
               <button
                 type="button"
-                class="text-red-400 hover:text-red-600 text-xs"
+                class="text-xp-red hover:text-xp-red-hover text-xs"
                 @click.stop="removeRow(idx)"
               >✕</button>
             </td>

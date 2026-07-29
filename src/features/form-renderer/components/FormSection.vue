@@ -38,6 +38,19 @@ const emit = defineEmits<{
 const sectionEnabled  = computed(() => evaluateEnable(props.enable, props.state))
 const sectionVisible  = computed(() => evaluateDisplay(props.display, props.state))
 
+// Column layout: a section with N columns (2–4 supported) renders as an N-wide grid on
+// desktop and collapses to a single column on small screens. Classes are written out in full
+// so Tailwind's scanner picks them up (no dynamic class-name interpolation).
+const columnLayoutClass = computed(() => {
+  const n = Math.min(Math.max(props.columns.length, 1), 4)
+  return {
+    1: 'flex flex-col gap-4',
+    2: 'grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4',
+    3: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4',
+    4: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4',
+  }[n]!
+})
+
 function isColumnEnabled(col: Column): boolean {
   return sectionEnabled.value && evaluateEnable(col.enable, props.state)
 }
@@ -58,17 +71,17 @@ function isControlVisible(control: Control): boolean {
 <template>
   <div
     v-show="sectionVisible"
-    class="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden transition-opacity"
+    class="rounded-lg border border-gray-200 bg-white shadow-xp overflow-hidden transition-opacity"
     :class="!sectionEnabled ? 'opacity-50' : ''"
   >
     <div v-if="title" class="px-4 py-2 bg-gray-50 border-b border-gray-200">
-      <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">{{ title }}</h3>
+      <h3 class="text-sm font-semibold text-xp-label uppercase tracking-wide">{{ title }}</h3>
     </div>
 
     <div
       class="p-4"
       :class="[
-        columns.length >= 2 ? 'grid grid-cols-2 gap-x-6' : 'flex flex-col gap-4',
+        columnLayoutClass,
         !sectionEnabled ? 'pointer-events-none select-none' : ''
       ]"
     >
@@ -94,7 +107,7 @@ function isControlVisible(control: Control): boolean {
             />
 
             <div v-else-if="control.type === 'text' && control.value_from" class="text-sm text-gray-600">
-              <span class="font-medium text-gray-700">{{ control.title }}:</span>
+              <span class="font-semibold text-xp-label">{{ control.title }}:</span>
               {{ state[control.value_from] ?? '' }}
             </div>
 

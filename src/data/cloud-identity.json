@@ -27,7 +27,11 @@
                   "type": "text",
                   "title": "Tenant ID",
                   "default": ""
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "client_id",
                   "type": "text",
@@ -68,7 +72,11 @@
                       "error": "5–1440 min"
                     }
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "environment",
                   "type": "select",
@@ -220,7 +228,11 @@
                       "error": "0–9999"
                     }
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "section_enable_field_3",
                   "type": "boolean",
@@ -248,7 +260,11 @@
                   "title": "Text field (enable: \"enable_fields_demo == true\")",
                   "default": "",
                   "enable": "enable_fields_demo == true"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "field_enable_spinner",
                   "type": "number_spinner",
@@ -326,7 +342,11 @@
                   "type": "boolean",
                   "title": "Field B (boolean)",
                   "default": false
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "section_display_field_3",
                   "type": "password",
@@ -371,7 +391,11 @@
                   ],
                   "default": "x",
                   "display": "show_fields_demo == true"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "field_display_spinner",
                   "type": "number_spinner",

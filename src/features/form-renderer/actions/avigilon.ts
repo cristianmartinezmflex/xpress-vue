@@ -22,7 +22,7 @@ export async function avigilon_loadFields({ guid, state, serviceBase }: ActionCo
     success: true,
     title: 'Load ACM Fields',
     message: newRows.length > 0
-      ? `Se cargaron ${newRows.length} campo(s) nuevo(s) desde Avigilon ACM.`
-      : 'No hay nuevos campos (todos ya están mapeados).',
+      ? `Loaded ${newRows.length} new field(s) from Avigilon ACM.`
+      : 'No new fields (all already mapped).',
   })
 }

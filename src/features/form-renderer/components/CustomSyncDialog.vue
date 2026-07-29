@@ -77,14 +77,14 @@ function labelFor(value: number): string {
         <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
           <button
             type="button"
-            class="px-4 py-1.5 text-sm font-medium rounded border border-gray-300 bg-white hover:bg-gray-50 cursor-pointer transition"
+            class="px-4 py-1.5 text-sm font-medium rounded-lg border border-gray-300 bg-white hover:bg-gray-50 cursor-pointer transition"
             @click="addTable"
           >
             Add Table
           </button>
           <button
             type="button"
-            class="px-4 py-1.5 text-sm font-medium rounded border border-gray-300 bg-white hover:bg-gray-50 cursor-pointer transition"
+            class="px-4 py-1.5 text-sm font-medium rounded-lg border border-gray-300 bg-white hover:bg-gray-50 cursor-pointer transition"
             @click="confirm"
           >
             Done
@@ -106,7 +106,7 @@ function labelFor(value: number): string {
 
             <select
               v-model.number="row.iDMTable"
-              class="flex-1 text-sm border border-gray-300 rounded px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-400 cursor-pointer"
+              class="flex-1 text-sm border border-gray-300 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-xp-primary cursor-pointer"
             >
               <option v-for="t in AVAILABLE_TABLES" :key="t.value" :value="t.value">
                 {{ t.label }}
@@ -120,7 +120,7 @@ function labelFor(value: number): string {
 
             <button
               type="button"
-              class="w-6 h-6 flex items-center justify-center text-red-500 hover:text-red-700 cursor-pointer transition text-lg leading-none"
+              class="w-6 h-6 flex items-center justify-center text-xp-red hover:text-xp-red-hover cursor-pointer transition text-lg leading-none"
               title="Remove"
               @click="removeTable(i)"
             >

@@ -16,7 +16,7 @@ function resolveValue(opt: SelectOption) {
 
 <template>
   <div class="flex flex-col gap-2">
-    <span v-if="title" class="text-sm font-medium text-gray-700">{{ title }}</span>
+    <span v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</span>
     <div class="flex flex-wrap gap-4">
       <label
         v-for="opt in values"
@@ -28,7 +28,7 @@ function resolveValue(opt: SelectOption) {
           :name="id"
           :value="resolveValue(opt)"
           :checked="modelValue === resolveValue(opt)"
-          class="text-blue-600 focus:ring-blue-500"
+          class="text-xp-primary focus:ring-xp-primary"
           @change="$emit('update:modelValue', resolveValue(opt))"
         />
         {{ opt.text }}

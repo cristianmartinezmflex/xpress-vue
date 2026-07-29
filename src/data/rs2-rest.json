@@ -26,7 +26,11 @@
                   "type": "text",
                   "title": "API Port",
                   "default": "7777"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "timezoneinfo",
                   "type": "select",
@@ -103,7 +107,11 @@
                   "type": "password",
                   "title": "Password",
                   "default": ""
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "api_token",
                   "type": "password",

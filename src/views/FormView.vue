@@ -108,7 +108,7 @@ async function handleAction(_id: string, handler: string, payload?: unknown) {
     <div class="flex items-center gap-3 px-6 py-4 bg-white border-b border-gray-200 shrink-0">
       <button
         type="button"
-        class="flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 text-gray-500 transition cursor-pointer"
+        class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-500 transition cursor-pointer"
         title="Back to Home"
         @click="router.push('/')"
       >
@@ -121,33 +121,33 @@ async function handleAction(_id: string, handler: string, payload?: unknown) {
       <!-- Save result indicator -->
       <span
         v-if="saving"
-        class="ml-auto text-xs text-blue-600 font-medium px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200"
+        class="ml-auto text-xs text-xp-primary font-medium px-2 py-0.5 rounded-full bg-blue-50 border border-xp-primary/30"
       >
-        Guardando...
+        Saving...
       </span>
       <span
         v-else-if="saveResult === 'ok'"
-        class="ml-auto text-xs text-green-600 font-medium px-2 py-0.5 rounded-full bg-green-50 border border-green-200"
+        class="ml-auto text-xs text-xp-success font-medium px-2 py-0.5 rounded-full bg-green-50 border border-green-200"
       >
-        Guardado correctamente
+        Saved successfully
       </span>
       <span
         v-else-if="saveResult === 'error'"
-        class="ml-auto text-xs text-red-600 font-medium px-2 py-0.5 rounded-full bg-red-50 border border-red-200"
+        class="ml-auto text-xs text-xp-red font-medium px-2 py-0.5 rounded-full bg-red-50 border border-red-200"
       >
-        Error al guardar
+        Error saving
       </span>
 
       <!-- Load indicator -->
       <span
         v-else-if="dmValues && !apiError"
-        class="ml-auto text-xs text-green-600 font-medium px-2 py-0.5 rounded-full bg-green-50 border border-green-200"
+        class="ml-auto text-xs text-xp-success font-medium px-2 py-0.5 rounded-full bg-green-50 border border-green-200"
       >
         Loaded from service
       </span>
       <span
         v-else-if="apiError"
-        class="ml-auto text-xs text-amber-600 font-medium px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200"
+        class="ml-auto text-xs text-xp-orange font-medium px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200"
         :title="apiError"
       >
         Using defaults

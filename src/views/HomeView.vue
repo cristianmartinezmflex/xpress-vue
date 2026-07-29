@@ -51,13 +51,13 @@ onMounted(async () => {
   try {
     const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers`)
     if (!res.ok) {
-      error.value = `El servicio respondió ${res.status}`
+      error.value = `The service responded ${res.status}`
       return
     }
     const data: DataManagerItem[] = await res.json()
     dataManagers.value = data.sort((a, b) => a.data_manager_name.localeCompare(b.data_manager_name))
   } catch {
-    error.value = `No se pudo conectar al servicio en ${DM_SERVICE_BASE}`
+    error.value = `Could not connect to the service at ${DM_SERVICE_BASE}`
   } finally {
     loading.value = false
   }
@@ -92,17 +92,17 @@ onMounted(async () => {
             v-for="{ dm, schema } in matchedDms"
             :key="dm.dm_guid"
             type="button"
-            class="group text-left bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-blue-300 transition cursor-pointer"
+            class="group text-left bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-xp-primary transition cursor-pointer"
             @click="openSchema(schema.key, dm.dm_guid)"
           >
             <span class="text-3xl">⚙️</span>
             <div class="flex-1">
-              <h2 class="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition">
+              <h2 class="text-base font-semibold text-gray-900 group-hover:text-xp-primary transition">
                 {{ dm.data_manager_name }}
               </h2>
               <p v-if="dm.id_prefix" class="mt-0.5 text-xs text-gray-400">Prefix: {{ dm.id_prefix }}</p>
             </div>
-            <div class="flex items-center gap-1 text-sm font-medium text-blue-600 group-hover:gap-2 transition-all">
+            <div class="flex items-center gap-1 text-sm font-medium text-xp-primary group-hover:gap-2 transition-all">
               Configure
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -111,7 +111,7 @@ onMounted(async () => {
           </button>
 
           <div v-if="matchedDms.length === 0" class="col-span-full text-sm text-gray-400 py-8">
-            No hay data managers de la base con un schema en ./data.
+            No database data managers have a schema in ./data.
           </div>
         </div>
       </div>

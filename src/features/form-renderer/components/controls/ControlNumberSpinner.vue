@@ -16,8 +16,8 @@ function step(delta: number) {
 
 <template>
   <div class="flex flex-col gap-1">
-    <label v-if="title" class="text-sm font-medium text-gray-700">{{ title }}</label>
-    <div class="flex items-stretch w-32 rounded-md border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500" :class="{ 'border-red-500': error }">
+    <label v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</label>
+    <div class="flex items-stretch w-32 rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-xp-primary" :class="{ 'border-xp-red': error }">
       <input
         type="number"
         :value="modelValue"
@@ -37,6 +37,6 @@ function step(delta: number) {
         >▼</button>
       </div>
     </div>
-    <p v-if="error" class="text-xs text-red-500">{{ error }}</p>
+    <p v-if="error" class="text-xs text-xp-red">{{ error }}</p>
   </div>
 </template>

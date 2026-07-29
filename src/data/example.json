@@ -186,6 +186,84 @@
     },
     {
       "title": "Advanced"
+    },
+    {
+      "title": "Columns Demo",
+      "sections": [
+        {
+          "title": "Three columns",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "demo_a",
+                  "type": "text",
+                  "title": "Field A"
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "demo_b",
+                  "type": "text",
+                  "title": "Field B"
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "demo_c",
+                  "type": "number",
+                  "title": "Field C"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Four columns",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "demo_1",
+                  "type": "text",
+                  "title": "Field 1"
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "demo_2",
+                  "type": "text",
+                  "title": "Field 2"
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "demo_3",
+                  "type": "number",
+                  "title": "Field 3"
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "demo_4",
+                  "type": "boolean",
+                  "title": "TLS"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

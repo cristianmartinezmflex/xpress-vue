@@ -38,7 +38,11 @@
                   "type": "password",
                   "title": "Password",
                   "default": ""
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "use_ssl",
                   "type": "boolean",
@@ -84,7 +88,11 @@
                   "title": "Doors From Area",
                   "loadFrom": "avigilon/zones",
                   "default": -1
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "to_zone_id",
                   "type": "select_dynamic",
@@ -130,7 +138,11 @@
                   "type": "boolean",
                   "title": "Send XPressEntry Live Activities",
                   "default": false
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "send_xpe_record_updates",
                   "type": "boolean",
@@ -211,7 +223,11 @@
                       "error": "Must be between 1 and 1000"
                     }
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "single_msmq_event_processing",
                   "type": "boolean",
@@ -258,7 +274,11 @@
                   "type": "text",
                   "title": "Database",
                   "default": "TransactionDB"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "postgre_username",
                   "type": "text",
@@ -291,7 +311,11 @@
                   "type": "text",
                   "title": "Strike DN Field",
                   "default": "plasecdoorStrkDN"
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "pulse_duration",
                   "type": "number_spinner",
@@ -334,7 +358,11 @@
                       "error": "Must be -1 or a valid profile ID"
                     }
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "default_outside_zone_id",
                   "type": "number_spinner",
