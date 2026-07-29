@@ -81,7 +81,7 @@ onMounted(async () => {
     <template v-else>
       <!-- First section: Data Managers that come from the database (matched to a ./data schema) -->
       <div class="max-w-4xl mx-auto">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Data Managers</p>
+        <p class="text-xs font-semibold uppercase tracking-wider text-xp-label mb-3">Data Managers</p>
 
         <div v-if="error" class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 mb-4">
           {{ error }}
@@ -92,7 +92,7 @@ onMounted(async () => {
             v-for="{ dm, schema } in matchedDms"
             :key="dm.dm_guid"
             type="button"
-            class="group text-left bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-xp-primary transition cursor-pointer"
+            class="group text-left bg-white rounded-xl border border-gray-200 shadow-xp p-6 flex flex-col gap-4 hover:shadow-md hover:border-xp-primary transition cursor-pointer"
             @click="openSchema(schema.key, dm.dm_guid)"
           >
             <span class="text-3xl">⚙️</span>
@@ -118,22 +118,22 @@ onMounted(async () => {
 
       <!-- Demo & Showcase: schemas in ./data with no matching database DM -->
       <div v-if="demoSchemas.length" class="max-w-4xl mx-auto mt-10">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Demo &amp; Showcase</p>
+        <p class="text-xs font-semibold uppercase tracking-wider text-xp-label mb-3">Demo &amp; Showcase</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <button
             v-for="s in demoSchemas"
             :key="s.key"
             type="button"
-            class="group text-left bg-white rounded-xl border border-dashed border-gray-300 shadow-sm p-6 flex flex-col gap-4 hover:shadow-md hover:border-purple-300 transition cursor-pointer"
+            class="group text-left bg-white rounded-xl border border-dashed border-gray-300 shadow-xp p-6 flex flex-col gap-4 hover:shadow-md hover:border-xp-orange transition cursor-pointer"
             @click="openSchema(s.key)"
           >
             <span class="text-3xl">🧩</span>
             <div class="flex-1">
-              <h2 class="text-base font-semibold text-gray-900 group-hover:text-purple-600 transition">
+              <h2 class="text-base font-semibold text-gray-900 group-hover:text-xp-orange transition">
                 {{ s.title }}
               </h2>
             </div>
-            <div class="flex items-center gap-1 text-sm font-medium text-purple-600 group-hover:gap-2 transition-all">
+            <div class="flex items-center gap-1 text-sm font-medium text-xp-orange group-hover:gap-2 transition-all">
               Configure
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
