@@ -109,7 +109,7 @@ async function loadSites() {
   }
   loading.value = true
   try {
-    const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/rs2/sites`)
+    const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/dm-data?type=sites`)
     if (!res.ok) { alert(`Error loading sites: HTTP ${res.status}`); return }
     const data: { id: string; name: string }[] = await res.json()
     loadedSites.value = [{ id: '-1', name: 'All Sites' }, ...data]

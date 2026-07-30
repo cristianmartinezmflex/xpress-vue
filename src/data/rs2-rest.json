@@ -137,7 +137,7 @@
                   "id": "selected_site",
                   "type": "select_dynamic",
                   "title": "Select Site",
-                  "loadFrom": "rs2/sites",
+                  "loadFrom": "sites",
                   "default": "-1"
                 },
                 {

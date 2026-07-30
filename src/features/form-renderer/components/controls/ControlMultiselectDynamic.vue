@@ -17,11 +17,17 @@ const loading  = ref(false)
 const fetchErr = ref('')
 
 onMounted(async () => {
-  if (!props.guid || !props.serviceBase || !props.loadFrom) return
+  if (!props.serviceBase || !props.loadFrom) return
+  // `shared/<type>` → /api/shared/<type> (no guid); otherwise → .../{guid}/dm-data?type=<type>
+  const isShared = props.loadFrom.startsWith('shared/')
+  if (!isShared && !props.guid) return
   loading.value  = true
   fetchErr.value = ''
   try {
-    const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/${props.loadFrom}`)
+    const url = isShared
+      ? `${props.serviceBase}/api/shared/${props.loadFrom.slice(7)}`
+      : `${props.serviceBase}/api/data-managers/${props.guid}/dm-data?type=${encodeURIComponent(props.loadFrom)}`
+    const res = await fetch(url)
     if (!res.ok) { fetchErr.value = `Error ${res.status}`; return }
     options.value = await res.json()
   } catch {

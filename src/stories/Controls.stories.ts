@@ -103,20 +103,23 @@ export const Select = story(
 )
 
 export const SelectDynamic = story(
-  { id: 'reader_id', type: 'select_dynamic', title: 'Reader', loadFrom: 'genetec/readers' },
+  { id: 'site_id', type: 'select_dynamic', title: 'Site', loadFrom: 'sites' },
   {
     note: 'Las opciones se cargan en runtime desde el servicio; en el catálogo no hay DM vivo, así que la lista queda vacía.',
     docs: [
       '**Uso:** elegir **una** opción de una lista que se **carga del servicio** en runtime.',
       '',
-      '**Props soportadas:** `loadFrom` (subruta que se agrega a `/api/data-managers/{guid}/`, ej. `genetec/readers`), `default`. Requiere un `guid` de DM en runtime.',
+      '**Props soportadas:** `loadFrom`, `default`. Requiere un `guid` de DM en runtime.',
+      '- `"<type>"` → `GET /api/data-managers/{guid}/dm-data?type=<type>` (data específica del DM, ej. `sites`, `zones`, `cardholder-fields`).',
+      '- `"shared/<type>"` → `GET /api/shared/<type>` (data local agnóstica de DM, ej. `shared/zones`, `shared/badge_types`; no requiere guid).',
+      'La API devuelve `[{ id, name }]`.',
     ].join('\n'),
   },
 )
 
 export const MultiselectDynamic = story(
-  { id: 'tables', type: 'multiselect_dynamic', title: 'Tables to Sync', loadFrom: 'tables' },
-  { docs: '**Uso:** elegir **varias** opciones de una lista cargada del servicio.\n\n**Props soportadas:** `loadFrom`.' },
+  { id: 'identifier_types', type: 'multiselect_dynamic', title: 'Identifier Types', loadFrom: 'shared/badge_types' },
+  { docs: '**Uso:** elegir **varias** opciones de una lista cargada del servicio.\n\n**Props soportadas:** `loadFrom` (misma convención que `select_dynamic`: `"<type>"` → `dm-data?type=`, `"shared/<type>"` → `/api/shared/`).' },
 )
 
 export const Radio = story(

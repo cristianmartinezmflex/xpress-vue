@@ -221,14 +221,14 @@ A dropdown whose options are loaded from a DM-specific API endpoint at runtime.
   "id": "site_id",
   "type": "select_dynamic",
   "title": "Select Site",
-  "loadFrom": "rs2/sites",
+  "loadFrom": "sites",
   "default": -1
 }
 ```
 
 | Field | Description |
 |---|---|
-| `loadFrom` | Sub-path appended to `/api/data-managers/{guid}/` to fetch options. The API must return `[{ text, value }]`. |
+| `loadFrom` | Options source. `"<type>"` → `GET /api/data-managers/{guid}/dm-data?type=<type>` (DM-specific data, e.g. `sites`, `zones`, `cardholder-fields`). `"shared/<type>"` → `GET /api/shared/<type>` (DM-agnostic local data, e.g. `shared/zones`, `shared/badge_types`; no guid needed). The API returns `[{ id, name }]`. |
 
 ---
 
@@ -260,7 +260,7 @@ A multi-select list loaded from a DM API endpoint. Selected values are stored as
   "id": "identifier_types_selected",
   "type": "multiselect_dynamic",
   "title": "Identifier Types",
-  "loadFrom": "aeos/badge-types",
+  "loadFrom": "shared/badge_types",
   "default": ""
 }
 ```

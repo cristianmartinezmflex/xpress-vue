@@ -18,11 +18,18 @@ const loading  = ref(false)
 const fetchErr = ref('')
 
 onMounted(async () => {
-  if (!props.guid || !props.serviceBase || !props.loadFrom) return
+  if (!props.serviceBase || !props.loadFrom) return
+  // `shared/<type>`  → GET /api/shared/<type>            (DM-agnostic local data, no guid needed)
+  // `<type>`         → GET .../{guid}/dm-data?type=<type> (DM-specific data)
+  const isShared = props.loadFrom.startsWith('shared/')
+  if (!isShared && !props.guid) return
   loading.value  = true
   fetchErr.value = ''
   try {
-    const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/${props.loadFrom}`)
+    const url = isShared
+      ? `${props.serviceBase}/api/shared/${props.loadFrom.slice(7)}`
+      : `${props.serviceBase}/api/data-managers/${props.guid}/dm-data?type=${encodeURIComponent(props.loadFrom)}`
+    const res = await fetch(url)
     if (!res.ok) { fetchErr.value = `Error ${res.status}`; return }
     const data: DynamicOption[] = await res.json()
     options.value = data

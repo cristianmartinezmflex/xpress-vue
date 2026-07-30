@@ -94,14 +94,14 @@
                   "id": "outside_area_id",
                   "type": "select_dynamic",
                   "title": "Outside Area",
-                  "loadFrom": "aeos/zones",
+                  "loadFrom": "shared/zones",
                   "default": -1
                 },
                 {
                   "id": "inside_area_id",
                   "type": "select_dynamic",
                   "title": "Inside Area",
-                  "loadFrom": "aeos/zones",
+                  "loadFrom": "shared/zones",
                   "default": -1
                 },
                 {
@@ -114,7 +114,7 @@
                   "id": "default_identifier_type",
                   "type": "select_dynamic",
                   "title": "Default Identifier Type for Unknown Cards",
-                  "loadFrom": "aeos/badge-types",
+                  "loadFrom": "shared/badge_types",
                   "default": -1
                 }
               ]
@@ -230,7 +230,7 @@
                   "id": "identifier_types_selected",
                   "type": "multiselect_dynamic",
                   "title": "Identifier Types",
-                  "loadFrom": "aeos/badge-types",
+                  "loadFrom": "shared/badge_types",
                   "default": ""
                 }
               ]

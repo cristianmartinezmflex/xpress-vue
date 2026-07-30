@@ -86,7 +86,7 @@
                   "id": "from_zone_id",
                   "type": "select_dynamic",
                   "title": "Doors From Area",
-                  "loadFrom": "avigilon/zones",
+                  "loadFrom": "zones",
                   "default": -1
                 }
               ]
@@ -97,7 +97,7 @@
                   "id": "to_zone_id",
                   "type": "select_dynamic",
                   "title": "Doors To Area",
-                  "loadFrom": "avigilon/zones",
+                  "loadFrom": "zones",
                   "default": -1
                 },
                 {

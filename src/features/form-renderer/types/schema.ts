@@ -85,7 +85,9 @@ export interface Control {
   key_header?: string
   value_title?: string
   value_header?: string
-  loadFrom?: string   // used by select_dynamic: sub-path appended to /api/data-managers/{guid}/
+  loadFrom?: string   // select_dynamic/multiselect_dynamic source:
+                      //   "shared/<type>" → GET /api/shared/<type>              (DM-agnostic local data)
+                      //   "<type>"        → GET .../{guid}/dm-data?type=<type>  (DM-specific data)
   enable?: EnableProp
   display?: DisplayProp
   disabled?: boolean

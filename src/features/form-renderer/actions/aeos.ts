@@ -5,16 +5,16 @@ import type { ActionContext } from './action-context'
 /** Fetches a field list from the service and merges new keys into a keyvalue state field. */
 async function loadFieldsInto(
   ctx: ActionContext,
-  endpoint: string,
+  datatype: string,
   stateField: string,
 ): Promise<void> {
   const { show } = useDialog()
   if (!ctx.guid) { show({ success: false, title: 'Load AEOS Fields', message: 'No GUID provided.' }); return }
 
-  const res = await fetch(`${ctx.serviceBase}/api/data-managers/${ctx.guid}/${endpoint}`)
+  const res = await fetch(`${ctx.serviceBase}/api/data-managers/${ctx.guid}/dm-data?type=${encodeURIComponent(datatype)}`)
   if (!res.ok) {
     const body = await res.json().catch(() => null)
-    show({ success: false, title: 'Load AEOS Fields', message: body?.Error ?? `Service returned ${res.status}` })
+    show({ success: false, title: 'Load AEOS Fields', message: body?.error ?? body?.Error ?? `Service returned ${res.status}` })
     return
   }
 
@@ -31,13 +31,13 @@ async function loadFieldsInto(
 }
 
 export function aeos_loadUserFields(ctx: ActionContext): Promise<void> {
-  return loadFieldsInto(ctx, 'aeos/employee-fields', 'emp_fields')
+  return loadFieldsInto(ctx, 'employee-fields', 'emp_fields')
 }
 
 export function aeos_loadVisitorFields(ctx: ActionContext): Promise<void> {
-  return loadFieldsInto(ctx, 'aeos/visitor-fields', 'visitor_fields')
+  return loadFieldsInto(ctx, 'visitor-fields', 'visitor_fields')
 }
 
 export function aeos_loadContractorFields(ctx: ActionContext): Promise<void> {
-  return loadFieldsInto(ctx, 'aeos/contractor-fields', 'contractor_fields')
+  return loadFieldsInto(ctx, 'contractor-fields', 'contractor_fields')
 }

@@ -6,10 +6,10 @@ export async function avigilon_loadFields({ guid, state, serviceBase }: ActionCo
   const { show } = useDialog()
   if (!guid) { show({ success: false, title: 'Load ACM Fields', message: 'No GUID provided.' }); return }
 
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/avigilon/identity-fields`)
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/dm-data?type=identity-fields`)
   if (!res.ok) {
     const body = await res.json().catch(() => null)
-    show({ success: false, title: 'Load ACM Fields', message: body?.Error ?? `Service returned ${res.status}` })
+    show({ success: false, title: 'Load ACM Fields', message: body?.error ?? body?.Error ?? `Service returned ${res.status}` })
     return
   }
 
