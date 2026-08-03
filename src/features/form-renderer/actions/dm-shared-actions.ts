@@ -51,6 +51,30 @@ function serializeState(schemaKey: string | undefined, state: Record<string, any
   return body
 }
 
+// Runs the DM connection test (same endpoint as the "Test Connect" button) and returns whether it
+// succeeded plus a one-line error message. Shared by dm_shared_testConnection and the pre-save check.
+async function checkConnection(
+  guid: string,
+  serviceBase: string | undefined,
+  schemaKey: string | undefined,
+  state: Record<string, any>,
+): Promise<{ ok: boolean; message: string }> {
+  try {
+    const res = await fetch(`${serviceBase}/api/data-managers/${guid}/test-connection`, {
+      method:  'POST',
+      headers: JSON_HEADERS,
+      body:    JSON.stringify(serializeState(schemaKey, state)),
+    })
+    if (res.ok) return { ok: true, message: '' }
+    const result = await res.json().catch(() => null)
+    const raw: string = result?.Error ?? result?.error ?? `Service returned ${res.status}.`
+    const message = raw.split(/\r?\n/).find((l) => l.trim().length > 0) ?? raw
+    return { ok: false, message }
+  } catch {
+    return { ok: false, message: 'Could not reach the service.' }
+  }
+}
+
 // ─── Client-side ───────────────────────────────────────────────────────────────
 
 export function dm_shared_setDefaults({ resetToDefaults }: ActionContext): void {
@@ -61,6 +85,18 @@ export function dm_shared_setDefaults({ resetToDefaults }: ActionContext): void 
 
 export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided — cannot save.'); return }
+
+  // Verify the connection before saving. If it fails, let the user decide whether to save anyway.
+  const check = await checkConnection(guid, serviceBase, schemaKey, state)
+  if (!check.ok) {
+    const proceed = await useDialog().confirm({
+      title:        'Connection Test Failed',
+      message:      `The connection test failed:\n\n${check.message}\n\nDo you want to save these settings anyway?`,
+      confirmLabel: 'Save Anyway',
+      cancelLabel:  'Cancel',
+    })
+    if (!proceed) return
+  }
 
   const res = await fetch(`${serviceBase}/api/data-managers/${guid}`, {
     method: 'PUT',
@@ -155,19 +191,11 @@ export async function dm_shared_testConnection({ guid, state, serviceBase, schem
     return
   }
 
-  const res    = await fetch(`${serviceBase}/api/data-managers/${guid}/test-connection`, {
-    method:  'POST',
-    headers: JSON_HEADERS,
-    body:    JSON.stringify(serializeState(schemaKey, state)),
-  })
-  const result = await res.json().catch(() => null)
-
-  if (res.ok) {
+  const check = await checkConnection(guid, serviceBase, schemaKey, state)
+  if (check.ok) {
     show({ success: true, title: 'Test Connection', message: 'Connection successful.' })
   } else {
-    const raw: string = result?.Error ?? `Service returned ${res.status}.`
-    const message = raw.split(/\r?\n/).find((l) => l.trim().length > 0) ?? raw
-    show({ success: false, title: 'Test Connection', message })
+    show({ success: false, title: 'Test Connection', message: check.message })
   }
 }
 

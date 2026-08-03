@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useDialog } from '../composables/useDialog'
 
-const { state, close } = useDialog()
+const { state, close, resolve } = useDialog()
 </script>
 
 <template>
@@ -41,9 +41,29 @@ const { state, close } = useDialog()
           <!-- Message -->
           <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{{ state.message }}</p>
 
-          <!-- OK button -->
-          <div class="flex justify-end">
+          <!-- Actions -->
+          <div class="flex justify-end gap-2">
+            <!-- Confirm mode: Cancel + Confirm -->
+            <template v-if="state.mode === 'confirm'">
+              <button
+                type="button"
+                class="px-4 py-1.5 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 cursor-pointer transition"
+                @click="resolve(false)"
+              >
+                {{ state.cancelLabel }}
+              </button>
+              <button
+                type="button"
+                class="px-4 py-1.5 text-sm font-medium rounded-lg bg-xp-primary hover:bg-xp-primary-hover text-white cursor-pointer transition"
+                @click="resolve(true)"
+              >
+                {{ state.confirmLabel }}
+              </button>
+            </template>
+
+            <!-- Message mode: single OK -->
             <button
+              v-else
               type="button"
               class="px-4 py-1.5 text-sm font-medium rounded-lg cursor-pointer transition"
               :class="state.success
