@@ -222,3 +222,15 @@ export async function dm_shared_sendActivitySync({ serviceBase }: ActionContext)
   const res = await fetch(`${serviceBase}/api/data-managers/send-activity-sync`, { method: 'POST' })
   if (!res.ok) alert(`Error in activity sync: the service returned ${res.status}`)
 }
+
+// ─── External data (Sync Options tab — not yet wired) ───────────────────────────
+// Placeholders for the "Clear External Data" / "Clear External Badge Activity" buttons on the
+// shared Sync Options tab. They intentionally do nothing yet — wire the real service calls here.
+
+export function dm_shared_clearExternalData(_ctx: ActionContext): void {
+  // TODO: call the service endpoint to clear this DM's cached external data.
+}
+
+export function dm_shared_clearExternalBadgeActivity(_ctx: ActionContext): void {
+  // TODO: call the service endpoint to clear this DM's cached external badge activity.
+}
