@@ -167,6 +167,37 @@
               ]
             }
           ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "customFields",
+                  "type": "keyvalue",
+                  "title": "",
+                  "key_title": "Source Columns",
+                  "key_header": "Source Field",
+                  "value_title": "Destination Columns",
+                  "value_header": "XPressEntry Field",
+                  "default": []
+                },
+                {
+                  "id": "btn_load_custom_fields",
+                  "type": "button_bar",
+                  "buttons": [
+                    {
+                      "id": "btn_load_custom_fields",
+                      "title": "Load Genetec Custom Fields",
+                      "onClick": "genetec_loadCustomFields",
+                      "tooltip": "Load available cardholder fields from Genetec for custom field mapping."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     },
