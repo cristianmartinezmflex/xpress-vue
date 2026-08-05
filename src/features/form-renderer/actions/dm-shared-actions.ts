@@ -71,7 +71,9 @@ async function checkConnection(
     if (res.ok) return { ok: true, message: '' }
     const result = await res.json().catch(() => null)
     const raw: string = result?.Error ?? result?.error ?? `Service returned ${res.status}.`
-    const message = raw.split(/\r?\n/).find((l) => l.trim().length > 0) ?? raw
+    // Keep every non-empty line: some DMs (e.g. OnGuard OpenAccess) put the generic text on the
+    // first line and the real diagnostic (HTTP status + error code) on the next — don't drop it.
+    const message = raw.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).join(' — ') || raw
     return { ok: false, message }
   } catch {
     return { ok: false, message: 'Could not reach the service.' }
