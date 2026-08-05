@@ -18,6 +18,7 @@ import ControlSocketInterfaces     from './controls/ControlSocketInterfaces.vue'
 import ControlIpBadgeMappings      from './controls/ControlIpBadgeMappings.vue'
 import ControlRioDevices           from './controls/ControlRioDevices.vue'
 import ControlSiteTimezones        from './controls/ControlSiteTimezones.vue'
+import ControlCheckboxMultiselect   from './controls/ControlCheckboxMultiselect.vue'
 
 const props = defineProps<{
   title?: string
@@ -241,6 +242,15 @@ function isControlVisible(control: Control): boolean {
               :model-value="state[control.id] ?? ''"
               :guid="guid"
               :service-base="serviceBase"
+              :state="state"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlCheckboxMultiselect
+              v-else-if="control.type === 'checkbox_multiselect'"
+              :title="control.title"
+              :model-value="state[control.id] ?? ''"
+              :options-key="control.optionsKey"
               :state="state"
               @update:model-value="emit('update:state', control.id, $event)"
             />

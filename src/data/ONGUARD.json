@@ -866,40 +866,10 @@
             {
               "controls": [
                 {
-                  "id": "panel_placeholder_panel",
-                  "type": "boolean",
-                  "title": "PLACEHOLDER PANEL",
-                  "default": false
-                },
-                {
-                  "id": "panel_newtestp",
-                  "type": "boolean",
-                  "title": "NEWTESTP",
-                  "default": false
-                },
-                {
-                  "id": "panel_xpressentry",
-                  "type": "boolean",
-                  "title": "XPressEntry",
-                  "default": false
-                },
-                {
-                  "id": "panel_xpe",
-                  "type": "boolean",
-                  "title": "XPE",
-                  "default": false
-                },
-                {
-                  "id": "panel_ivanxpressentry",
-                  "type": "boolean",
-                  "title": "IvanXPressEntry",
-                  "default": false
-                },
-                {
-                  "id": "panel_xpe_commsvr2",
-                  "type": "boolean",
-                  "title": "XPE-COMMSVR2",
-                  "default": false
+                  "id": "panel_filter",
+                  "type": "checkbox_multiselect",
+                  "title": "Panels",
+                  "optionsKey": "_onguard_panels"
                 },
                 {
                   "id": "btn_bar_panel",
@@ -912,6 +882,13 @@
                       "tooltip": "Retrieve and refresh the list of available panels from the OnGuard system."
                     }
                   ]
+                },
+                {
+                  "id": "filter_access_levels_by_panel",
+                  "type": "boolean",
+                  "title": "Filter Access Levels by Panel",
+                  "default": false,
+                  "enable": { "type": "hasValue", "field": "panel_filter" }
                 }
               ]
             }

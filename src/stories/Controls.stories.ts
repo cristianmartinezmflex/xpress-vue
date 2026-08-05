@@ -122,6 +122,28 @@ export const MultiselectDynamic = story(
   { docs: '**Uso:** elegir **varias** opciones de una lista cargada del servicio.\n\n**Props soportadas:** `loadFrom` (misma convención que `select_dynamic`: `"<type>"` → `dm-data?type=`, `"shared/<type>"` → `/api/shared/`).' },
 )
 
+export const CheckboxMultiselect = story(
+  { id: 'panel_filter', type: 'checkbox_multiselect', title: 'Panels', optionsKey: 'panel_options' },
+  {
+    note: 'Las opciones vienen de una key del state (`optionsKey`) que llena una acción/botón; acá se siembran para la demo. El valor es una lista de ids separados por coma.',
+    initial: {
+      panel_options: JSON.stringify([
+        { id: '1', name: 'Main Building' },
+        { id: '5', name: 'Warehouse' },
+        { id: '9', name: 'Parking Gate' },
+      ]),
+      panel_filter: '5',
+    },
+    docs: [
+      '**Uso:** multi-select de checkboxes **genérico** (no atado a ningún DM) para listas que se cargan on-demand (por un botón/acción), no al montar. Ej.: el "Panel Filter (Readers)" de OnGuard.',
+      '',
+      '**Props soportadas:**',
+      '- `optionsKey` — key del **form state** que contiene la lista de opciones (`[{ id, name }]`, como JSON string o array). Alguna acción la escribe (ej. tras traer la lista del sistema externo); el control la renderiza.',
+      '- **Valor**: string de ids separados por coma (ej. `"1,5,9"`). Los ids seleccionados que aún no están en las opciones se muestran igual (labeleados por id) para no perder la selección guardada.',
+    ].join('\n'),
+  },
+)
+
 export const Radio = story(
   {
     id: 'direction',

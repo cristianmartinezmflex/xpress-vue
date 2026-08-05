@@ -72,6 +72,7 @@ export type ControlType =
   | 'ip_badge_mappings'
   | 'rio_devices'
   | 'site_timezones'
+  | 'checkbox_multiselect'
 
 export interface Control {
   id: string
@@ -88,6 +89,8 @@ export interface Control {
   loadFrom?: string   // select_dynamic/multiselect_dynamic source:
                       //   "shared/<type>" → GET /api/shared/<type>              (DM-agnostic local data)
                       //   "<type>"        → GET .../{guid}/dm-data?type=<type>  (DM-specific data)
+  optionsKey?: string // checkbox_multiselect: form-state key holding the [{ id, name }] option list
+                      // (populated by an action/button); value is a comma-separated list of ids
   enable?: EnableProp
   display?: DisplayProp
   disabled?: boolean

@@ -35,11 +35,18 @@ export async function onguard_updateSegmentList({ guid, serviceBase }: ActionCon
   show({ success: result.success, title: 'Update Segment List', message: result.message })
 }
 
-export async function onguard_updatePanelList({ guid, serviceBase }: ActionContext): Promise<void> {
+export async function onguard_updatePanelList({ guid, state, serviceBase }: ActionContext): Promise<void> {
   const { show } = useDialog()
   if (!guid) { show({ success: false, title: 'Update Panels', message: 'No GUID provided.' }); return }
   const result = await onGuardPost(serviceBase, guid, 'update-panels')
-  show({ success: result.success, title: 'Update Panel List', message: result.message })
+  // Cache the fetched panels so the panel_filter control can render them as checkboxes.
+  const panels: { id: string; name: string }[] = Array.isArray(result.panels) ? result.panels : []
+  if (result.success) state['_onguard_panels'] = JSON.stringify(panels)
+  show({
+    success: result.success,
+    title:   'Update Panel List',
+    message: result.success ? `Loaded ${panels.length} panel(s) from OnGuard.` : result.message,
+  })
 }
 
 export async function onguard_createLogicalSource({ guid, serviceBase }: ActionContext): Promise<void> {

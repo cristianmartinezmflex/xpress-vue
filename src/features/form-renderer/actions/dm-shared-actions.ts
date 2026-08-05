@@ -17,6 +17,9 @@ const JSON_HEADERS = { 'Content-Type': 'application/json' }
 // Kept here because it is applied uniformly by the shared save / test-connection actions.
 function serializeState(schemaKey: string | undefined, state: Record<string, any>): Record<string, any> {
   const body: Record<string, any> = { ...state }
+  // Drop transient UI-only keys (prefixed with "_", e.g. _onguard_panels, _rs2_sites_cache) so they
+  // are never persisted as DM settings.
+  for (const key of Object.keys(body)) if (key.startsWith('_')) delete body[key]
   const kvToObject = (field: string) => {
     if (Array.isArray(body[field])) {
       body[field] = Object.fromEntries(
