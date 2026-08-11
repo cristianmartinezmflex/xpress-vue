@@ -139,11 +139,6 @@
                   "type": "button_bar",
                   "buttons": [
                     {
-                      "id": "btn_testconnect",
-                      "title": "Test Connect",
-                      "onClick": "dm_shared_testConnection"
-                    },
-                    {
                       "id": "btn_defaults",
                       "title": "Defaults",
                       "onClick": "dm_shared_setDefaults"

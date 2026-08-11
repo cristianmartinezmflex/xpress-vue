@@ -302,9 +302,8 @@ A horizontal row of action buttons. Typically placed in a section with `title: "
   "id": "btn_bar_general",
   "type": "button_bar",
   "buttons": [
-    { "id": "btn_test",     "title": "Test Connect", "onClick": "dm_shared_testConnection", "tooltip": "Test connection to the server." },
     { "id": "btn_defaults", "title": "Defaults",     "onClick": "setDefaults",              "tooltip": "Reset all settings to defaults." },
-    { "id": "btn_save",     "title": "Save",         "onClick": "dm_shared_save",           "tooltip": "Save current settings." }
+    { "id": "btn_save",     "title": "Save",         "onClick": "dm_shared_save",           "tooltip": "Save current settings (also tests the connection)." }
   ]
 }
 ```
@@ -457,7 +456,6 @@ The `onClick` value is a handler name resolved by the form renderer. Use these r
 
 | Handler | Description |
 |---|---|
-| `dm_shared_testConnection` | Runs the DM's Test Connection endpoint and shows the result. |
 | `dm_shared_runPartialSync` | Triggers a partial sync for this DM. |
 | `dm_shared_runFullSync` | Triggers a full sync for this DM. |
 | `dm_shared_runCustomSync` | Triggers the custom sync operation. |
@@ -544,9 +542,8 @@ The `onClick` value is a handler name resolved by the form renderer. Use these r
                   "id": "btn_bar",
                   "type": "button_bar",
                   "buttons": [
-                    { "id": "btn_test",     "title": "Test Connect", "onClick": "dm_shared_testConnection", "tooltip": "Test the connection." },
                     { "id": "btn_defaults", "title": "Defaults",     "onClick": "setDefaults",              "tooltip": "Reset to defaults." },
-                    { "id": "btn_save",     "title": "Save",         "onClick": "dm_shared_save",           "tooltip": "Save settings." }
+                    { "id": "btn_save",     "title": "Save",         "onClick": "dm_shared_save",           "tooltip": "Save settings (also tests the connection)." }
                   ]
                 }
               ]

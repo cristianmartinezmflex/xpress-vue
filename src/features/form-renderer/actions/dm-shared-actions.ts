@@ -54,31 +54,38 @@ function serializeState(schemaKey: string | undefined, state: Record<string, any
   return body
 }
 
-// Runs the DM connection test (same endpoint as the "Test Connect" button) and returns whether it
-// succeeded plus a one-line error message. Shared by dm_shared_testConnection and the pre-save check.
-async function checkConnection(
-  guid: string,
-  serviceBase: string | undefined,
-  schemaKey: string | undefined,
-  state: Record<string, any>,
-): Promise<{ ok: boolean; message: string }> {
-  try {
-    const res = await fetch(`${serviceBase}/api/data-managers/${guid}/test-connection`, {
-      method:  'POST',
-      headers: JSON_HEADERS,
-      body:    JSON.stringify(serializeState(schemaKey, state)),
-    })
-    if (res.ok) return { ok: true, message: '' }
-    const result = await res.json().catch(() => null)
-    const raw: string = result?.Error ?? result?.error ?? `Service returned ${res.status}.`
-    // Keep every non-empty line: some DMs (e.g. OnGuard OpenAccess) put the generic text on the
-    // first line and the real diagnostic (HTTP status + error code) on the next — don't drop it.
-    const message = raw.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).join(' — ') || raw
-    return { ok: false, message }
-  } catch {
-    return { ok: false, message: 'Could not reach the service.' }
-  }
+// Collapse a multi-line service message into one line. Some DMs (e.g. OnGuard OpenAccess) put the
+// generic text on the first line and the real diagnostic (HTTP status + error code) on the next.
+function oneLine(raw: string): string {
+  return raw.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).join(' — ') || raw
 }
+
+// Kept for reference: the old standalone connection test (separate /test-connection endpoint), used
+// before Save itself started testing the connection (SetSettings => GetStatus) and returning the
+// result. Left commented in case a standalone test is needed again.
+// async function checkConnection(
+//   guid: string,
+//   serviceBase: string | undefined,
+//   schemaKey: string | undefined,
+//   state: Record<string, any>,
+// ): Promise<{ ok: boolean; message: string }> {
+//   try {
+//     const res = await fetch(`${serviceBase}/api/data-managers/${guid}/test-connection`, {
+//       method:  'POST',
+//       headers: JSON_HEADERS,
+//       body:    JSON.stringify(serializeState(schemaKey, state)),
+//     })
+//     if (res.ok) return { ok: true, message: '' }
+//     const result = await res.json().catch(() => null)
+//     const raw: string = result?.Error ?? result?.error ?? `Service returned ${res.status}.`
+//     // Keep every non-empty line: some DMs (e.g. OnGuard OpenAccess) put the generic text on the
+//     // first line and the real diagnostic (HTTP status + error code) on the next — don't drop it.
+//     const message = oneLine(raw)
+//     return { ok: false, message }
+//   } catch {
+//     return { ok: false, message: 'Could not reach the service.' }
+//   }
+// }
 
 // ─── Client-side ───────────────────────────────────────────────────────────────
 
@@ -91,24 +98,44 @@ export function dm_shared_setDefaults({ resetToDefaults }: ActionContext): void 
 export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided — cannot save.'); return }
 
-  // Verify the connection before saving. If it fails, let the user decide whether to save anyway.
-  const check = await checkConnection(guid, serviceBase, schemaKey, state)
-  if (!check.ok) {
-    const proceed = await useDialog().confirm({
-      title:        'Connection Test Failed',
-      message:      `The connection test failed:\n\n${check.message}\n\nDo you want to save these settings anyway?`,
-      confirmLabel: 'Save Anyway',
-      cancelLabel:  'Cancel',
+  const { show } = useDialog()
+
+  // Save is the single action: the service stops active operations, persists the settings, applies
+  // them (SetSettings) and runs GetStatus — then returns the outcome in `connection_result`. There is
+  // no separate Test Connect step anymore.
+  let res: Response
+  try {
+    res = await fetch(`${serviceBase}/api/data-managers/${guid}`, {
+      method: 'PUT',
+      headers: JSON_HEADERS,
+      body: JSON.stringify(serializeState(schemaKey, state)),
     })
-    if (!proceed) return
+  } catch {
+    show({ success: false, title: 'Save', message: 'Could not reach the service.' })
+    return
   }
 
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}`, {
-    method: 'PUT',
-    headers: JSON_HEADERS,
-    body: JSON.stringify(serializeState(schemaKey, state)),
-  })
-  if (!res.ok) alert(`Error saving: the service returned ${res.status}`)
+  if (!res.ok) {
+    const err = await res.json().catch(() => null)
+    const msg = err?.Error ?? err?.error ?? `The service returned ${res.status}.`
+    show({ success: false, title: 'Save', message: oneLine(String(msg)) })
+    return
+  }
+
+  // Settings are persisted. Surface the GetStatus result — success/failure plus any version or other
+  // data the DM reports (OnGuard returns nothing; Genetec and others include a version).
+  const saved = await res.json().catch(() => null)
+  const cr = saved?.connection_result
+  const detail = cr?.message ? `\n\n${oneLine(String(cr.message))}` : ''
+
+  if (cr && cr.success === false) {
+    show({ success: false, title: 'Saved — Connection Failed', message: `Settings saved, but the connection test failed.${detail}` })
+  } else if (cr && cr.success === true) {
+    show({ success: true, title: 'Saved', message: `Settings saved and connection verified.${detail}` })
+  } else {
+    // Older service without connection_result — just confirm the save.
+    show({ success: true, title: 'Saved', message: 'Settings saved.' })
+  }
 }
 
 // ─── Sync (fire & forget) ─────────────────────────────────────────────────────
@@ -184,24 +211,6 @@ export function dm_shared_setupDataManager({ guid, schemaKey, navigate }: Action
   const path = `/form/${schemaKey}?guid=${guid}`
   if (navigate) navigate(path)
   else window.location.href = path
-}
-
-// ─── Test Connection ──────────────────────────────────────────────────────────
-
-export async function dm_shared_testConnection({ guid, state, serviceBase, schemaKey }: ActionContext): Promise<void> {
-  const { show } = useDialog()
-
-  if (!guid) {
-    show({ success: false, title: 'Test Connection', message: 'No GUID provided — cannot test connection.' })
-    return
-  }
-
-  const check = await checkConnection(guid, serviceBase, schemaKey, state)
-  if (check.ok) {
-    show({ success: true, title: 'Test Connection', message: 'Connection successful.' })
-  } else {
-    show({ success: false, title: 'Test Connection', message: check.message })
-  }
 }
 
 // ─── Custom Sync Editor ──────────────────────────────────────────────────────
