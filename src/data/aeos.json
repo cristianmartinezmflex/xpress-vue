@@ -5,7 +5,6 @@
       "title": "General",
       "sections": [
         {
-          "title": "Connection",
           "columns": [
             {
               "controls": [
@@ -26,11 +25,7 @@
                   "type": "text",
                   "title": "Port",
                   "default": "8443"
-                }
-              ]
-            },
-            {
-              "controls": [
+                },
                 {
                   "id": "login",
                   "type": "text",
@@ -42,16 +37,19 @@
                   "type": "password",
                   "title": "Password",
                   "default": "aeosrules"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "title": "Options",
-          "columns": [
-            {
-              "controls": [
+                },
+                {
+                  "id": "events_port",
+                  "type": "text",
+                  "title": "Socket Port",
+                  "default": "8035"
+                },
+                {
+                  "id": "valid_access_events",
+                  "type": "text",
+                  "title": "APB Events",
+                  "default": "1015"
+                },
                 {
                   "id": "enable_paging",
                   "type": "boolean",
@@ -71,18 +69,6 @@
                       "error": "Must be between 1 and 5000"
                     }
                   ]
-                },
-                {
-                  "id": "events_port",
-                  "type": "text",
-                  "title": "Socket Port",
-                  "default": "8035"
-                },
-                {
-                  "id": "valid_access_events",
-                  "type": "text",
-                  "title": "APB Events",
-                  "default": "1015"
                 },
                 {
                   "id": "auto_assign_entrance_areas",
@@ -116,11 +102,7 @@
                   "title": "Default Identifier Type for Unknown Cards",
                   "loadFrom": "shared/badge_types",
                   "default": -1
-                }
-              ]
-            },
-            {
-              "controls": [
+                },
                 {
                   "id": "verbose_tcp",
                   "type": "boolean",
@@ -136,13 +118,13 @@
                 {
                   "id": "use_ip_badge",
                   "type": "boolean",
-                  "title": "Use IPBadge for Activities",
+                  "title": "Use IPBadge for Activites",
                   "default": false
                 },
                 {
                   "id": "use_sockets_for_activities",
                   "type": "boolean",
-                  "title": "Use Sockets for Activities",
+                  "title": "Use Sockets for Activites",
                   "default": true,
                   "value_from": "use_ip_badge",
                   "invert": true,
@@ -261,6 +243,7 @@
                   "id": "event_filter",
                   "type": "text",
                   "title": "Filter Name",
+                  "enable": "enable_event_filter == true",
                   "default": ""
                 }
               ]
@@ -282,23 +265,15 @@
                   "id": "enable_user_event_filter",
                   "type": "boolean",
                   "title": "Enable User Filter for Events",
-                  "default": false
+                  "default": false,
+                  "enable": "search_users_in_events_with_name == true"
                 },
                 {
                   "id": "user_event_filter",
-                  "type": "text",
-                  "title": "User Event Filter",
-                  "default": ""
-                }
-              ]
-            },
-            {
-              "controls": [
-                {
-                  "id": "events_user_search_limit",
                   "type": "select",
-                  "title": "Events User Search Limit",
+                  "title": "User Event Filter",
                   "default": "Visitor",
+                  "enable": "search_users_in_events_with_name == true && enable_user_event_filter == true",
                   "values": [
                     {
                       "text": "Visitor",
@@ -313,12 +288,32 @@
                       "value": "Contractor"
                     }
                   ]
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "events_user_search_limit",
+                  "type": "number_spinner",
+                  "title": "Events User Search Limit",
+                  "default": 5,
+                  "enable": "search_users_in_events_with_name == true",
+                  "validations": [
+                    {
+                      "type": "min_max",
+                      "min": 0,
+                      "max": 10000,
+                      "error": "Must be between 0 and 10000"
+                    }
+                  ]
                 },
                 {
                   "id": "modification_date_filter_mins",
                   "type": "number_spinner",
                   "title": "Modification Range Filter (Minutes)",
                   "default": 0,
+                  "enable": "search_users_in_events_with_name == true",
                   "validations": [
                     {
                       "type": "min_max",
@@ -332,7 +327,8 @@
                   "id": "delete_user_in_badge_delete_events",
                   "type": "boolean",
                   "title": "Delete Users Only in Badge Delete Events",
-                  "default": false
+                  "default": false,
+                  "enable": "search_users_in_events_with_name == true"
                 }
               ]
             }
@@ -354,11 +350,7 @@
                   "type": "boolean",
                   "title": "Download Pictures in User Events",
                   "default": true
-                }
-              ]
-            },
-            {
-              "controls": [
+                },
                 {
                   "id": "process_users_in_badge_issue_events",
                   "type": "boolean",
@@ -381,7 +373,7 @@
       "title": "Employee",
       "sections": [
         {
-          "title": "Employee Field Mappings",
+          "title": "",
           "columns": [
             {
               "controls": [
@@ -415,7 +407,7 @@
       "title": "Visitor",
       "sections": [
         {
-          "title": "Visitor Field Mappings",
+          "title": "",
           "columns": [
             {
               "controls": [
@@ -449,7 +441,7 @@
       "title": "Contractor",
       "sections": [
         {
-          "title": "Contractor Field Mappings",
+          "title": "",
           "columns": [
             {
               "controls": [

@@ -1,0 +1,287 @@
+{
+  "title": "Avigilon ACM Data Manager",
+  "tabs": [
+    {
+      "title": "General",
+      "sections": [
+        {
+          "title": "Connection",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "server_ip",
+                  "type": "text",
+                  "title": "Server",
+                  "default": "192.168.1.201",
+                  "validations": [
+                    {
+                      "type": "required",
+                      "error": "Server is required"
+                    }
+                  ]
+                },
+                {
+                  "id": "server_port",
+                  "type": "text",
+                  "title": "Port",
+                  "default": "443"
+                },
+                {
+                  "id": "username",
+                  "type": "text",
+                  "title": "User",
+                  "default": "admin"
+                },
+                {
+                  "id": "password",
+                  "type": "password",
+                  "title": "Password",
+                  "default": ""
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "validate_ssl_cert",
+                  "type": "boolean",
+                  "title": "Validate SSL Certificate",
+                  "default": true
+                },
+                {
+                  "id": "use_ssl",
+                  "type": "boolean",
+                  "title": "Use SSL",
+                  "default": true
+                },
+                {
+                  "id": "verbose_api_data",
+                  "type": "boolean",
+                  "title": "Verbose API Data",
+                  "default": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "PostGRE Transactions Connection Settings",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "postgre_ip_address",
+                  "type": "text",
+                  "title": "Server",
+                  "default": ""
+                },
+                {
+                  "id": "postgre_port",
+                  "type": "text",
+                  "title": "Port",
+                  "default": ""
+                },
+                {
+                  "id": "postgre_database",
+                  "type": "text",
+                  "title": "Database",
+                  "default": "TransactionDB"
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "postgre_username",
+                  "type": "text",
+                  "title": "Username",
+                  "default": ""
+                },
+                {
+                  "id": "postgre_password",
+                  "type": "password",
+                  "title": "Password",
+                  "default": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "activity_lookback_seconds",
+                  "type": "number_spinner",
+                  "title": "Activity Lookback (seconds)",
+                  "default": 30,
+                  "validations": [
+                    {
+                      "type": "min_max",
+                      "min": 0,
+                      "max": 999999,
+                      "error": "Must be 0 or greater"
+                    }
+                  ]
+                },
+                {
+                  "id": "xml_events_port",
+                  "type": "text",
+                  "title": "XML Events Port",
+                  "default": ""
+                },
+                {
+                  "id": "from_zone_id",
+                  "type": "select_dynamic",
+                  "title": "Doors From Area",
+                  "loadFrom": "shared/zones_external",
+                  "default": -1
+                },
+                {
+                  "id": "to_zone_id",
+                  "type": "select_dynamic",
+                  "title": "Doors To Area",
+                  "loadFrom": "shared/zones_external",
+                  "default": -1
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
+                  "id": "partial_sync_users",
+                  "type": "boolean",
+                  "title": "Partial Sync Modified Identities",
+                  "default": true
+                },
+                {
+                  "id": "use_local_grant_for_success",
+                  "type": "boolean",
+                  "title": "Use Local Grant for Activity Success",
+                  "default": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Relay Pulse",
+      "sections": [
+        {
+          "title": "Relay Pulse",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "pulse_relay_on_scan",
+                  "type": "boolean",
+                  "title": "Enable Relay Pulse",
+                  "default": false
+                },
+                {
+                  "id": "relay_strike_dn_attribute",
+                  "type": "text",
+                  "title": "Strike DN Field",
+                  "default": "plasecdoorStrkDN",
+                  "enable": "pulse_relay_on_scan == true"
+                },
+                {
+                  "id": "relay_pulse_duration",
+                  "type": "number_spinner",
+                  "title": "Pulse Duration",
+                  "default": 0,
+                  "enable": "pulse_relay_on_scan == true",
+                  "validations": [
+                    {
+                      "type": "min_max",
+                      "min": 0,
+                      "max": 99999,
+                      "error": "Must be 0 or greater"
+                    }
+                  ]
+                },
+                {
+                  "id": "relay_pulse_max_age_seconds",
+                  "type": "number_spinner",
+                  "title": "Max Scan Age (s)",
+                  "default": 5,
+                  "enable": "pulse_relay_on_scan == true",
+                  "validations": [
+                    {
+                      "type": "min_max",
+                      "min": 0,
+                      "max": 99999,
+                      "error": "Must be 0 or greater"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Relay Pulse Filters",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "pulse_relay_on_muster",
+                  "type": "boolean",
+                  "title": "Pulse on Muster Scans",
+                  "default": false,
+                  "enable": "pulse_relay_on_scan == true"
+                },
+                {
+                  "id": "relay_door_filter",
+                  "type": "multiselect_dynamic",
+                  "title": "Enabled Doors",
+                  "enable": "pulse_relay_on_scan == true",
+                  "loadFrom": "doors",
+                  "default": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Custom Mapping",
+      "sections": [
+        {
+          "title": "Identity Field Mappings",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "CustomFields",
+                  "type": "keyvalue",
+                  "title": "",
+                  "key_header": "ACM Identity Field",
+                  "value_header": "XPressEntry UDF Field",
+                  "default": []
+                },
+                {
+                  "id": "btn_load_fields",
+                  "type": "button_bar",
+                  "buttons": [
+                    {
+                      "id": "btn_load_fields",
+                      "title": "Load ACM Fields",
+                      "onClick": "avigilon_loadFields",
+                      "tooltip": "Load available identity fields from the Avigilon ACM system for custom field mapping."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

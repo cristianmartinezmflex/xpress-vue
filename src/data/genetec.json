@@ -53,21 +53,43 @@
                   "default": true
                 },
                 {
-                  "id": "update_cardholder_occupancy",
+                  "id": "cardholder_events",
                   "type": "boolean",
-                  "title": "Update Cardholder Occupancy",
+                  "title": "Cardholder Software Events",
                   "default": true
                 },
                 {
+                  "id": "credential_events",
+                  "type": "boolean",
+                  "title": "Credential Software Events",
+                  "default": true
+                },
+                {
+                  "id": "access_rule_events",
+                  "type": "boolean",
+                  "title": "Access Rule Software Events",
+                  "default": true
+                }
+              ]
+            },
+            {
+              "controls": [
+                {
                   "id": "use_raw_data",
                   "type": "boolean",
-                  "title": "Use Raw Data",
+                  "title": "Use Raw Badge Data from Genetec",
+                  "default": false
+                },
+                {
+                  "id": "send_wiegand_on_searched",
+                  "type": "boolean",
+                  "title": "Send Wiegand for Searched Cardholder",
                   "default": false
                 },
                 {
                   "id": "page_size",
                   "type": "number_spinner",
-                  "title": "Page Size",
+                  "title": "SDK Page Size",
                   "default": 10000,
                   "validations": [
                     {
@@ -77,28 +99,27 @@
                       "error": "Must be between 1 and 100000"
                     }
                   ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Occupancy Settings",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "update_cardholder_occupancy",
+                  "type": "boolean",
+                  "title": "Update Cardholder Occupancy",
+                  "default": true
                 },
                 {
                   "id": "min_hours_of_activities_to_pull",
                   "type": "number_spinner",
-                  "title": "Min Hours of Activities to Pull",
+                  "title": "Download Activity # Hours",
                   "default": 4
-                }
-              ]
-            },
-            {
-              "controls": [
-                {
-                  "id": "rio_enabled",
-                  "type": "boolean",
-                  "title": "Enable CloudLink (RIO)",
-                  "default": true
-                },
-                {
-                  "id": "rio_reader_timeout",
-                  "type": "number_spinner",
-                  "title": "RIO Reader Timeout (ms)",
-                  "default": 3000
                 }
               ]
             }
@@ -123,29 +144,56 @@
                   "id": "card_num_start_bit",
                   "type": "number_spinner",
                   "title": "Card Number Start Bit",
-                  "default": 0,
-                  "enable": "custom_card_format == true"
+                  "default": 0
                 },
                 {
                   "id": "card_num_bit_length",
                   "type": "number_spinner",
                   "title": "Card Number Bit Length",
-                  "default": 0,
-                  "enable": "custom_card_format == true"
+                  "default": 0
                 },
                 {
                   "id": "fc_start_bit",
                   "type": "number_spinner",
                   "title": "Facility Code Start Bit",
-                  "default": 0,
-                  "enable": "custom_card_format == true"
+                  "default": 0
                 },
                 {
                   "id": "fc_bit_length",
                   "type": "number_spinner",
                   "title": "Facility Code Bit Length",
-                  "default": 0,
-                  "enable": "custom_card_format == true"
+                  "default": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "customFields",
+                  "type": "keyvalue",
+                  "title": "",
+                  "key_title": "Source Columns",
+                  "key_header": "Source Field",
+                  "value_title": "Destination Columns",
+                  "value_header": "XPressEntry Field",
+                  "default": []
+                },
+                {
+                  "id": "btn_load_custom_fields",
+                  "type": "button_bar",
+                  "buttons": [
+                    {
+                      "id": "btn_load_custom_fields",
+                      "title": "Load Genetec Custom Fields",
+                      "onClick": "genetec_loadCustomFields",
+                      "tooltip": "Load available cardholder fields from Genetec for custom field mapping."
+                    }
+                  ]
                 }
               ]
             }
@@ -196,42 +244,33 @@
               ]
             }
           ]
+        },
+        {
+          "title": "Global RIO Settings",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "rio_enabled",
+                  "type": "boolean",
+                  "title": "Enable RIO",
+                  "default": true
+                },
+                {
+                  "id": "rio_reader_timeout",
+                  "type": "number_spinner",
+                  "title": "RIO Reader Timeout (mins)",
+                  "default": 3000
+                }
+              ]
+            }
+          ]
         }
       ]
     },
     {
       "title": "Custom",
       "sections": [
-        {
-          "title": "Custom Field Mapping",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "customfields_buttons",
-                  "type": "button_bar",
-                  "buttons": [
-                    {
-                      "id": "btn_load_fields",
-                      "title": "Load Genetec Custom Fields",
-                      "onClick": "genetec_loadCustomFields",
-                      "tooltip": "Load available custom cardholder fields from the Genetec Security Center."
-                    }
-                  ]
-                },
-                {
-                  "id": "customFields",
-                  "type": "keyvalue",
-                  "title": "Custom Fields (Genetec Field → XPE Field)",
-                  "key_title": "Genetec Field",
-                  "key_header": "Genetec Field",
-                  "value_title": "XPE Field",
-                  "value_header": "XPE Field"
-                }
-              ]
-            }
-          ]
-        },
         {
           "title": "Event Names",
           "columns": [
@@ -268,33 +307,11 @@
                   "default": ""
                 }
               ]
-            },
-            {
-              "controls": [
-                {
-                  "id": "cardholder_events",
-                  "type": "boolean",
-                  "title": "Cardholder Software Events",
-                  "default": true
-                },
-                {
-                  "id": "credential_events",
-                  "type": "boolean",
-                  "title": "Credential Software Events",
-                  "default": true
-                },
-                {
-                  "id": "access_rule_events",
-                  "type": "boolean",
-                  "title": "Access Rule Software Events",
-                  "default": true
-                }
-              ]
             }
           ]
         },
         {
-          "title": "Credential Fields",
+          "title": "Credential Custom Fields",
           "columns": [
             {
               "controls": [
@@ -319,12 +336,6 @@
                   "type": "text",
                   "title": "Custom Credential Field 3",
                   "default": ""
-                },
-                {
-                  "id": "send_wiegand_on_searched",
-                  "type": "boolean",
-                  "title": "Send Wiegand on Searched",
-                  "default": false
                 }
               ]
             }
