@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import type { FormSchema, Control, Button, Tab } from '../types/schema'
 import { useFormState } from '../composables/useFormState'
 import { evaluateEnable, evaluateDisplay } from '../composables/useDisabled'
@@ -63,9 +63,9 @@ const sections = computed(() =>
   ),
 )
 
-const { state, errors, validate, resetToDefaults } = useFormState(props.schema, props.initialValues)
+const { state, errors, validate, resetToDefaults, isDirty, markPristine } = useFormState(props.schema, props.initialValues)
 
-defineExpose({ state, resetToDefaults })
+defineExpose({ state, resetToDefaults, markPristine })
 
 const controlMap = computed<Record<string, Control>>(() => {
   const map: Record<string, Control> = {}
@@ -84,6 +84,42 @@ function onUpdateState(id: string, value: any) {
   const ctrl = controlMap.value[id]
   if (ctrl?.validations?.length) validate(ctrl)
 }
+
+// ─── Active-sync indicator ──────────────────────────────────────────────────────
+// Mirrors the WinForm: next to Save, surface whether a sync is currently running for THIS DM (and
+// which one[s]) so the user can choose to wait before saving. The badge is only shown while a sync is
+// actually running — when idle it renders nothing (no clutter). Saving anyway is allowed; the service
+// stops running operations first (see HandleSaveDataManager).
+const activeSyncTypes = ref<string[]>([])
+let syncStatusTimer: ReturnType<typeof setInterval> | null = null
+
+function prettySyncType(t: string): string {
+  return t.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
+const isSyncing = computed(() => activeSyncTypes.value.length > 0)
+const syncLabel = computed(() => `Sync running: ${activeSyncTypes.value.map(prettySyncType).join(', ')}`)
+
+async function refreshSyncStatus(): Promise<void> {
+  if (!props.guid || !props.serviceBase) { activeSyncTypes.value = []; return }
+  try {
+    const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/sync-status`)
+    if (!res.ok) { activeSyncTypes.value = []; return }
+    const status = await res.json() as Record<string, boolean> | null
+    activeSyncTypes.value = status ? Object.keys(status).filter((k) => status[k]) : []
+  } catch {
+    activeSyncTypes.value = []
+  }
+}
+
+onMounted(() => {
+  refreshSyncStatus()
+  syncStatusTimer = setInterval(refreshSyncStatus, 4000)
+})
+
+onBeforeUnmount(() => {
+  if (syncStatusTimer) clearInterval(syncStatusTimer)
+})
 </script>
 
 <template>
@@ -122,11 +158,26 @@ function onUpdateState(id: string, value: any) {
       </button>
       <button
         type="button"
-        class="px-4 py-2 text-sm font-medium rounded-lg border border-xp-primary bg-xp-primary text-white hover:bg-xp-primary-hover transition cursor-pointer"
+        :disabled="!isDirty"
+        class="px-4 py-2 text-sm font-medium rounded-lg border transition"
+        :class="isDirty
+          ? 'border-xp-primary bg-xp-primary text-white hover:bg-xp-primary-hover cursor-pointer'
+          : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'"
+        :title="isDirty ? 'Save settings (also tests the connection)' : 'No changes to save'"
         @click="emit('action', 'btn_save', 'dm_shared_save')"
       >
         Save
       </button>
+
+      <!-- Active-sync indicator: only shown while a sync is running for this DM (WinForm parity). -->
+      <div
+        v-if="isSyncing"
+        class="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-amber-200 bg-amber-50 text-amber-700"
+        :title="syncLabel"
+      >
+        <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+        {{ syncLabel }}
+      </div>
 
     </div>
 

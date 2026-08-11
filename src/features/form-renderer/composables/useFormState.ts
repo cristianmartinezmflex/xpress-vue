@@ -1,4 +1,4 @@
-import { reactive, readonly } from 'vue'
+import { reactive, readonly, ref, computed } from 'vue'
 import type { FormSchema, Control } from '../types/schema'
 
 /**
@@ -134,7 +134,24 @@ export function useFormState(schema: FormSchema, initialValues?: Record<string, 
     })
   }
 
-  initState()
+  // ─── Dirty tracking ───────────────────────────────────────────────────────────
+  // Baseline snapshot of the state right after load (or after a successful save). Save is only
+  // enabled while the live state differs from this baseline.
+  const baseline = ref('')
 
-  return { state, errors: readonly(errors), validate, resetToDefaults }
+  function snapshot(): string {
+    try { return JSON.stringify(state) } catch { return '' }
+  }
+
+  /** Resets the baseline to the current state (call after a successful save / initial load). */
+  function markPristine(): void {
+    baseline.value = snapshot()
+  }
+
+  const isDirty = computed(() => snapshot() !== baseline.value)
+
+  initState()
+  markPristine()
+
+  return { state, errors: readonly(errors), validate, resetToDefaults, isDirty, markPristine }
 }

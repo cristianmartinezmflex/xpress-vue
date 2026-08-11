@@ -92,6 +92,9 @@ async function handleAction(_id: string, handler: string, payload?: unknown) {
   try {
     await dispatch(handler, payload)
     saveResult.value = 'ok'
+    // After a successful save the current values become the new baseline, so Save disables again
+    // until the user changes something.
+    if (handler === 'dm_shared_save') formRenderer.value?.markPristine()
   } catch {
     saveResult.value = 'error'
   } finally {
