@@ -1,7 +1,9 @@
 import { Centrifuge } from 'centrifuge'
 
 const CENTRIFUGO_WS_URL = 'ws://localhost:8000/connection/websocket'
-const CENTRIFUGO_CHANNEL = 'xpedm.sync-records'
+// The DM service publishes across three channels (see CentrifugoPublisher): general log lines,
+// data add/remove/modify operations, and non-data DM/service key events. The log view consumes all.
+const CENTRIFUGO_CHANNELS = ['logs', 'dataupdates', 'dmkeyevents']
 
 export interface DmLogEntry {
   timestamp: string
@@ -29,9 +31,7 @@ function getClient(): Centrifuge {
 
   client.on('error', () => { /* suppress console noise when Centrifugo is not running */ })
 
-  const sub = client.newSubscription(CENTRIFUGO_CHANNEL)
-
-  sub.on('publication', ({ data }) => {
+  const onPublication = ({ data }: { data: Record<string, any> }) => {
     if (!data) return
     const dmGuid: string | undefined = data.dmGuid?.toLowerCase()
     const entry = buildEntry(data)
@@ -40,9 +40,14 @@ function getClient(): Centrifuge {
       subscribers.get(dmGuid)?.forEach(cb => cb(entry))
     }
     subscribers.get('*')?.forEach(cb => cb(entry))
-  })
+  }
 
-  sub.subscribe()
+  for (const channel of CENTRIFUGO_CHANNELS) {
+    const sub = client.newSubscription(channel)
+    sub.on('publication', onPublication)
+    sub.subscribe()
+  }
+
   client.connect()
 
   return client

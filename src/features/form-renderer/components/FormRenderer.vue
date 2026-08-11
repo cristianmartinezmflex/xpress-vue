@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed } from 'vue'
 import type { FormSchema, Control, Button, Tab } from '../types/schema'
 import { useFormState } from '../composables/useFormState'
 import { evaluateEnable, evaluateDisplay } from '../composables/useDisabled'
@@ -84,42 +84,6 @@ function onUpdateState(id: string, value: any) {
   const ctrl = controlMap.value[id]
   if (ctrl?.validations?.length) validate(ctrl)
 }
-
-// ─── Active-sync indicator ──────────────────────────────────────────────────────
-// Poll /sync-status so the action bar reflects (a) whether a sync is running and (b) which one(s),
-// mirroring the WinForm behavior next to Save.
-const activeSyncTypes = ref<string[]>([])
-let syncStatusTimer: ReturnType<typeof setInterval> | null = null
-
-function prettySyncType(t: string): string {
-  return t.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
-}
-
-const isSyncing = computed(() => activeSyncTypes.value.length > 0)
-const syncLabel = computed(() =>
-  isSyncing.value ? `Syncing: ${activeSyncTypes.value.map(prettySyncType).join(', ')}` : 'Idle',
-)
-
-async function refreshSyncStatus(): Promise<void> {
-  if (!props.guid || !props.serviceBase) { activeSyncTypes.value = []; return }
-  try {
-    const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/sync-status`)
-    if (!res.ok) { activeSyncTypes.value = []; return }
-    const status = await res.json() as Record<string, boolean> | null
-    activeSyncTypes.value = status ? Object.keys(status).filter((k) => status[k]) : []
-  } catch {
-    activeSyncTypes.value = []
-  }
-}
-
-onMounted(() => {
-  refreshSyncStatus()
-  syncStatusTimer = setInterval(refreshSyncStatus, 3000)
-})
-
-onBeforeUnmount(() => {
-  if (syncStatusTimer) clearInterval(syncStatusTimer)
-})
 </script>
 
 <template>
@@ -164,19 +128,6 @@ onBeforeUnmount(() => {
         Save
       </button>
 
-      <!-- Active-sync indicator: mirrors the WinForm behavior of showing whether a sync is running
-           and which sync(s). Polls /sync-status. -->
-      <div
-        class="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border transition"
-        :class="isSyncing ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-gray-400 bg-gray-50 border-gray-200'"
-        :title="isSyncing ? syncLabel : 'No sync running'"
-      >
-        <span
-          class="inline-block w-2 h-2 rounded-full"
-          :class="isSyncing ? 'bg-amber-500 animate-pulse' : 'bg-gray-300'"
-        ></span>
-        {{ syncLabel }}
-      </div>
     </div>
 
     <!-- Tab content -->
