@@ -45,15 +45,36 @@ async function loadSchema(key: string) {
   dmValues.value = undefined
   apiError.value = null
 
-  const loader = schemaByKey[key]
-  if (!loader) { notFound.value = true; loading.value = false; return }
+  const guid = route.query.guid as string | undefined
 
-  const mod    = await loader()
-  schema.value = mod.default as FormSchema
+  // Genetec (pilot): load the FormSchema from the service — the JSON is generated at build time from
+  // GenetecSettings + layouts and embedded in the plugin DLL, served by
+  // GET /api/data-managers/{guid}/settings-schema. Every other DM keeps using its static
+  // src/data/<key>.json for now. Falls back to the static schema if the endpoint is unavailable.
+  let schemaFromService = false
+  if (key === 'genetec' && guid) {
+    try {
+      const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${guid}/settings-schema`)
+      if (res.ok) {
+        schema.value      = await res.json() as FormSchema
+        schemaFromService = true
+      } else {
+        apiError.value = `settings-schema returned ${res.status} — falling back to static schema`
+      }
+    } catch {
+      apiError.value = `Could not reach settings-schema endpoint — falling back to static schema`
+    }
+  }
+
+  if (!schemaFromService) {
+    const loader = schemaByKey[key]
+    if (!loader) { notFound.value = true; loading.value = false; return }
+    const mod    = await loader()
+    schema.value = mod.default as FormSchema
+  }
 
   // If a DM GUID is provided as query param, fetch saved values from the service.
   // URL format: /form/on-guard?guid=<dm-guid>
-  const guid = route.query.guid as string | undefined
   if (guid) {
     try {
       const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${guid}`)

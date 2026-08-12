@@ -1,5 +1,6 @@
 ﻿<script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { resolveLoadFromUrl } from '../../utils/loadFrom'
 
 const props = defineProps<{
   title?:      string
@@ -18,17 +19,11 @@ const loading  = ref(false)
 const fetchErr = ref('')
 
 onMounted(async () => {
-  if (!props.serviceBase || !props.loadFrom) return
-  // `shared/<type>`  → GET /api/shared/<type>            (DM-agnostic local data, no guid needed)
-  // `<type>`         → GET .../{guid}/dm-data?type=<type> (DM-specific data)
-  const isShared = props.loadFrom.startsWith('shared/')
-  if (!isShared && !props.guid) return
+  const url = resolveLoadFromUrl(props.loadFrom, props.serviceBase ?? '', props.guid)
+  if (!url) return
   loading.value  = true
   fetchErr.value = ''
   try {
-    const url = isShared
-      ? `${props.serviceBase}/api/shared/${props.loadFrom.slice(7)}`
-      : `${props.serviceBase}/api/data-managers/${props.guid}/dm-data?type=${encodeURIComponent(props.loadFrom)}`
     const res = await fetch(url)
     if (!res.ok) { fetchErr.value = `Error ${res.status}`; return }
     const data: DynamicOption[] = await res.json()
