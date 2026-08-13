@@ -132,10 +132,10 @@ async function onImportFile(e: Event) {
 </script>
 
 <template>
-  <div class="min-h-full bg-gray-50 px-6 py-10">
+  <div class="flex-1 min-h-0 overflow-y-auto bg-gray-50 px-6 py-10">
 
     <!-- Header -->
-    <div class="max-w-4xl mx-auto mb-10 flex items-start justify-between gap-4">
+    <div class="max-w-6xl mx-auto mb-10 flex items-start justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">XPressEntry</h1>
         <p class="mt-1 text-sm text-gray-500">Select a data manager to configure.</p>
@@ -162,13 +162,13 @@ async function onImportFile(e: Event) {
     </div>
 
     <!-- Loading -->
-    <div v-if="loading" class="max-w-4xl mx-auto text-sm text-gray-400">
+    <div v-if="loading" class="max-w-6xl mx-auto text-sm text-gray-400">
       Loading data managers...
     </div>
 
     <template v-else>
       <!-- First section: Data Managers that come from the database (matched to a ./data schema) -->
-      <div class="max-w-4xl mx-auto">
+      <div class="max-w-6xl mx-auto">
         <p class="text-xs font-semibold uppercase tracking-wider text-xp-label mb-3">Data Managers</p>
 
         <div v-if="error" class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 mb-4">
@@ -220,7 +220,7 @@ async function onImportFile(e: Event) {
       </div>
 
       <!-- Demo & Showcase: schemas in ./data with no matching database DM -->
-      <div v-if="demoSchemas.length" class="max-w-4xl mx-auto mt-10">
+      <div v-if="demoSchemas.length" class="max-w-6xl mx-auto mt-10">
         <p class="text-xs font-semibold uppercase tracking-wider text-xp-label mb-3">Demo &amp; Showcase</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <button
