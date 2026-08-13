@@ -60,7 +60,6 @@ function lineClass(entry: DmLogEntry): string {
       ref="logEl"
       class="flex-1 w-full overflow-y-auto rounded-lg border border-gray-200 bg-gray-950 font-mono text-xs p-3 leading-relaxed"
     >
-      <div v-if="logs.length === 0" class="text-gray-600">Waiting for sync events...</div>
       <div
         v-for="(entry, i) in logs"
         :key="i"

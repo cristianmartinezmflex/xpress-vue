@@ -387,7 +387,7 @@
               "controls": [
                 {
                   "id": "emp_fields",
-                  "type": "keyvalue",
+                  "type": "customFields",
                   "title": "",
                   "key_header": "Source Field",
                   "value_header": "XPressEntry Field",
@@ -421,7 +421,7 @@
               "controls": [
                 {
                   "id": "visitor_fields",
-                  "type": "keyvalue",
+                  "type": "customFields",
                   "title": "",
                   "key_header": "Source Field",
                   "value_header": "XPressEntry Field",
@@ -455,7 +455,7 @@
               "controls": [
                 {
                   "id": "contractor_fields",
-                  "type": "keyvalue",
+                  "type": "customFields",
                   "title": "",
                   "key_header": "Source Field",
                   "value_header": "XPressEntry Field",

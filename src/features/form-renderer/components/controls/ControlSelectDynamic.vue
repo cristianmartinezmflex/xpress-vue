@@ -52,7 +52,9 @@ function onChange(e: Event) {
       :disabled="loading"
       @change="onChange"
     >
-      <option :value="-1">— All (no filter) —</option>
+      <!-- Blank "unset" option — mirrors the WinForm (which shows an empty combo when no value is set),
+           instead of a "— All (no filter) —" label that could be mistaken for an actual filter. -->
+      <option :value="-1"></option>
       <option v-if="loading" value="" disabled>Loading...</option>
       <option
         v-for="opt in options"

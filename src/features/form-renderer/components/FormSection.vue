@@ -12,6 +12,7 @@ import ControlSelectDynamic from './controls/ControlSelectDynamic.vue'
 import ControlRadio from './controls/ControlRadio.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
 import ControlKeyValue             from './controls/ControlKeyValue.vue'
+import ControlCustomFields         from './controls/ControlCustomFields.vue'
 import ControlLogView              from './controls/ControlLogView.vue'
 import ControlMultiselectDynamic   from './controls/ControlMultiselectDynamic.vue'
 import ControlSocketInterfaces     from './controls/ControlSocketInterfaces.vue'
@@ -199,6 +200,21 @@ function isControlVisible(control: Control): boolean {
               :key-header="control.key_header"
               :value-title="control.value_title"
               :value-header="control.value_header"
+              :model-value="state[control.id] ?? []"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlCustomFields
+              v-else-if="control.type === 'customFields'"
+              :title="control.title"
+              :key-title="control.key_title"
+              :key-header="control.key_header"
+              :value-title="control.value_title"
+              :value-header="control.value_header"
+              :load-from="control.loadFrom"
+              :destination-load-from="control.destinationLoadFrom"
+              :guid="guid"
+              :service-base="serviceBase"
               :model-value="state[control.id] ?? []"
               @update:model-value="emit('update:state', control.id, $event)"
             />

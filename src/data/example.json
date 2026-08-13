@@ -156,7 +156,7 @@
               "controls": [
                 {
                   "id": "user_mappings",
-                  "type": "keyvalue",
+                  "type": "customFields",
                   "title": "Customer User Mappings",
                   "key_title": "Source Columns",
                   "key_header": "Source Field",

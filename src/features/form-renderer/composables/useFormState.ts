@@ -20,8 +20,8 @@ function coerceValue(value: any, control: Control): any {
     return isNaN(n) ? value : n
   }
 
-  // keyvalue: the service may return an array, a plain object, or a JSON string.
-  if (control.type === 'keyvalue') {
+  // keyvalue / customFields: the service may return an array, a plain object, or a JSON string.
+  if (control.type === 'keyvalue' || control.type === 'customFields') {
     if (Array.isArray(value)) return value
     if (typeof value === 'string') {
       try {

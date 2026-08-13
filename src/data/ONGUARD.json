@@ -1021,7 +1021,7 @@
               "controls": [
                 {
                   "id": "custom_mappings",
-                  "type": "keyvalue",
+                  "type": "customFields",
                   "title": "",
                   "key_title": "Source Columns",
                   "key_header": "Source Field",
@@ -1045,7 +1045,7 @@
               "controls": [
                 {
                   "id": "badge_custom_mapping",
-                  "type": "keyvalue",
+                  "type": "customFields",
                   "title": "",
                   "key_title": "Source Columns",
                   "key_header": "Source Field",

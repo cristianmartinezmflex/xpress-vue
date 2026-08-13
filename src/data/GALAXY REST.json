@@ -228,7 +228,7 @@
               "controls": [
                 {
                   "id": "user_custom_fields",
-                  "type": "keyvalue",
+                  "type": "customFields",
                   "title": "",
                   "key_title": "Source Columns",
                   "key_header": "Source Field",

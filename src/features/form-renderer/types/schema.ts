@@ -67,6 +67,7 @@ export type ControlType =
   | 'radio'
   | 'button_bar'
   | 'keyvalue'
+  | 'customFields'
   | 'log_view'
   | 'socket_interfaces'
   | 'ip_badge_mappings'
@@ -86,7 +87,9 @@ export interface Control {
   key_header?: string
   value_title?: string
   value_header?: string
-  loadFrom?: string   // select_dynamic/multiselect_dynamic source:
+  entity?: string              // customFields: which local entity the mapping targets (Users/Badges/...)
+  destinationLoadFrom?: string // customFields: source for the "Destination Columns" (XPressEntry fields)
+  loadFrom?: string   // select_dynamic/multiselect_dynamic/customFields source:
                       //   "shared/<type>" → GET /api/shared/<type>              (DM-agnostic local data)
                       //   "<type>"        → GET .../{guid}/dm-data?type=<type>  (DM-specific data)
   optionsKey?: string // checkbox_multiselect: form-state key holding the [{ id, name }] option list

@@ -247,8 +247,8 @@
                 },
                 {
                   "id": "custom_fields_users",
-                  "type": "keyvalue",
-                  "title": "Custom User Field Mapping (RS2 Field → XPE Field)",
+                  "type": "customFields",
+                  "title": "Custom User Field Mapping (RS2 Field â†’ XPE Field)",
                   "key_title": "Source Columns",
                   "key_header": "Source Columns",
                   "value_title": "Destination Columns",

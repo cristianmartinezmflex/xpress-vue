@@ -393,7 +393,7 @@
               "controls": [
                 {
                   "id": "CustomFields",
-                  "type": "keyvalue",
+                  "type": "customFields",
                   "title": "",
                   "key_header": "ACM Identity Field",
                   "value_header": "XPressEntry UDF Field",

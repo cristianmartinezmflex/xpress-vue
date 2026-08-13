@@ -69,7 +69,7 @@
                       "type": "min_max",
                       "min": 5,
                       "max": 1440,
-                      "error": "5–1440 min"
+                      "error": "5â€“1440 min"
                     }
                   ]
                 }
@@ -104,10 +104,10 @@
       ]
     },
     {
-      "title": "Enable → Tab",
+      "title": "Enable â†’ Tab",
       "sections": [
         {
-          "title": "Enable on Tab — tab stays visible but becomes non-clickable when disabled",
+          "title": "Enable on Tab â€” tab stays visible but becomes non-clickable when disabled",
           "columns": [
             {
               "controls": [
@@ -136,7 +136,7 @@
                   "id": "conditional_tab_field",
                   "type": "text",
                   "title": "Sample field",
-                  "default": "This tab was disabled — toggle the switch to enable it"
+                  "default": "This tab was disabled â€” toggle the switch to enable it"
                 }
               ]
             }
@@ -145,10 +145,10 @@
       ]
     },
     {
-      "title": "Display → Tab",
+      "title": "Display â†’ Tab",
       "sections": [
         {
-          "title": "Display on Tab — tab is completely hidden when display is false",
+          "title": "Display on Tab â€” tab is completely hidden when display is false",
           "columns": [
             {
               "controls": [
@@ -177,7 +177,7 @@
                   "id": "hidden_tab_field",
                   "type": "text",
                   "title": "Sample field",
-                  "default": "This tab was hidden — toggle the switch to show it"
+                  "default": "This tab was hidden â€” toggle the switch to show it"
                 }
               ]
             }
@@ -186,10 +186,10 @@
       ]
     },
     {
-      "title": "Enable → Section & Field",
+      "title": "Enable â†’ Section & Field",
       "sections": [
         {
-          "title": "Enable on Section — enables or disables the section below",
+          "title": "Enable on Section â€” enables or disables the section below",
           "columns": [
             {
               "controls": [
@@ -225,7 +225,7 @@
                       "type": "min_max",
                       "min": 0,
                       "max": 9999,
-                      "error": "0–9999"
+                      "error": "0â€“9999"
                     }
                   ]
                 }
@@ -244,7 +244,7 @@
           ]
         },
         {
-          "title": "Enable on Field — enables or disables individual fields",
+          "title": "Enable on Field â€” enables or disables individual fields",
           "columns": [
             {
               "controls": [
@@ -275,7 +275,7 @@
                       "type": "min_max",
                       "min": 1,
                       "max": 1000,
-                      "error": "1–1000"
+                      "error": "1â€“1000"
                     }
                   ],
                   "enable": "enable_fields_demo == true"
@@ -308,10 +308,10 @@
       ]
     },
     {
-      "title": "Display → Section & Field",
+      "title": "Display â†’ Section & Field",
       "sections": [
         {
-          "title": "Display on Section — shows or hides the section below",
+          "title": "Display on Section â€” shows or hides the section below",
           "columns": [
             {
               "controls": [
@@ -358,7 +358,7 @@
           ]
         },
         {
-          "title": "Display on Field — shows or hides individual fields",
+          "title": "Display on Field â€” shows or hides individual fields",
           "columns": [
             {
               "controls": [
@@ -407,7 +407,7 @@
                       "type": "min_max",
                       "min": 0,
                       "max": 999,
-                      "error": "0–999"
+                      "error": "0â€“999"
                     }
                   ]
                 },
@@ -428,7 +428,7 @@
       "title": "2 Columns",
       "sections": [
         {
-          "title": "Enable on Column — left column disabled, right stays active",
+          "title": "Enable on Column â€” left column disabled, right stays active",
           "columns": [
             {
               "enable": "enable_col_demo == true",
@@ -460,7 +460,7 @@
           ]
         },
         {
-          "title": "Display on Column — left column hidden, right stays visible",
+          "title": "Display on Column â€” left column hidden, right stays visible",
           "columns": [
             {
               "display": "show_col_demo == true",
@@ -502,7 +502,7 @@
           ]
         },
         {
-          "title": "2-column layout — all control types",
+          "title": "2-column layout â€” all control types",
           "columns": [
             {
               "controls": [
@@ -534,7 +534,7 @@
                       "type": "min_max",
                       "min": 1,
                       "max": 9999,
-                      "error": "1–9999"
+                      "error": "1â€“9999"
                     }
                   ]
                 },
@@ -593,13 +593,13 @@
           ]
         },
         {
-          "title": "Key-Value — field mapping",
+          "title": "Key-Value â€” field mapping",
           "columns": [
             {
               "controls": [
                 {
                   "id": "demo_mappings",
-                  "type": "keyvalue",
+                  "type": "customFields",
                   "title": "",
                   "key_title": "Source Field",
                   "key_header": "Source",

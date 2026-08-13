@@ -221,8 +221,8 @@
                 },
                 {
                   "id": "customFields",
-                  "type": "keyvalue",
-                  "title": "Custom Fields (Genetec Field → XPE Field)",
+                  "type": "customFields",
+                  "title": "Custom Fields (Genetec Field â†’ XPE Field)",
                   "key_title": "Genetec Field",
                   "key_header": "Genetec Field",
                   "value_title": "XPE Field",
