@@ -122,19 +122,15 @@ export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: Ac
     return
   }
 
-  // Settings are persisted. Surface the GetStatus result — success/failure plus any version or other
-  // data the DM reports (OnGuard returns nothing; Genetec and others include a version).
+  // Settings are persisted. Only OPEN A DIALOG when the GetStatus connection test failed (with its
+  // error detail). On success we show nothing here — the top-right "Saved successfully" toast (FormView)
+  // is enough.
   const saved = await res.json().catch(() => null)
   const cr = saved?.connection_result
-  const detail = cr?.message ? `\n\n${oneLine(String(cr.message))}` : ''
 
   if (cr && cr.success === false) {
+    const detail = cr.message ? `\n\n${oneLine(String(cr.message))}` : ''
     show({ success: false, title: 'Saved — Connection Failed', message: `Settings saved, but the connection test failed.${detail}` })
-  } else if (cr && cr.success === true) {
-    show({ success: true, title: 'Saved', message: `Settings saved and connection verified.${detail}` })
-  } else {
-    // Older service without connection_result — just confirm the save.
-    show({ success: true, title: 'Saved', message: 'Settings saved.' })
   }
 }
 
