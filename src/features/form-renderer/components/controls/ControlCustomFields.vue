@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import type { KeyValuePair } from '../../types/schema'
 import { resolveLoadFromUrl } from '../../utils/loadFrom'
 
-// Maps an external system field -> an XPressEntry field. Replaces the old generic "keyvalue" control.
-// - Source Columns:      loaded from `loadFrom`            (the DM's external fields)
-// - Destination Columns: loaded from `destinationLoadFrom` (local XPressEntry fields)
-// When a load URL isn't provided (or the endpoint isn't available yet for that DM), the corresponding
-// picker falls back to a free-text input, preserving the old behavior. The value round-trips as the
-// same KeyValuePair[] the service already expects (key = source field, value = XPressEntry field).
+// Maps an external system field -> an XPressEntry field. Mirrors the WinForm ctlCustomFields:
+//   - Source Columns / Destination Columns are EDITABLE combos: pick from the loaded list OR type a
+//     custom value (WinForm uses editable ComboBox.Text).
+//   - The "+" button is ALWAYS enabled; clicking with either combo empty simply does nothing
+//     (WinForm btnAddTable_Click: Exit Sub when either is blank).
+//   - Duplicate source fields are not added.
+// Source Columns  = loadFrom            (the DM's external fields)
+// Destination Cols = destinationLoadFrom (local XPressEntry fields; the WinForm defaults these to the
+//                    UserData fields, which is what /api/shared/entity-fields-users returns).
+// Value round-trips as the same KeyValuePair[] the service expects (key = source, value = XPE field).
 const props = defineProps<{
   title?:               string
   keyHeader?:           string
@@ -23,18 +27,15 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: KeyValuePair[]] }>()
 
+// Unique ids so multiple customFields controls on one page don't share <datalist>s.
+let _uidCounter = 0
+const uid = `cf-${Date.now().toString(36)}-${_uidCounter++}`
+
 const sourceOptions = ref<string[]>([])
 const destOptions   = ref<string[]>([])
 const selSource     = ref('')
 const selDest       = ref('')
 const loadErr       = ref('')
-
-const rows = computed<KeyValuePair[]>(() => props.modelValue ?? [])
-
-// Sources already mapped are hidden from the picker (a source maps to one destination).
-const availableSources = computed(() =>
-  sourceOptions.value.filter((s) => !rows.value.some((r) => r.key === s)),
-)
 
 async function loadInto(url: string | null, target: typeof sourceOptions) {
   if (!url) return
@@ -56,72 +57,62 @@ onMounted(() => {
   loadInto(resolveLoadFromUrl(props.destinationLoadFrom, props.serviceBase ?? '', props.guid), destOptions)
 })
 
+// Always enabled (WinForm parity). No-op if either field is empty or the source is already mapped.
 function addMapping() {
   const k = selSource.value.trim()
   const v = selDest.value.trim()
   if (!k || !v) return
-  if (rows.value.some((r) => r.key === k)) return   // one destination per source
-  emit('update:modelValue', [...rows.value, { key: k, value: v }])
+  const rows = props.modelValue ?? []
+  if (rows.some((r) => r.key === k)) return   // one destination per source
+  emit('update:modelValue', [...rows, { key: k, value: v }])
   selSource.value = ''
   selDest.value   = ''
 }
 
 function removeRow(index: number) {
-  emit('update:modelValue', rows.value.filter((_, i) => i !== index))
+  emit('update:modelValue', (props.modelValue ?? []).filter((_, i) => i !== index))
 }
-
-const canAdd = computed(() => selSource.value.trim() !== '' && selDest.value.trim() !== '')
 </script>
 
 <template>
   <div class="flex flex-col gap-3">
     <span v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</span>
 
-    <!-- Pickers: Source Columns + Destination Columns + add -->
+    <!-- Editable combos (pick or type) + add — same as the WinForm -->
     <div class="flex gap-3 items-end">
       <div class="flex flex-col gap-1 flex-1">
         <label class="text-xs text-gray-500">{{ keyTitle ?? 'Source Columns' }}</label>
-        <select
-          v-if="sourceOptions.length"
-          v-model="selSource"
-          class="rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
-        >
-          <option value=""></option>
-          <option v-for="s in availableSources" :key="s" :value="s">{{ s }}</option>
-        </select>
         <input
-          v-else
           v-model="selSource"
+          :list="`${uid}-src`"
           class="rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
-          placeholder="Source field"
+          placeholder="Select or type a source field"
+          @keydown.enter.prevent="addMapping"
         />
+        <datalist :id="`${uid}-src`">
+          <option v-for="s in sourceOptions" :key="s" :value="s" />
+        </datalist>
       </div>
 
       <div class="flex flex-col gap-1 flex-1">
         <label class="text-xs text-gray-500">{{ valueTitle ?? 'Destination Columns' }}</label>
-        <select
-          v-if="destOptions.length"
-          v-model="selDest"
-          class="rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
-        >
-          <option value=""></option>
-          <option v-for="d in destOptions" :key="d" :value="d">{{ d }}</option>
-        </select>
         <input
-          v-else
           v-model="selDest"
+          :list="`${uid}-dst`"
           class="rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
-          placeholder="XPressEntry field"
+          placeholder="Select or type an XPressEntry field"
+          @keydown.enter.prevent="addMapping"
         />
+        <datalist :id="`${uid}-dst`">
+          <option v-for="d in destOptions" :key="d" :value="d" />
+        </datalist>
       </div>
 
       <button
         type="button"
-        class="flex items-center justify-center w-9 h-9 rounded-full text-white font-bold transition self-end leading-none"
-        :class="canAdd ? 'bg-xp-success hover:bg-xp-success-hover cursor-pointer' : 'bg-green-300 cursor-not-allowed'"
+        class="flex items-center justify-center w-9 h-9 rounded-full text-white font-bold transition self-end leading-none bg-xp-success hover:bg-xp-success-hover cursor-pointer"
         style="font-size: 22px; padding-bottom: 1px;"
-        :title="canAdd ? 'Add mapping' : 'Pick a source and a destination first'"
-        :disabled="!canAdd"
+        title="Add mapping"
         @click="addMapping"
       >+</button>
     </div>
@@ -140,7 +131,7 @@ const canAdd = computed(() => selSource.value.trim() !== '' && selDest.value.tri
         </thead>
         <tbody>
           <tr
-            v-for="(row, idx) in rows"
+            v-for="(row, idx) in (modelValue ?? [])"
             :key="idx"
             class="border-b border-gray-100 last:border-0"
           >
@@ -154,7 +145,7 @@ const canAdd = computed(() => selSource.value.trim() !== '' && selDest.value.tri
               >✕</button>
             </td>
           </tr>
-          <tr v-if="rows.length === 0">
+          <tr v-if="(modelValue ?? []).length === 0">
             <td colspan="3" class="px-3 py-4 text-center text-gray-400 text-sm">No field mappings</td>
           </tr>
         </tbody>
