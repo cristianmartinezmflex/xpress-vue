@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import type { FormSchema, Control, Button, Tab } from '../types/schema'
 import { useFormState } from '../composables/useFormState'
 import { evaluateEnable, evaluateDisplay } from '../composables/useDisabled'
+import { useCentrifugo } from '../composables/useCentrifugo'
 import FormSection from './FormSection.vue'
 
 // Sync operations are common to EVERY Data Manager, so the whole "Sync" tab is fixed here
@@ -91,7 +92,6 @@ function onUpdateState(id: string, value: any) {
 // actually running — when idle it renders nothing (no clutter). Saving anyway is allowed; the service
 // stops running operations first (see HandleSaveDataManager).
 const activeSyncTypes = ref<string[]>([])
-let syncStatusTimer: ReturnType<typeof setInterval> | null = null
 
 function prettySyncType(t: string): string {
   return t.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
@@ -112,13 +112,61 @@ async function refreshSyncStatus(): Promise<void> {
   }
 }
 
+// The sync-status indicator used to poll every 4s forever. Instead we now refresh it only when
+// something can actually have changed:
+//   - once on mount (catch a sync already running when the form opens),
+//   - when the DM service PUSHES a sync lifecycle event over Centrifugo (SyncStarted/Completed/…),
+//   - when the tab regains visibility (in case events were missed while hidden / Centrifugo was down),
+//   - a slow safety-net interval that ONLY ticks while the tab is visible (covers Centrifugo being off).
+// Result: no calls at all while the tab is hidden, and near-zero while idle and visible.
+const SYNC_LIFECYCLE_EVENTS = new Set(['SyncStarted', 'SyncCompleted', 'SyncFailed', 'SyncFinished'])
+const SAFETY_POLL_MS = 30000
+
+let unsubscribeSync: (() => void) | null = null
+let refreshDebounce: ReturnType<typeof setTimeout> | null = null
+let safetyTimer: ReturnType<typeof setInterval> | null = null
+
+function scheduleRefresh(): void {
+  if (refreshDebounce) clearTimeout(refreshDebounce)
+  // Small debounce so a burst of events (start + first data updates) collapses into one fetch.
+  refreshDebounce = setTimeout(refreshSyncStatus, 300)
+}
+
+function startSafetyPoll(): void {
+  if (safetyTimer || document.visibilityState !== 'visible') return
+  safetyTimer = setInterval(refreshSyncStatus, SAFETY_POLL_MS)
+}
+
+function stopSafetyPoll(): void {
+  if (safetyTimer) { clearInterval(safetyTimer); safetyTimer = null }
+}
+
+function onVisibilityChange(): void {
+  if (document.visibilityState === 'visible') {
+    refreshSyncStatus()   // catch up on anything missed while hidden
+    startSafetyPoll()
+  } else {
+    stopSafetyPoll()      // no background polling when the user isn't looking
+  }
+}
+
 onMounted(() => {
   refreshSyncStatus()
-  syncStatusTimer = setInterval(refreshSyncStatus, 4000)
+
+  // Push-driven refresh: only react to sync lifecycle events for THIS DM (ignore log/data noise).
+  unsubscribeSync = useCentrifugo().subscribe(props.guid, (entry) => {
+    if (SYNC_LIFECYCLE_EVENTS.has(entry.type)) scheduleRefresh()
+  })
+
+  document.addEventListener('visibilitychange', onVisibilityChange)
+  startSafetyPoll()
 })
 
 onBeforeUnmount(() => {
-  if (syncStatusTimer) clearInterval(syncStatusTimer)
+  unsubscribeSync?.()
+  document.removeEventListener('visibilitychange', onVisibilityChange)
+  if (refreshDebounce) clearTimeout(refreshDebounce)
+  stopSafetyPoll()
 })
 </script>
 
