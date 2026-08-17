@@ -47,12 +47,15 @@ async function loadSchema(key: string) {
 
   const guid = route.query.guid as string | undefined
 
-  // Genetec (pilot): load the FormSchema from the service — the JSON is generated at build time from
-  // GenetecSettings + layouts and embedded in the plugin DLL, served by
+  // These DMs load their FormSchema from the service — the JSON is generated at build time from
+  // <DM>Settings + layouts and embedded in the plugin DLL, served by
   // GET /api/data-managers/{guid}/settings-schema. Every other DM keeps using its static
   // src/data/<key>.json for now. Falls back to the static schema if the endpoint is unavailable.
+  // Compared case-insensitively because the route key is the ./data filename (e.g. "ONGUARD").
+  const SERVICE_SCHEMA_KEYS = new Set(['genetec', 'onguard'])
+
   let schemaFromService = false
-  if (key === 'genetec' && guid) {
+  if (guid && SERVICE_SCHEMA_KEYS.has(key.toLowerCase())) {
     try {
       const res = await fetch(`${DM_SERVICE_BASE}/api/data-managers/${guid}/settings-schema`)
       if (res.ok) {
