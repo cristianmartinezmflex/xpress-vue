@@ -53,15 +53,37 @@
                   "default": true
                 },
                 {
-                  "id": "update_cardholder_occupancy",
+                  "id": "cardholder_events",
                   "type": "boolean",
-                  "title": "Update Cardholder Occupancy",
+                  "title": "Cardholder Software Events",
                   "default": true
                 },
+                {
+                  "id": "credential_events",
+                  "type": "boolean",
+                  "title": "Credential Software Events",
+                  "default": true
+                },
+                {
+                  "id": "access_rule_events",
+                  "type": "boolean",
+                  "title": "Access Rule Software Events",
+                  "default": true
+                }
+              ]
+            },
+            {
+              "controls": [
                 {
                   "id": "use_raw_data",
                   "type": "boolean",
                   "title": "Use Raw Data",
+                  "default": false
+                },
+                {
+                  "id": "send_wiegand_on_searched",
+                  "type": "boolean",
+                  "title": "Send Wiegand on Searched",
                   "default": false
                 },
                 {
@@ -77,28 +99,27 @@
                       "error": "Must be between 1 and 100000"
                     }
                   ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Occupancy Settings",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "update_cardholder_occupancy",
+                  "type": "boolean",
+                  "title": "Update Cardholder Occupancy",
+                  "default": true
                 },
                 {
                   "id": "min_hours_of_activities_to_pull",
                   "type": "number_spinner",
                   "title": "Min Hours of Activities to Pull",
                   "default": 4
-                }
-              ]
-            },
-            {
-              "controls": [
-                {
-                  "id": "rio_enabled",
-                  "type": "boolean",
-                  "title": "Enable CloudLink (RIO)",
-                  "default": true
-                },
-                {
-                  "id": "rio_reader_timeout",
-                  "type": "number_spinner",
-                  "title": "RIO Reader Timeout (ms)",
-                  "default": 3000
                 }
               ]
             }
@@ -156,6 +177,27 @@
     {
       "title": "CloudLink",
       "sections": [
+        {
+          "title": "Global RIO Settings",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "rio_enabled",
+                  "type": "boolean",
+                  "title": "Enable CloudLink (RIO)",
+                  "default": true
+                },
+                {
+                  "id": "rio_reader_timeout",
+                  "type": "number_spinner",
+                  "title": "RIO Reader Timeout (ms)",
+                  "default": 3000
+                }
+              ]
+            }
+          ]
+        },
         {
           "title": "CloudLink (RIO) Devices",
           "columns": [
@@ -268,28 +310,6 @@
                   "default": ""
                 }
               ]
-            },
-            {
-              "controls": [
-                {
-                  "id": "cardholder_events",
-                  "type": "boolean",
-                  "title": "Cardholder Software Events",
-                  "default": true
-                },
-                {
-                  "id": "credential_events",
-                  "type": "boolean",
-                  "title": "Credential Software Events",
-                  "default": true
-                },
-                {
-                  "id": "access_rule_events",
-                  "type": "boolean",
-                  "title": "Access Rule Software Events",
-                  "default": true
-                }
-              ]
             }
           ]
         },
@@ -319,12 +339,6 @@
                   "type": "text",
                   "title": "Custom Credential Field 3",
                   "default": ""
-                },
-                {
-                  "id": "send_wiegand_on_searched",
-                  "type": "boolean",
-                  "title": "Send Wiegand on Searched",
-                  "default": false
                 }
               ]
             }

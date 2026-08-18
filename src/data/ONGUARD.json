@@ -212,24 +212,10 @@
             {
               "controls": [
                 {
-                  "id": "open_access_directory_name",
-                  "type": "select",
+                  "id": "open_access_directory_id",
+                  "type": "select_dynamic",
                   "title": "Directory",
-                  "values": [
-                    {
-                      "text": "AD.TELAERIS.COM",
-                      "value": "AD.TELAERIS.COM"
-                    },
-                    {
-                      "text": "WORKGROUP",
-                      "value": "WORKGROUP"
-                    },
-                    {
-                      "text": "LOCAL",
-                      "value": "LOCAL"
-                    }
-                  ],
-                  "default": "AD.TELAERIS.COM"
+                  "loadFrom": "/api/data-managers/{dmId}/dm-data?type=directories"
                 },
                 {
                   "id": "legacy_api",
@@ -373,12 +359,6 @@
             {
               "controls": [
                 {
-                  "id": "get_activities",
-                  "type": "boolean",
-                  "title": "Download OnGuard Activities",
-                  "default": false
-                },
-                {
                   "id": "ignore_last_dm_sync_hours",
                   "type": "boolean",
                   "title": "Ignore Last DM Sync Hours",
@@ -387,7 +367,7 @@
                 {
                   "id": "download_activity_timer",
                   "type": "number_spinner",
-                  "title": "Download Activity # Hours",
+                  "title": "Activity/Occupancy # Hours",
                   "default": 16,
                   "validations": [
                     {
@@ -397,12 +377,6 @@
                       "error": "Must be between 1 and 720"
                     }
                   ]
-                },
-                {
-                  "id": "get_occupancies",
-                  "type": "boolean",
-                  "title": "Download OnGuard Occupancy",
-                  "default": true
                 },
                 {
                   "id": "ignore_empty_area",
@@ -766,44 +740,17 @@
                   "default": ""
                 }
               ]
-            }
-          ]
-        },
-        {
-          "title": "Badge Types",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "badge_type_employee",
-                  "type": "boolean",
-                  "title": "Employee",
-                  "default": false
-                },
-                {
-                  "id": "badge_type_visitor",
-                  "type": "boolean",
-                  "title": "Visitor",
-                  "default": false
-                },
-                {
-                  "id": "badge_type_temporary",
-                  "type": "boolean",
-                  "title": "Temporary",
-                  "default": false
-                }
-              ]
             },
             {
               "controls": [
                 {
-                  "id": "badge_type_vehicle",
-                  "type": "boolean",
-                  "title": "Vehicle",
-                  "default": false
+                  "id": "badge_types_filter",
+                  "type": "checkbox_multiselect",
+                  "title": "Badge Types",
+                  "loadFrom": "/api/data-managers/{dmId}/dm-data?type=badge-types"
                 },
                 {
-                  "id": "exclude_selected_badges",
+                  "id": "exclude_badge_types",
                   "type": "boolean",
                   "title": "Exclude Selected Badges",
                   "default": false
@@ -946,31 +893,10 @@
                   "default": false
                 },
                 {
-                  "id": "vehicle_badge_employee",
-                  "type": "boolean",
-                  "title": "Employee",
-                  "default": false,
-                  "enable": "enable_vehicle_mappings == true"
-                },
-                {
-                  "id": "vehicle_badge_visitor",
-                  "type": "boolean",
-                  "title": "Visitor",
-                  "default": false,
-                  "enable": "enable_vehicle_mappings == true"
-                },
-                {
-                  "id": "vehicle_badge_temporary",
-                  "type": "boolean",
-                  "title": "Temporary",
-                  "default": false,
-                  "enable": "enable_vehicle_mappings == true"
-                },
-                {
-                  "id": "vehicle_badge_vehicle",
-                  "type": "boolean",
-                  "title": "Vehicle",
-                  "default": false,
+                  "id": "vehicle_types_filter",
+                  "type": "checkbox_multiselect",
+                  "title": "Vehicle Badge Types",
+                  "loadFrom": "/api/data-managers/{dmId}/dm-data?type=badge-types",
                   "enable": "enable_vehicle_mappings == true"
                 }
               ]
