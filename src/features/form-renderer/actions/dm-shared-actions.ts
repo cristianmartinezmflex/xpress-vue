@@ -128,7 +128,13 @@ export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: Ac
   const saved = await res.json().catch(() => null)
   const cr = saved?.connection_result
 
-  if (cr && cr.success === false) {
+  // `pending` = the test didn't finish within the service's timeout and is STILL running in the
+  // background (some DMs, e.g. OnGuard, take well over a minute to connect + sync UDFs on first apply).
+  // This is NOT a failure — settings are saved — so show a neutral/positive dialog, not a red error.
+  if (cr && cr.pending) {
+    const detail = cr.message ? `\n\n${oneLine(String(cr.message))}` : ''
+    show({ success: true, title: 'Saved — Connection Test Running', message: `Settings saved. The connection test is still running in the background.${detail}` })
+  } else if (cr && cr.success === false) {
     const detail = cr.message ? `\n\n${oneLine(String(cr.message))}` : ''
     show({ success: false, title: 'Saved — Connection Failed', message: `Settings saved, but the connection test failed.${detail}` })
   }

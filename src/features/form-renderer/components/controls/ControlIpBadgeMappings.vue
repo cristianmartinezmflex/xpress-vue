@@ -2,35 +2,75 @@
 /**
  * ControlIpBadgeMappings
  *
- * Renders the AEOS "ip_badge_settings" field.
- * Value is a vbBack-separated string of XML-serialized IPBadgeInterfaceModel objects.
+ * Renders the AEOS "ip_badge_settings" field. The value is a concatenation of XML-serialized
+ * IPBadgeInterfaceModel documents; the service splits them by the <?xml boundary
+ * (AeosDataManager.SplitXmlEntries) and deserializes each with XmlSerializer(IPBadgeInterfaceModel),
+ * so the element names below MUST match that model's properties.
  *
- * IPBadgeInterfaceModel fields (from WinForms ctlIPBadgeSelection):
- *   Name, ServerAddress, BadgeTypeExternalId, DoorExternalId, ReaderExternalId,
- *   Username, Password, UseSSL
+ * IPBadgeInterfaceModel fields (SocketHelpers/IPBadgeInterfaceModel.vb, mirrored by the WinForm
+ * ctlIPBadgeSelection): IPBadgeType (Type: ENTRY/EXIT/MUSTER), DoorOrReader (door id for ENTRY/EXIT,
+ * reader id for MUSTER), ASCII, IPAddress, Port, CardType (badge type id), IdentifierTypePrefix (Prefix),
+ * PadZeroesLength.
  */
 
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { resolveLoadFromUrl } from '../../utils/loadFrom'
 
 interface IPBadgeRow {
-  Name:                string
-  ServerAddress:       string
-  BadgeTypeExternalId: string
-  DoorExternalId:      string
-  ReaderExternalId:    string
-  Username:            string
-  Password:            string
-  UseSSL:              boolean
+  IPBadgeType:          string   // ENTRY | EXIT | MUSTER
+  DoorOrReader:         string   // door id (ENTRY/EXIT) or reader id (MUSTER)
+  ASCII:                boolean
+  IPAddress:            string
+  Port:                 string
+  CardType:             string   // badge type external id
+  IdentifierTypePrefix: string
+  PadZeroesLength:      string   // integer as string
 }
 
+interface Option { id: string; name: string }
+
+const TYPES = ['ENTRY', 'EXIT', 'MUSTER']
 const SEPARATOR = '\x08'
 
 const props = defineProps<{
-  title?:     string
-  modelValue: string
+  title?:       string
+  modelValue:   string
+  guid?:        string
+  serviceBase?: string
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
+// ─── Option lists (badge types, doors, readers) ──────────────────────────────
+const cardTypes = ref<Option[]>([])
+const doors     = ref<Option[]>([])
+const readers   = ref<Option[]>([])
+
+async function loadInto(shortForm: string, target: typeof cardTypes) {
+  const url = resolveLoadFromUrl(shortForm, props.serviceBase ?? '', props.guid)
+  if (!url) return
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return
+    const data = await res.json()
+    if (Array.isArray(data)) {
+      target.value = data
+        .map((o: any) => ({ id: String(o?.id ?? ''), name: String(o?.name ?? o?.id ?? '') }))
+        .filter((o) => o.id)
+    }
+  } catch { /* leave empty — ids are still preserved */ }
+}
+
+onMounted(() => {
+  loadInto('shared/badge_types', cardTypes)
+  loadInto('shared/doors', doors)
+  loadInto('shared/readers', readers)
+})
+
+function isDoorType(t: string): boolean { return t === 'ENTRY' || t === 'EXIT' }
+function targetOptions(t: string): Option[] { return isDoorType(t) ? doors.value : readers.value }
+function optionName(list: Option[], id: string): string { return list.find((o) => o.id === id)?.name ?? id }
+
+// ─── Parse / serialize XML ───────────────────────────────────────────────────
 function parseXml(xml: string): IPBadgeRow | null {
   try {
     const parser = new DOMParser()
@@ -38,14 +78,14 @@ function parseXml(xml: string): IPBadgeRow | null {
     if (doc.querySelector('parsererror')) return null
     const get = (tag: string) => doc.querySelector(tag)?.textContent ?? ''
     return {
-      Name:                get('Name'),
-      ServerAddress:       get('ServerAddress'),
-      BadgeTypeExternalId: get('BadgeTypeExternalId'),
-      DoorExternalId:      get('DoorExternalId'),
-      ReaderExternalId:    get('ReaderExternalId'),
-      Username:            get('Username'),
-      Password:            get('Password'),
-      UseSSL:              get('UseSSL').toLowerCase() === 'true',
+      IPBadgeType:          get('IPBadgeType'),
+      DoorOrReader:         get('DoorOrReader'),
+      ASCII:                get('ASCII').toLowerCase() === 'true',
+      IPAddress:            get('IPAddress'),
+      Port:                 get('Port'),
+      CardType:             get('CardType'),
+      IdentifierTypePrefix: get('IdentifierTypePrefix'),
+      PadZeroesLength:      get('PadZeroesLength') || '0',
     }
   } catch {
     return null
@@ -53,16 +93,17 @@ function parseXml(xml: string): IPBadgeRow | null {
 }
 
 function rowToXml(row: IPBadgeRow): string {
+  const pad = String(parseInt(row.PadZeroesLength, 10) || 0)
   return `<?xml version="1.0" encoding="utf-16"?>\n` +
     `<IPBadgeInterfaceModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">\n` +
-    `  <Name>${escXml(row.Name)}</Name>\n` +
-    `  <ServerAddress>${escXml(row.ServerAddress)}</ServerAddress>\n` +
-    `  <BadgeTypeExternalId>${escXml(row.BadgeTypeExternalId)}</BadgeTypeExternalId>\n` +
-    `  <DoorExternalId>${escXml(row.DoorExternalId)}</DoorExternalId>\n` +
-    `  <ReaderExternalId>${escXml(row.ReaderExternalId)}</ReaderExternalId>\n` +
-    `  <Username>${escXml(row.Username)}</Username>\n` +
-    `  <Password>${escXml(row.Password)}</Password>\n` +
-    `  <UseSSL>${row.UseSSL}</UseSSL>\n` +
+    `  <IPBadgeType>${escXml(row.IPBadgeType)}</IPBadgeType>\n` +
+    `  <DoorOrReader>${escXml(row.DoorOrReader)}</DoorOrReader>\n` +
+    `  <ASCII>${row.ASCII}</ASCII>\n` +
+    `  <IPAddress>${escXml(row.IPAddress)}</IPAddress>\n` +
+    `  <Port>${escXml(row.Port)}</Port>\n` +
+    `  <CardType>${escXml(row.CardType)}</CardType>\n` +
+    `  <IdentifierTypePrefix>${escXml(row.IdentifierTypePrefix)}</IdentifierTypePrefix>\n` +
+    `  <PadZeroesLength>${pad}</PadZeroesLength>\n` +
     `</IPBadgeInterfaceModel>`
 }
 
@@ -70,6 +111,7 @@ function escXml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
+// ─── State ───────────────────────────────────────────────────────────────────
 const rows = computed<IPBadgeRow[]>(() => {
   const val = props.modelValue ?? ''
   return val.split(SEPARATOR)
@@ -84,7 +126,10 @@ function emitRows(next: IPBadgeRow[]) {
 }
 
 function addRow() {
-  emitRows([...rows.value, { Name: '', ServerAddress: '', BadgeTypeExternalId: '', DoorExternalId: '', ReaderExternalId: '', Username: '', Password: '', UseSSL: false }])
+  emitRows([...rows.value, {
+    IPBadgeType: 'ENTRY', DoorOrReader: '', ASCII: false, IPAddress: 'localhost',
+    Port: '11020', CardType: '', IdentifierTypePrefix: '', PadZeroesLength: '0',
+  }])
 }
 
 function removeRow(idx: number) {
@@ -92,7 +137,15 @@ function removeRow(idx: number) {
 }
 
 function updateField(idx: number, field: keyof IPBadgeRow, val: string | boolean) {
-  const next = rows.value.map((r, i) => i === idx ? { ...r, [field]: val } : r)
+  const next = rows.value.map((r, i) => {
+    if (i !== idx) return r
+    const updated = { ...r, [field]: val }
+    // Switching between a Door type and a Reader type clears the picked target (WinForm parity).
+    if (field === 'IPBadgeType' && isDoorType(r.IPBadgeType) !== isDoorType(val as string)) {
+      updated.DoorOrReader = ''
+    }
+    return updated
+  })
   emitRows(next)
 }
 
@@ -128,9 +181,9 @@ function toggleExpand(idx: number) {
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
           </svg>
           <span class="text-sm font-semibold text-xp-label flex-1">
-            {{ row.Name || row.ServerAddress || `Mapping ${idx + 1}` }}
+            {{ row.IPBadgeType }} — {{ optionName(targetOptions(row.IPBadgeType), row.DoorOrReader) || `Mapping ${idx + 1}` }}
           </span>
-          <span v-if="row.ServerAddress" class="text-xs text-gray-400">{{ row.ServerAddress }}</span>
+          <span v-if="row.IPAddress" class="text-xs text-gray-400">{{ row.IPAddress }}:{{ row.Port }}</span>
           <button
             type="button"
             class="ml-2 text-xp-red hover:text-xp-red-hover text-xs px-2"
@@ -141,42 +194,69 @@ function toggleExpand(idx: number) {
         <!-- Fields -->
         <div v-if="expanded.has(idx)" class="p-3 grid grid-cols-2 gap-3 border-t border-gray-100">
           <div class="flex flex-col gap-1">
-            <label class="text-xs text-gray-500">Name</label>
-            <input :value="row.Name" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Name', ($event.target as HTMLInputElement).value)" />
+            <label class="text-xs text-gray-500">Type</label>
+            <select
+              :value="row.IPBadgeType"
+              class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
+              @change="updateField(idx, 'IPBadgeType', ($event.target as HTMLSelectElement).value)"
+            >
+              <option v-for="t in TYPES" :key="t" :value="t">{{ t }}</option>
+            </select>
           </div>
           <div class="flex flex-col gap-1">
-            <label class="text-xs text-gray-500">Server Address</label>
-            <input :value="row.ServerAddress" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'ServerAddress', ($event.target as HTMLInputElement).value)" />
+            <label class="text-xs text-gray-500">Card Type</label>
+            <select
+              :value="row.CardType"
+              class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
+              @change="updateField(idx, 'CardType', ($event.target as HTMLSelectElement).value)"
+            >
+              <option value="" disabled>Select a card type…</option>
+              <option v-if="row.CardType && !cardTypes.some((c) => c.id === row.CardType)" :value="row.CardType">
+                {{ optionName(cardTypes, row.CardType) }}
+              </option>
+              <option v-for="ct in cardTypes" :key="ct.id" :value="ct.id">{{ ct.name }}</option>
+            </select>
+          </div>
+          <div class="flex items-end gap-3 col-span-2">
+            <div class="flex flex-col gap-1 flex-1">
+              <label class="text-xs text-gray-500">{{ isDoorType(row.IPBadgeType) ? 'Door' : 'Reader' }}</label>
+              <select
+                :value="row.DoorOrReader"
+                class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
+                @change="updateField(idx, 'DoorOrReader', ($event.target as HTMLSelectElement).value)"
+              >
+                <option value="" disabled>Select a {{ isDoorType(row.IPBadgeType) ? 'door' : 'reader' }}…</option>
+                <option v-if="row.DoorOrReader && !targetOptions(row.IPBadgeType).some((o) => o.id === row.DoorOrReader)" :value="row.DoorOrReader">
+                  {{ optionName(targetOptions(row.IPBadgeType), row.DoorOrReader) }}
+                </option>
+                <option v-for="o in targetOptions(row.IPBadgeType)" :key="o.id" :value="o.id">{{ o.name }}</option>
+              </select>
+            </div>
+            <label class="flex items-center gap-2 h-9 shrink-0 cursor-pointer">
+              <input
+                type="checkbox"
+                :checked="row.ASCII"
+                class="w-4 h-4 accent-xp-primary"
+                @change="updateField(idx, 'ASCII', ($event.target as HTMLInputElement).checked)"
+              />
+              <span class="text-sm text-gray-700">ASCII</span>
+            </label>
           </div>
           <div class="flex flex-col gap-1">
-            <label class="text-xs text-gray-500">Badge Type External ID</label>
-            <input :value="row.BadgeTypeExternalId" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'BadgeTypeExternalId', ($event.target as HTMLInputElement).value)" />
+            <label class="text-xs text-gray-500">IP Address / Hostname</label>
+            <input :value="row.IPAddress" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'IPAddress', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="flex flex-col gap-1">
-            <label class="text-xs text-gray-500">Door External ID</label>
-            <input :value="row.DoorExternalId" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'DoorExternalId', ($event.target as HTMLInputElement).value)" />
+            <label class="text-xs text-gray-500">Port</label>
+            <input type="number" :value="row.Port" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Port', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="flex flex-col gap-1">
-            <label class="text-xs text-gray-500">Reader External ID</label>
-            <input :value="row.ReaderExternalId" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'ReaderExternalId', ($event.target as HTMLInputElement).value)" />
+            <label class="text-xs text-gray-500">Prefix</label>
+            <input :value="row.IdentifierTypePrefix" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'IdentifierTypePrefix', ($event.target as HTMLInputElement).value)" />
           </div>
           <div class="flex flex-col gap-1">
-            <label class="text-xs text-gray-500">Username</label>
-            <input :value="row.Username" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Username', ($event.target as HTMLInputElement).value)" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-xs text-gray-500">Password</label>
-            <input type="password" :value="row.Password" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'Password', ($event.target as HTMLInputElement).value)" />
-          </div>
-          <div class="flex items-center gap-2 pt-4">
-            <input
-              type="checkbox"
-              :id="`ssl-${idx}`"
-              :checked="row.UseSSL"
-              class="w-4 h-4 accent-xp-primary"
-              @change="updateField(idx, 'UseSSL', ($event.target as HTMLInputElement).checked)"
-            />
-            <label :for="`ssl-${idx}`" class="text-sm text-gray-700 cursor-pointer">Use SSL</label>
+            <label class="text-xs text-gray-500">Pad to Length with 0's</label>
+            <input type="number" min="0" :value="row.PadZeroesLength" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary" @input="updateField(idx, 'PadZeroesLength', ($event.target as HTMLInputElement).value)" />
           </div>
         </div>
       </div>
@@ -195,4 +275,3 @@ function toggleExpand(idx: number) {
     </button>
   </div>
 </template>
-

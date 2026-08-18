@@ -8,7 +8,14 @@ async function onGuardPost(serviceBase: string, guid: string, subRoute: string, 
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
     body:    body ? JSON.stringify(body) : undefined,
   })
-  return res.json().catch(() => ({ success: false, message: `Service returned ${res.status}` }))
+  const data = await res.json().catch(() => null)
+  // Normalize the result so every caller gets a usable success flag and a NON-EMPTY message.
+  // The service returns { success, message, ... } on OK and an ApiError { Error } on failure — the
+  // dialog was showing blank because callers only read `message` (camelCase) and never `Error`.
+  const success = res.ok && (data?.success ?? true)
+  const message = data?.message ?? data?.Error ?? data?.error ??
+    (success ? '' : `The service returned ${res.status}.`)
+  return { ...(data ?? {}), success, message }
 }
 
 export async function onguard_checkSubscriptions({ guid, serviceBase }: ActionContext): Promise<void> {

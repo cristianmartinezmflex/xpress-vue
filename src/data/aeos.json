@@ -177,7 +177,8 @@
                 {
                   "id": "socket_interface_settings",
                   "type": "socket_interfaces",
-                  "title": "Socket Interfaces"
+                  "title": "Socket Interfaces",
+                  "loadFrom": "shared/badge_types"
                 }
               ]
             }
@@ -261,7 +262,8 @@
                   "id": "event_filter",
                   "type": "text",
                   "title": "Filter Name",
-                  "default": ""
+                  "default": "",
+                  "enable": "enable_event_filter == true"
                 }
               ]
             }

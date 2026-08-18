@@ -36,7 +36,13 @@ const props = defineProps<{
   initialValues?: Record<string, any>
   guid?:          string
   serviceBase?:   string
+  // Handler currently in-flight (set by the parent while it awaits the action). Used to show a
+  // loading state on the button that triggered it — today only Save.
+  activeAction?:  string | null
 }>()
+
+// True while the Save action's API call is in progress.
+const isSaving = computed(() => props.activeAction === 'dm_shared_save')
 const emit = defineEmits<{ action: [id: string, handler: string, payload?: unknown] }>()
 
 const activeTab = ref(0)
@@ -206,15 +212,27 @@ onBeforeUnmount(() => {
       </button>
       <button
         type="button"
-        :disabled="!isDirty"
-        class="px-4 py-2 text-sm font-medium rounded-lg border transition"
-        :class="isDirty
+        :disabled="!isDirty || isSaving"
+        class="px-4 py-2 text-sm font-medium rounded-lg border transition flex items-center gap-2"
+        :class="(isDirty && !isSaving)
           ? 'border-xp-primary bg-xp-primary text-white hover:bg-xp-primary-hover cursor-pointer'
-          : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'"
-        :title="isDirty ? 'Save settings (also tests the connection)' : 'No changes to save'"
+          : isSaving
+            ? 'border-xp-primary bg-xp-primary text-white cursor-wait'
+            : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'"
+        :title="isSaving ? 'Saving…' : isDirty ? 'Save settings (also tests the connection)' : 'No changes to save'"
         @click="emit('action', 'btn_save', 'dm_shared_save')"
       >
-        Save
+        <svg
+          v-if="isSaving"
+          class="animate-spin w-4 h-4 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        {{ isSaving ? 'Saving…' : 'Save' }}
       </button>
 
       <!-- Active-sync indicator: only shown while a sync is running for this DM (WinForm parity). -->

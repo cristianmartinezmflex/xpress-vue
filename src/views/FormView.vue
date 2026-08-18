@@ -18,6 +18,7 @@ const notFound     = ref(false)
 const dmValues     = ref<Record<string, any> | undefined>(undefined)
 const apiError     = ref<string | null>(null)
 const saving       = ref(false)
+const activeAction = ref<string | null>(null)
 const saveResult   = ref<'ok' | 'error' | null>(null)
 const formRenderer = ref<InstanceType<typeof FormRenderer> | null>(null)
 
@@ -111,8 +112,9 @@ const { dispatch } = useDmActions(() => ({
 }))
 
 async function handleAction(_id: string, handler: string, payload?: unknown) {
-  saving.value     = true
-  saveResult.value = null
+  saving.value       = true
+  activeAction.value = handler
+  saveResult.value   = null
   try {
     await dispatch(handler, payload)
     saveResult.value = 'ok'
@@ -122,7 +124,8 @@ async function handleAction(_id: string, handler: string, payload?: unknown) {
   } catch {
     saveResult.value = 'error'
   } finally {
-    saving.value = false
+    saving.value       = false
+    activeAction.value = null
     setTimeout(() => { saveResult.value = null }, 3000)
   }
 }
@@ -197,6 +200,7 @@ async function handleAction(_id: string, handler: string, payload?: unknown) {
       :initial-values="dmValues"
       :guid="route.query.guid as string | undefined"
       :service-base="DM_SERVICE_BASE"
+      :active-action="activeAction"
       class="flex-1 overflow-hidden"
       @action="handleAction"
     />

@@ -1,7 +1,18 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useDialog } from '../composables/useDialog'
 
 const { state, close, resolve } = useDialog()
+
+// General safety net: never show a modal with an empty body. If a caller opened the dialog without a
+// message (e.g. the service returned an error the caller didn't surface), fall back to a generic line
+// so the user always gets some information instead of a blank modal.
+const displayMessage = computed(() => {
+  if (state.message && state.message.trim()) return state.message
+  return state.success
+    ? 'Operation completed successfully.'
+    : 'The operation failed, but the service did not provide any details. Check the service logs for more information.'
+})
 </script>
 
 <template>
@@ -39,7 +50,7 @@ const { state, close, resolve } = useDialog()
           </div>
 
           <!-- Message -->
-          <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{{ state.message }}</p>
+          <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{{ displayMessage }}</p>
 
           <!-- Actions -->
           <div class="flex justify-end gap-2">

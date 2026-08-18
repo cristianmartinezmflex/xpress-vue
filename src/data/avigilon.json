@@ -310,7 +310,8 @@
                   "id": "strike_dn_field",
                   "type": "text",
                   "title": "Strike DN Field",
-                  "default": "plasecdoorStrkDN"
+                  "default": "plasecdoorStrkDN",
+                  "enable": "pulse_door_relay == true"
                 }
               ]
             },
@@ -321,6 +322,7 @@
                   "type": "number_spinner",
                   "title": "Pulse Duration",
                   "default": 0,
+                  "enable": "pulse_door_relay == true",
                   "validations": [
                     {
                       "type": "min_max",

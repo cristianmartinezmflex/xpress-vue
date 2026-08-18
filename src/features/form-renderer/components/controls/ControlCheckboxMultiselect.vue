@@ -13,7 +13,8 @@
  * - Any currently-selected id not present in the options is still shown, so a saved selection stays
  *   visible before the option list is (re)loaded.
  */
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+import { resolveLoadFromUrl } from '../../utils/loadFrom'
 
 interface Option { id: string; name: string }
 
@@ -21,6 +22,9 @@ const props = defineProps<{
   title?:      string
   modelValue:  string        // comma-separated selected ids
   optionsKey?: string        // form-state key holding the [{ id, name }] option list
+  loadFrom?:   string        // optional URL to auto-load the option list on mount (like the WinForm's list)
+  guid?:       string
+  serviceBase?: string
   state?:      Record<string, any>
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
@@ -28,6 +32,28 @@ const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 const selectedIds = computed<string[]>(() =>
   (props.modelValue ?? '').split(',').map((s) => s.trim()).filter(Boolean),
 )
+
+// Options fetched once on mount from `loadFrom` (mirrors the WinForm showing the current list on open).
+// A subsequent live refresh via the "Update Panel List" button writes `optionsKey` and takes precedence.
+const fetchedOptions = ref<Option[]>([])
+const loadErr        = ref('')
+
+onMounted(async () => {
+  const url = resolveLoadFromUrl(props.loadFrom, props.serviceBase ?? '', props.guid)
+  if (!url) return
+  try {
+    const res = await fetch(url)
+    if (!res.ok) { loadErr.value = `Error ${res.status}`; return }
+    const data = await res.json()
+    if (Array.isArray(data)) {
+      fetchedOptions.value = data
+        .map((o: any) => ({ id: String(o?.id ?? ''), name: String(o?.name ?? o?.id ?? '') }))
+        .filter((o) => o.id)
+    }
+  } catch {
+    loadErr.value = 'Could not load'
+  }
+})
 
 const options = computed<Option[]>(() => {
   let provided: Option[] = []
@@ -37,11 +63,13 @@ const options = computed<Option[]>(() => {
   } else if (Array.isArray(raw)) {
     provided = raw
   }
-  const normalized = provided.map((o) => ({ id: String(o.id), name: o.name }))
-  const known = new Set(normalized.map((o) => o.id))
-  // Keep saved-but-not-yet-loaded ids visible (labeled by id) so nothing is silently dropped.
-  const extras = selectedIds.value.filter((id) => !known.has(id)).map((id) => ({ id, name: id }))
-  return [...normalized, ...extras]
+  // Merge by id: mount-fetched list first, then the button-provided list (a live refresh wins), then any
+  // saved-but-not-listed ids so a selection is never silently dropped.
+  const byId = new Map<string, Option>()
+  for (const o of fetchedOptions.value) byId.set(String(o.id), { id: String(o.id), name: o.name })
+  for (const o of provided)             byId.set(String(o.id), { id: String(o.id), name: o.name })
+  for (const id of selectedIds.value)   if (!byId.has(id)) byId.set(id, { id, name: id })
+  return [...byId.values()]
 })
 
 function isChecked(id: string): boolean {
@@ -80,13 +108,13 @@ function clearAll()  { emit('update:modelValue', '') }
           @change="toggle(o.id)"
         />
         <span class="text-sm text-gray-800">{{ o.name }}</span>
-        <span class="ml-auto text-xs text-gray-400">{{ o.id }}</span>
       </label>
       <div v-if="options.length === 0" class="px-3 py-4 text-center text-gray-400 text-sm">
         No options loaded yet.
       </div>
     </div>
 
+    <p v-if="loadErr" class="text-xs text-xp-orange">{{ loadErr }} — click “Update Panel List” to load from the system</p>
     <p class="text-xs text-gray-400">{{ selectedIds.length }} selected</p>
   </div>
 </template>

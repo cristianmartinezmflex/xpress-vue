@@ -233,6 +233,9 @@ function isControlVisible(control: Control): boolean {
               v-else-if="control.type === 'socket_interfaces'"
               :title="control.title"
               :model-value="state[control.id] ?? ''"
+              :load-from="control.loadFrom"
+              :guid="guid"
+              :service-base="serviceBase"
               @update:model-value="emit('update:state', control.id, $event)"
             />
 
@@ -240,6 +243,8 @@ function isControlVisible(control: Control): boolean {
               v-else-if="control.type === 'ip_badge_mappings'"
               :title="control.title"
               :model-value="state[control.id] ?? ''"
+              :guid="guid"
+              :service-base="serviceBase"
               @update:model-value="emit('update:state', control.id, $event)"
             />
 
@@ -267,6 +272,9 @@ function isControlVisible(control: Control): boolean {
               :title="control.title"
               :model-value="state[control.id] ?? ''"
               :options-key="control.optionsKey"
+              :load-from="control.loadFrom"
+              :guid="guid"
+              :service-base="serviceBase"
               :state="state"
               @update:model-value="emit('update:state', control.id, $event)"
             />
