@@ -34,6 +34,18 @@ const displayTitle = computed(() => {
   return ''
 })
 
+// When loadFrom / destinationLoadFrom aren't given explicitly, derive them from `entity` (same
+// convention as the .NET generator): source = external custom fields, destination = XPressEntry fields.
+// A DM whose source list is entity-specific (e.g. AEOS employee/visitor/contractor) still declares its
+// own `loadFrom`; the destination is almost always derivable from the entity, so it can be omitted.
+const entityLower = computed(() => (props.entity ?? '').trim().toLowerCase())
+const effectiveLoadFrom = computed(() =>
+  props.loadFrom || (entityLower.value ? `custom-fields-${entityLower.value}` : undefined),
+)
+const effectiveDestinationLoadFrom = computed(() =>
+  props.destinationLoadFrom || (entityLower.value ? `shared/entity-fields-${entityLower.value}` : undefined),
+)
+
 interface Combo { text: string; options: string[]; loading: boolean; open: boolean; menu: { left: number; top: number; width: number } }
 const newCombo = (): Combo => ({ text: '', options: [], loading: false, open: false, menu: { left: 0, top: 0, width: 0 } })
 const source = reactive<Combo>(newCombo())
@@ -83,8 +95,8 @@ async function loadInto(url: string | null, combo: Combo) {
 }
 
 onMounted(() => {
-  loadInto(resolveLoadFromUrl(props.loadFrom, props.serviceBase ?? '', props.guid), source)
-  loadInto(resolveLoadFromUrl(props.destinationLoadFrom, props.serviceBase ?? '', props.guid), dest)
+  loadInto(resolveLoadFromUrl(effectiveLoadFrom.value, props.serviceBase ?? '', props.guid), source)
+  loadInto(resolveLoadFromUrl(effectiveDestinationLoadFrom.value, props.serviceBase ?? '', props.guid), dest)
   window.addEventListener('scroll', reposition, true)
   window.addEventListener('resize', reposition)
 })

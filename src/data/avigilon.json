@@ -84,7 +84,7 @@
                 },
                 {
                   "id": "from_zone_id",
-                  "type": "select",
+                  "type": "select_dynamic",
                   "title": "Doors From Area",
                   "loadFrom": "shared/zones_external",
                   "default": -1
@@ -95,7 +95,7 @@
               "controls": [
                 {
                   "id": "to_zone_id",
-                  "type": "select",
+                  "type": "select_dynamic",
                   "title": "Doors To Area",
                   "loadFrom": "shared/zones_external",
                   "default": -1
@@ -399,8 +399,8 @@
                   "title": "",
                   "key_header": "ACM Identity Field",
                   "value_header": "XPressEntry UDF Field",
+                  "entity": "Users",
                   "loadFrom": "identity-fields",
-                  "destinationLoadFrom": "shared/entity-fields-users",
                   "default": []
                 }
               ]

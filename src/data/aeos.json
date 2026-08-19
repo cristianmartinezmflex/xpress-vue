@@ -92,14 +92,14 @@
                 },
                 {
                   "id": "outside_area_id",
-                  "type": "select",
+                  "type": "select_dynamic",
                   "title": "Outside Area",
                   "loadFrom": "shared/zones",
                   "default": -1
                 },
                 {
                   "id": "inside_area_id",
-                  "type": "select",
+                  "type": "select_dynamic",
                   "title": "Inside Area",
                   "loadFrom": "shared/zones",
                   "default": -1
@@ -112,7 +112,7 @@
                 },
                 {
                   "id": "default_identifier_type",
-                  "type": "select",
+                  "type": "select_dynamic",
                   "title": "Default Identifier Type for Unknown Cards",
                   "loadFrom": "shared/badge_types",
                   "default": -1
@@ -394,8 +394,8 @@
                   "title": "",
                   "key_header": "Source Field",
                   "value_header": "XPressEntry Field",
+                  "entity": "Users",
                   "loadFrom": "employee-fields",
-                  "destinationLoadFrom": "shared/entity-fields-users",
                   "default": []
                 }
               ]
@@ -418,8 +418,8 @@
                   "title": "",
                   "key_header": "Source Field",
                   "value_header": "XPressEntry Field",
+                  "entity": "Users",
                   "loadFrom": "visitor-fields",
-                  "destinationLoadFrom": "shared/entity-fields-users",
                   "default": []
                 }
               ]
@@ -442,8 +442,8 @@
                   "title": "",
                   "key_header": "Source Field",
                   "value_header": "XPressEntry Field",
+                  "entity": "Users",
                   "loadFrom": "contractor-fields",
-                  "destinationLoadFrom": "shared/entity-fields-users",
                   "default": []
                 }
               ]

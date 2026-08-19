@@ -28,7 +28,7 @@ const meta: Meta<typeof ControlShowcase> = {
           '- **REST (recomendada)** — el botón declara `{ verb, action }`: al clickearlo se hace `verb <serviceBase><action>` (con `{dmId}` reemplazado por el guid del DM). No requiere código front. Es la forma que usan OnGuard y Genetec (ej. `check-subscriptions`, `update-panels`, `clear-external-data`).',
           '- **Handler front (`onClick`)** — nombre de una función resuelta **por prefijo**: `dm_shared_*` (compartidas, en `actions/dm-shared-actions.ts`). Los handlers específicos por DM (`aeos_*`, `avigilon_*`, `genetec_*`, `rs2_*`, `on-guard`) fueron eliminados: la carga de campos ahora la hace el propio control (`customFields` con `loadFrom`), no un botón.',
           '',
-          '**Loading:** mientras una acción está en vuelo, el botón que la disparó muestra un spinner y queda deshabilitado (igual que Save). Los dropdowns que cargan de la API (`select` con `loadFrom`, `checkbox_multiselect`, `customFields`) muestran un spinner mientras traen sus opciones.',
+          '**Loading:** mientras una acción está en vuelo, el botón que la disparó muestra un spinner y queda deshabilitado (igual que Save). Los dropdowns que cargan de la API (`select_dynamic`, `checkbox_multiselect`, `customFields`) muestran un spinner mientras traen sus opciones.',
         ].join('\n'),
       },
     },
@@ -103,15 +103,15 @@ export const Select = story(
       { text: 'Full', value: 'full' },
     ],
   },
-  { docs: '**Uso:** elegir **una** opción. Las opciones pueden ser **estáticas** (`values`) o **dinámicas** (`loadFrom`, ver siguiente story).\n\n**Props soportadas:** `values` (`[{ text, value }]`) **o** `loadFrom`, `default`.' },
+  { docs: '**Uso:** elegir **una** opción de una lista **fija** (valores conocidos en tiempo de compilación).\n\n**Props soportadas:** `values` (`[{ text, value }]`), `default`. Para opciones cargadas de la API usá `select_dynamic`.' },
 )
 
-export const SelectWithLoadFrom = story(
-  { id: 'site_id', type: 'select', title: 'Site', loadFrom: 'sites', default: -1 },
+export const SelectDynamic = story(
+  { id: 'site_id', type: 'select_dynamic', title: 'Site', loadFrom: 'sites', default: -1 },
   {
-    note: 'Mismo control `select`, pero con `loadFrom`: las opciones se cargan del servicio en runtime. En el catálogo no hay DM vivo, así que la lista queda vacía (muestra spinner y luego vacío).',
+    note: 'Las opciones se cargan del servicio en runtime (`loadFrom`). En el catálogo no hay DM vivo, así que la lista queda vacía (muestra spinner y luego vacío).',
     docs: [
-      '**Uso:** `select` con opciones que se **cargan del servicio** en runtime (reemplaza al viejo `select_dynamic`).',
+      '**Uso:** elegir **una** opción de una lista que se **carga de la API** en runtime. (Para valores estáticos usá `select`.)',
       '',
       '**Props soportadas:** `loadFrom`, `default`. Requiere un `guid` de DM en runtime.',
       '- `"<type>"` → `GET /api/data-managers/{guid}/dm-data?type=<type>` (data específica del DM, ej. `sites`, `zones`, `directories`).',
@@ -137,7 +137,7 @@ export const CheckboxMultiselect = story(
       '**Uso:** multi-select de checkboxes **genérico** (no atado a ningún DM), con Select All / Clear All. Ej.: los filtros de "Panels" / "Segments" / "Badge Types" de OnGuard.',
       '',
       '**Props soportadas:**',
-      '- `loadFrom` — URL para **auto-cargar** la lista al montar (misma convención que `select` dinámico: `"<type>"` → `dm-data?type=`, `"shared/<type>"` → `/api/shared/`). Muestra un spinner mientras carga.',
+      '- `loadFrom` — URL para **auto-cargar** la lista al montar (misma convención que `select_dynamic`: `"<type>"` → `dm-data?type=`, `"shared/<type>"` → `/api/shared/`). Muestra un spinner mientras carga.',
       '- `optionsKey` (opcional) — key del **form state** con la lista de opciones (`[{ id, name }]`); una acción/botón la escribe para **refrescar** la lista en vivo. Si está presente, se mergea sobre lo cargado por `loadFrom`.',
       '- **Valor**: string de ids separados por coma (ej. `"1,5,9"`). Los ids seleccionados que aún no están en las opciones se muestran igual (labeleados por id) para no perder la selección guardada.',
     ].join('\n'),
@@ -190,7 +190,6 @@ export const CustomFields = story(
     key_header: 'Source Field',
     value_header: 'XPressEntry Field',
     loadFrom: 'employee-fields',
-    destinationLoadFrom: 'shared/entity-fields-users',
     default: [],
   },
   {
@@ -199,13 +198,13 @@ export const CustomFields = story(
       '**Uso:** mapeo de campos **Source → Destination** (ej. campos del sistema externo → UDFs de XPressEntry). Reemplaza el viejo patrón "keyvalue + botón Load Fields": ahora las columnas se cargan solas.',
       '',
       '**Props soportadas:**',
-      '- `loadFrom` — auto-carga las **Source Columns** (misma convención que `select` dinámico: `"<type>"` → `dm-data?type=`, `"shared/<type>"` → `/api/shared/`).',
-      '- `destinationLoadFrom` — auto-carga las **Destination Columns** (campos de XPressEntry, ej. `shared/entity-fields-users`).',
+      '- `entity` — entidad local a la que apunta el mapeo (`Users` / `Badges`). De acá se **deriva** el destino (`Destination Columns` = `shared/entity-fields-<entity>`) y, si no se declara `loadFrom`, también el origen (`custom-fields-<entity>`). Además da el título por defecto ("Users Custom Mapping").',
+      '- `loadFrom` (opcional) — override del origen (**Source Columns**) cuando NO es el genérico del entity. Ej. AEOS usa `employee-fields`/`visitor-fields`/`contractor-fields` (3 fuentes distintas, todas hacia la entidad Users).',
+      '- `destinationLoadFrom` (opcional) — override del destino; normalmente se omite y se deriva del `entity`.',
       '- `key_header` / `value_header` — encabezados de columna; `key_title` / `value_title` — labels de los dropdowns de "agregar".',
-      '- `entity` — entidad local a la que apunta el mapeo (`Users` / `Badges`); si no hay `title`, se deriva de acá (ej. "Users Custom Mapping").',
       '- **Valor**: array `[{ key, value }]` (source → destination).',
       '',
-      '**Ejemplo real (AEOS Employee):** `loadFrom: "employee-fields"`, `destinationLoadFrom: "shared/entity-fields-users"`.',
+      '**Ejemplo real (AEOS Employee):** `entity: "Users"`, `loadFrom: "employee-fields"` (el destino se deriva del entity).',
     ].join('\n'),
   },
 )

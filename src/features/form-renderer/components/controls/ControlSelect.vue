@@ -1,112 +1,39 @@
 <script setup lang="ts">
 /**
- * ControlSelect — single-choice dropdown.
- *
- * Two sources of options, mutually exclusive:
- *  - **Static** — `values` (`[{ text, value }]`) declared in the schema.
- *  - **Dynamic** — `loadFrom` URL fetched on mount (`[{ id, name }]`). Shows a spinner while loading
- *    and a blank "unset" option first. Replaces the former standalone `select_dynamic` control.
+ * ControlSelect — single-choice dropdown with a STATIC list of options (`values`), known at
+ * schema-authoring time. For options that must be fetched from the API at runtime use
+ * `select_dynamic` instead.
  */
-import { ref, computed, onMounted } from 'vue'
 import type { SelectOption } from '../../types/schema'
-import { resolveLoadFromUrl } from '../../utils/loadFrom'
 
-const props = defineProps<{
+defineProps<{
   title?: string
   modelValue: string | number
-  values?: SelectOption[]
-  loadFrom?: string
-  guid?: string
-  serviceBase?: string
+  values: SelectOption[]
   error?: string
 }>()
-const emit = defineEmits<{ 'update:modelValue': [value: string | number] }>()
-
-const isDynamic = computed(() => !!props.loadFrom)
-
-interface DynamicOption { id: number | string; name: string }
-const dynamicOptions = ref<DynamicOption[]>([])
-const loading  = ref(false)
-const fetchErr = ref('')
-
-onMounted(async () => {
-  if (!props.loadFrom) return
-  const url = resolveLoadFromUrl(props.loadFrom, props.serviceBase ?? '', props.guid)
-  if (!url) return
-  loading.value  = true
-  fetchErr.value = ''
-  try {
-    const res = await fetch(url)
-    if (!res.ok) { fetchErr.value = `Error ${res.status}`; return }
-    dynamicOptions.value = await res.json()
-  } catch {
-    fetchErr.value = 'Could not load'
-  } finally {
-    loading.value = false
-  }
-})
+defineEmits<{ 'update:modelValue': [value: string | number] }>()
 
 function resolveValue(opt: SelectOption) {
   return opt.value !== undefined ? opt.value : opt.text
-}
-
-function onChangeStatic(e: Event) {
-  emit('update:modelValue', (e.target as HTMLSelectElement).value)
-}
-
-// Dynamic values are usually numeric ids — coerce so the saved value matches the option id type.
-function onChangeDynamic(e: Event) {
-  const raw = (e.target as HTMLSelectElement).value
-  const num = Number(raw)
-  emit('update:modelValue', raw === '' || isNaN(num) ? raw : num)
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-1">
     <label v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</label>
-
-    <!-- Dynamic: options fetched from the API -->
-    <div v-if="isDynamic" class="relative">
-      <select
-        :value="modelValue"
-        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
-        :class="[{ 'border-xp-red': error }, loading ? 'pr-9 text-gray-400' : '']"
-        :disabled="loading"
-        @change="onChangeDynamic"
-      >
-        <option :value="-1"></option>
-        <option v-if="loading" value="" disabled>Loading…</option>
-        <option v-for="opt in dynamicOptions" :key="opt.id" :value="opt.id">{{ opt.name }}</option>
-      </select>
-      <svg
-        v-if="loading"
-        class="animate-spin w-4 h-4 text-xp-primary absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-      </svg>
-    </div>
-
-    <!-- Static: options declared in the schema -->
     <select
-      v-else
       :value="modelValue"
       class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
       :class="{ 'border-xp-red': error }"
-      @change="onChangeStatic"
+      @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
     >
       <option
-        v-for="opt in (values ?? [])"
+        v-for="opt in values"
         :key="resolveValue(opt)"
         :value="resolveValue(opt)"
       >{{ opt.text }}</option>
     </select>
-
-    <p v-if="fetchErr" class="text-xs text-xp-orange">{{ fetchErr }} — enter ID manually</p>
     <p v-if="error" class="text-xs text-xp-red">{{ error }}</p>
   </div>
 </template>

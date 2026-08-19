@@ -64,6 +64,7 @@ export type ControlType =
   | 'number'
   | 'number_spinner'
   | 'select'
+  | 'select_dynamic'
   | 'radio'
   | 'button_bar'
   | 'customFields'
@@ -90,7 +91,7 @@ export interface Control {
   value_header?: string
   entity?: string              // customFields: which local entity the mapping targets (Users/Badges/...)
   destinationLoadFrom?: string // customFields: source for the "Destination Columns" (XPressEntry fields)
-  loadFrom?: string   // select (dynamic)/checkbox_multiselect/customFields source:
+  loadFrom?: string   // select_dynamic/checkbox_multiselect/customFields source (options fetched from the API):
                       //   "shared/<type>" → GET /api/shared/<type>              (DM-agnostic local data)
                       //   "<type>"        → GET .../{guid}/dm-data?type=<type>  (DM-specific data)
   optionsKey?: string // checkbox_multiselect: form-state key holding the [{ id, name }] option list

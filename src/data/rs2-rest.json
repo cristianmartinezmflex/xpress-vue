@@ -135,7 +135,7 @@
               "controls": [
                 {
                   "id": "selected_site",
-                  "type": "select",
+                  "type": "select_dynamic",
                   "title": "Select Site",
                   "loadFrom": "sites",
                   "default": "-1"
@@ -229,8 +229,8 @@
                   "key_header": "Source Columns",
                   "value_title": "Destination Columns",
                   "value_header": "Destination Columns",
-                  "loadFrom": "user-fields",
-                  "destinationLoadFrom": "shared/entity-fields-users"
+                  "entity": "Users",
+                  "loadFrom": "user-fields"
                 }
               ]
             }

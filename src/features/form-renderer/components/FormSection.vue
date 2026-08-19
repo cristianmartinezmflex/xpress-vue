@@ -8,6 +8,7 @@ import ControlBoolean from './controls/ControlBoolean.vue'
 import ControlNumber from './controls/ControlNumber.vue'
 import ControlNumberSpinner from './controls/ControlNumberSpinner.vue'
 import ControlSelect        from './controls/ControlSelect.vue'
+import ControlSelectDynamic from './controls/ControlSelectDynamic.vue'
 import ControlRadio from './controls/ControlRadio.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
 import ControlCustomFields         from './controls/ControlCustomFields.vue'
@@ -152,9 +153,17 @@ function isControlVisible(control: Control): boolean {
             <ControlSelect
               v-else-if="control.type === 'select'"
               :title="control.title"
-              :model-value="control.loadFrom ? (state[control.id] ?? -1) : state[control.id]"
+              :model-value="state[control.id]"
               :values="control.values ?? []"
-              :load-from="control.loadFrom"
+              :error="errors[control.id]"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlSelectDynamic
+              v-else-if="control.type === 'select_dynamic'"
+              :title="control.title"
+              :model-value="state[control.id] ?? -1"
+              :load-from="control.loadFrom ?? ''"
               :guid="guid"
               :service-base="serviceBase"
               :error="errors[control.id]"

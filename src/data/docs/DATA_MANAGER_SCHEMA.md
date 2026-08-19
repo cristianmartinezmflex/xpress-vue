@@ -191,7 +191,7 @@ A numeric input with increment/decrement arrows and optional min/max validation.
 
 ### `select`
 
-A single-choice dropdown. Options are either **static** (`values`) or **dynamic** (`loadFrom`, fetched from the API at runtime — shows a spinner while loading). Declare one or the other.
+A single-choice dropdown with a **static** list of options, known at schema-authoring time. For options fetched from the API use `select_dynamic`.
 
 ```json
 {
@@ -206,10 +206,20 @@ A single-choice dropdown. Options are either **static** (`values`) or **dynamic*
 }
 ```
 
+| Field | Description |
+|---|---|
+| `values` | Array of `{ text, value }` objects. `text` is displayed; `value` is stored. |
+
+---
+
+### `select_dynamic`
+
+A single-choice dropdown whose options are **loaded from the API** at runtime (shows a spinner while loading).
+
 ```json
 {
   "id": "site_id",
-  "type": "select",
+  "type": "select_dynamic",
   "title": "Select Site",
   "loadFrom": "sites",
   "default": -1
@@ -218,8 +228,7 @@ A single-choice dropdown. Options are either **static** (`values`) or **dynamic*
 
 | Field | Description |
 |---|---|
-| `values` | (Static) Array of `{ text, value }` objects. `text` is displayed; `value` is stored. |
-| `loadFrom` | (Dynamic) Options source. `"<type>"` → `GET /api/data-managers/{guid}/dm-data?type=<type>` (DM-specific data, e.g. `sites`, `zones`, `directories`). `"shared/<type>"` → `GET /api/shared/<type>` (DM-agnostic local data, e.g. `shared/zones`, `shared/badge_types`, `shared/user_profiles`; no guid needed). The API returns `[{ id, name }]`. |
+| `loadFrom` | Options source. `"<type>"` → `GET /api/data-managers/{guid}/dm-data?type=<type>` (DM-specific data, e.g. `sites`, `zones`, `directories`). `"shared/<type>"` → `GET /api/shared/<type>` (DM-agnostic local data, e.g. `shared/zones`, `shared/badge_types`, `shared/user_profiles`; no guid needed). The API returns `[{ id, name }]`. |
 
 ---
 
