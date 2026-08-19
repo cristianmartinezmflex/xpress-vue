@@ -23,6 +23,9 @@ const activeAction = ref<string | null>(null)
 // show a spinner and disable itself until the API call resolves.
 const activeActionId = ref<string | null>(null)
 const saveResult   = ref<'ok' | 'error' | null>(null)
+// "Loaded from service" is a transient confirmation shown briefly right after the initial load, not a
+// permanent status — otherwise it lingers forever (and reappears after every save).
+const showLoaded   = ref(false)
 const formRenderer = ref<InstanceType<typeof FormRenderer> | null>(null)
 
 // Auto-discover every schema in src/data by filename — no manual registration needed.
@@ -97,6 +100,12 @@ async function loadSchema(key: string) {
   }
 
   loading.value = false
+
+  // Flash "Loaded from service" briefly, then hide it (transient, not a permanent badge).
+  if (dmValues.value && !apiError.value) {
+    showLoaded.value = true
+    setTimeout(() => { showLoaded.value = false }, 3000)
+  }
 }
 
 watch(() => route.params.schema, (key) => loadSchema(key as string), { immediate: true })
@@ -173,9 +182,9 @@ async function handleAction(id: string, handler: string, payload?: unknown) {
         Error saving
       </span>
 
-      <!-- Load indicator -->
+      <!-- Load indicator (transient: only right after the initial load) -->
       <span
-        v-else-if="dmValues && !apiError"
+        v-else-if="showLoaded && !apiError"
         class="ml-auto text-xs text-xp-success font-medium px-2 py-0.5 rounded-full bg-green-50 border border-green-200"
       >
         Loaded from service

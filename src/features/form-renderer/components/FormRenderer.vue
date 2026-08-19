@@ -66,6 +66,10 @@ function isTabEnabled(tab: (typeof visibleTabs.value)[number]): boolean {
 const showTabs   = computed(() => visibleTabs.value.length > 1)
 const currentTab = computed(() => visibleTabs.value[activeTab.value])
 
+// The fixed Sync tab has its own operations (Partial/Full/Custom Sync) and no settings to persist,
+// so the Defaults/Save action bar is irrelevant there — hide it while that tab is active.
+const isSyncTab = computed(() => currentTab.value === SYNC_TAB)
+
 const sections = computed(() =>
   (currentTab.value?.sections ?? []).filter((s) =>
     s.columns?.some((col) => col.controls?.length > 0),
@@ -203,8 +207,11 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- Sticky action bar: settings actions common to every DM (fixed here), centered.
-         Save is the single action (it saves + tests the connection); no Test Connect button. -->
-    <div class="flex flex-wrap items-center justify-center gap-3 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
+         Save is the single action (it saves + tests the connection); no Test Connect button.
+         Hidden on the Sync tab, which has no settings to save. -->
+    <div
+      v-if="!isSyncTab"
+      class="flex flex-wrap items-center justify-center gap-3 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
       <button
         type="button"
         class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
