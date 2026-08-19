@@ -84,7 +84,7 @@
                 },
                 {
                   "id": "from_zone_id",
-                  "type": "select_dynamic",
+                  "type": "select",
                   "title": "Doors From Area",
                   "loadFrom": "shared/zones_external",
                   "default": -1
@@ -95,7 +95,7 @@
               "controls": [
                 {
                   "id": "to_zone_id",
-                  "type": "select_dynamic",
+                  "type": "select",
                   "title": "Doors To Area",
                   "loadFrom": "shared/zones_external",
                   "default": -1

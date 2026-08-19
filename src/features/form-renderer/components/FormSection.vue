@@ -8,15 +8,12 @@ import ControlBoolean from './controls/ControlBoolean.vue'
 import ControlNumber from './controls/ControlNumber.vue'
 import ControlNumberSpinner from './controls/ControlNumberSpinner.vue'
 import ControlSelect        from './controls/ControlSelect.vue'
-import ControlSelectDynamic from './controls/ControlSelectDynamic.vue'
 import ControlRadio from './controls/ControlRadio.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
 import ControlCustomFields         from './controls/ControlCustomFields.vue'
 import ControlLogView              from './controls/ControlLogView.vue'
-import ControlMultiselectDynamic   from './controls/ControlMultiselectDynamic.vue'
 import ControlSocketInterfaces     from './controls/ControlSocketInterfaces.vue'
 import ControlIpBadgeMappings      from './controls/ControlIpBadgeMappings.vue'
-import ControlRioDevices           from './controls/ControlRioDevices.vue'
 import ControlSiteTimezones        from './controls/ControlSiteTimezones.vue'
 import ControlCheckboxMultiselect   from './controls/ControlCheckboxMultiselect.vue'
 import ControlTable                 from './controls/ControlTable.vue'
@@ -155,17 +152,9 @@ function isControlVisible(control: Control): boolean {
             <ControlSelect
               v-else-if="control.type === 'select'"
               :title="control.title"
-              :model-value="state[control.id]"
+              :model-value="control.loadFrom ? (state[control.id] ?? -1) : state[control.id]"
               :values="control.values ?? []"
-              :error="errors[control.id]"
-              @update:model-value="emit('update:state', control.id, $event)"
-            />
-
-            <ControlSelectDynamic
-              v-else-if="control.type === 'select_dynamic'"
-              :title="control.title"
-              :model-value="state[control.id] ?? -1"
-              :load-from="control.loadFrom ?? ''"
+              :load-from="control.loadFrom"
               :guid="guid"
               :service-base="serviceBase"
               :error="errors[control.id]"
@@ -211,16 +200,6 @@ function isControlVisible(control: Control): boolean {
               @update:model-value="emit('update:state', control.id, $event)"
             />
 
-            <ControlMultiselectDynamic
-              v-else-if="control.type === 'multiselect_dynamic'"
-              :title="control.title"
-              :model-value="state[control.id] ?? ''"
-              :load-from="control.loadFrom ?? ''"
-              :guid="guid"
-              :service-base="serviceBase"
-              @update:model-value="emit('update:state', control.id, $event)"
-            />
-
             <ControlSocketInterfaces
               v-else-if="control.type === 'socket_interfaces'"
               :title="control.title"
@@ -238,16 +217,6 @@ function isControlVisible(control: Control): boolean {
               :guid="guid"
               :service-base="serviceBase"
               @update:model-value="emit('update:state', control.id, $event)"
-            />
-
-            <ControlRioDevices
-              v-else-if="control.type === 'rio_devices'"
-              :title="control.title"
-              :model-value="state[control.id] ?? ''"
-              :buttons="control.buttons ?? []"
-              :active-action-id="activeActionId"
-              @update:model-value="emit('update:state', control.id, $event)"
-              @action="(id, handler, payload) => emit('action', id, handler, payload)"
             />
 
             <ControlSiteTimezones
@@ -276,6 +245,7 @@ function isControlVisible(control: Control): boolean {
               :model-value="state[control.id] ?? ''"
               :options-key="control.optionsKey"
               :load-from="control.loadFrom"
+              :separator="control.separator"
               :guid="guid"
               :service-base="serviceBase"
               :state="state"

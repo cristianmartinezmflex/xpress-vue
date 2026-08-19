@@ -191,7 +191,7 @@ A numeric input with increment/decrement arrows and optional min/max validation.
 
 ### `select`
 
-A dropdown with a static list of options.
+A single-choice dropdown. Options are either **static** (`values`) or **dynamic** (`loadFrom`, fetched from the API at runtime — shows a spinner while loading). Declare one or the other.
 
 ```json
 {
@@ -206,20 +206,10 @@ A dropdown with a static list of options.
 }
 ```
 
-| Field | Description |
-|---|---|
-| `values` | Array of `{ text, value }` objects. `text` is displayed; `value` is stored. |
-
----
-
-### `select_dynamic`
-
-A dropdown whose options are loaded from a DM-specific API endpoint at runtime.
-
 ```json
 {
   "id": "site_id",
-  "type": "select_dynamic",
+  "type": "select",
   "title": "Select Site",
   "loadFrom": "sites",
   "default": -1
@@ -228,7 +218,8 @@ A dropdown whose options are loaded from a DM-specific API endpoint at runtime.
 
 | Field | Description |
 |---|---|
-| `loadFrom` | Options source. `"<type>"` → `GET /api/data-managers/{guid}/dm-data?type=<type>` (DM-specific data, e.g. `sites`, `zones`, `cardholder-fields`). `"shared/<type>"` → `GET /api/shared/<type>` (DM-agnostic local data, e.g. `shared/zones`, `shared/badge_types`; no guid needed). The API returns `[{ id, name }]`. |
+| `values` | (Static) Array of `{ text, value }` objects. `text` is displayed; `value` is stored. |
+| `loadFrom` | (Dynamic) Options source. `"<type>"` → `GET /api/data-managers/{guid}/dm-data?type=<type>` (DM-specific data, e.g. `sites`, `zones`, `directories`). `"shared/<type>"` → `GET /api/shared/<type>` (DM-agnostic local data, e.g. `shared/zones`, `shared/badge_types`, `shared/user_profiles`; no guid needed). The API returns `[{ id, name }]`. |
 
 ---
 
@@ -251,19 +242,26 @@ A group of mutually exclusive radio buttons.
 
 ---
 
-### `multiselect_dynamic`
+### `checkbox_multiselect`
 
-A multi-select list loaded from a DM API endpoint. Selected values are stored as a comma-separated string.
+A multi-select checkbox list (with Select All / Clear All). Options auto-load from `loadFrom` on mount (spinner while loading) and/or from a form-state key (`optionsKey`) written by an action to refresh the list live. Selected values are stored as a separator-joined string of ids.
 
 ```json
 {
   "id": "identifier_types_selected",
-  "type": "multiselect_dynamic",
+  "type": "checkbox_multiselect",
   "title": "Identifier Types",
   "loadFrom": "shared/badge_types",
+  "separator": "\b",
   "default": ""
 }
 ```
+
+| Field | Description |
+|---|---|
+| `loadFrom` | Options source (same convention as `select`'s dynamic `loadFrom`). Returns `[{ id, name }]`. |
+| `optionsKey` | (Optional) Form-state key holding the option list, written by an action/button to refresh it in-place. Merged over `loadFrom`. |
+| `separator` | (Optional) Token joining the selected ids. Default `,`. Use `"\b"` (vbBack) for AEOS to match the WinForm format. |
 
 ---
 
@@ -347,16 +345,6 @@ A specialized editor for IP badge mappings. DM-specific — used by AEOS.
 
 ```json
 { "id": "ip_badge_settings", "type": "ip_badge_mappings", "title": "IP Badge Mappings" }
-```
-
----
-
-### `rio_devices`
-
-A specialized editor for RIO device configuration. DM-specific.
-
-```json
-{ "id": "rio_device_settings", "type": "rio_devices", "title": "RIO Devices", "guid": "...", "serviceBase": "..." }
 ```
 
 ---

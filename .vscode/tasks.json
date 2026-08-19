@@ -1,0 +1,103 @@
+{
+  // Tareas para levantar/operar la app (xpress-vue). Corré con:
+  //   Terminal → Run Task…   (o Ctrl+Shift+B para el build por defecto: "Dev Server")
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev Server",
+      "detail": "Levanta la app en modo desarrollo (Vite + HMR).",
+      "type": "npm",
+      "script": "dev",
+      "path": "",
+      "isBackground": true,
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "app"
+      },
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": "^\\s*(.*)$",
+          "file": 1,
+          "location": 1,
+          "message": 1
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*(VITE|vite).*",
+          "endsPattern": ".*(ready in|Local:|localhost).*"
+        }
+      }
+    },
+    {
+      "label": "Storybook",
+      "detail": "Levanta el catálogo de componentes (Storybook, puerto 6006).",
+      "type": "npm",
+      "script": "storybook",
+      "path": "",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "app"
+      },
+      "problemMatcher": {
+        "owner": "storybook",
+        "pattern": {
+          "regexp": "^\\s*(.*)$",
+          "file": 1,
+          "location": 1,
+          "message": 1
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*(Storybook|storybook).*",
+          "endsPattern": ".*(started|Local:|localhost:6006).*"
+        }
+      }
+    },
+    {
+      "label": "Type Check",
+      "detail": "Chequeo de tipos (vue-tsc --noEmit).",
+      "type": "npm",
+      "script": "type-check",
+      "path": "",
+      "group": "test",
+      "problemMatcher": ["$tsc"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Lint",
+      "detail": "ESLint con --fix.",
+      "type": "npm",
+      "script": "lint",
+      "path": "",
+      "problemMatcher": ["$eslint-stylish"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Build",
+      "detail": "Build de producción (type-check + vite build).",
+      "type": "npm",
+      "script": "build",
+      "path": "",
+      "group": "build",
+      "problemMatcher": ["$tsc"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

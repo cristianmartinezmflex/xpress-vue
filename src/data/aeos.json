@@ -92,14 +92,14 @@
                 },
                 {
                   "id": "outside_area_id",
-                  "type": "select_dynamic",
+                  "type": "select",
                   "title": "Outside Area",
                   "loadFrom": "shared/zones",
                   "default": -1
                 },
                 {
                   "id": "inside_area_id",
-                  "type": "select_dynamic",
+                  "type": "select",
                   "title": "Inside Area",
                   "loadFrom": "shared/zones",
                   "default": -1
@@ -112,7 +112,7 @@
                 },
                 {
                   "id": "default_identifier_type",
-                  "type": "select_dynamic",
+                  "type": "select",
                   "title": "Default Identifier Type for Unknown Cards",
                   "loadFrom": "shared/badge_types",
                   "default": -1
@@ -229,9 +229,10 @@
               "controls": [
                 {
                   "id": "identifier_types_selected",
-                  "type": "multiselect_dynamic",
+                  "type": "checkbox_multiselect",
                   "title": "Identifier Types",
                   "loadFrom": "shared/badge_types",
+                  "separator": "\b",
                   "default": ""
                 }
               ]

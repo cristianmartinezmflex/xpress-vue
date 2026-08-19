@@ -135,7 +135,7 @@
               "controls": [
                 {
                   "id": "selected_site",
-                  "type": "select_dynamic",
+                  "type": "select",
                   "title": "Select Site",
                   "loadFrom": "sites",
                   "default": "-1"

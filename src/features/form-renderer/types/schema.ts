@@ -64,15 +64,12 @@ export type ControlType =
   | 'number'
   | 'number_spinner'
   | 'select'
-  | 'select_dynamic'
-  | 'multiselect_dynamic'
   | 'radio'
   | 'button_bar'
   | 'customFields'
   | 'log_view'
   | 'socket_interfaces'
   | 'ip_badge_mappings'
-  | 'rio_devices'
   | 'site_timezones'
   | 'checkbox_multiselect'
   | 'table'
@@ -93,11 +90,12 @@ export interface Control {
   value_header?: string
   entity?: string              // customFields: which local entity the mapping targets (Users/Badges/...)
   destinationLoadFrom?: string // customFields: source for the "Destination Columns" (XPressEntry fields)
-  loadFrom?: string   // select_dynamic/multiselect_dynamic/customFields source:
+  loadFrom?: string   // select (dynamic)/checkbox_multiselect/customFields source:
                       //   "shared/<type>" → GET /api/shared/<type>              (DM-agnostic local data)
                       //   "<type>"        → GET .../{guid}/dm-data?type=<type>  (DM-specific data)
   optionsKey?: string // checkbox_multiselect: form-state key holding the [{ id, name }] option list
-                      // (populated by an action/button); value is a comma-separated list of ids
+                      // (populated by an action/button); value is a separator-joined list of ids
+  separator?: string  // checkbox_multiselect: token joining selected ids (default ","; "\b"/vbBack for AEOS)
   enable?: EnableProp
   display?: DisplayProp
   disabled?: boolean

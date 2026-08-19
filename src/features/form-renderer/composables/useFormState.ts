@@ -38,10 +38,10 @@ function coerceValue(value: any, control: Control): any {
     return []
   }
 
-  // multiselect_dynamic: value is already a vbBack-separated string — pass through.
+  // checkbox_multiselect: value is a separator-joined string of ids — pass through.
   // socket_interfaces / ip_badge_mappings: already a vbBack-separated XML string — pass through.
   if (
-    control.type === 'multiselect_dynamic' ||
+    control.type === 'checkbox_multiselect' ||
     control.type === 'socket_interfaces' ||
     control.type === 'ip_badge_mappings'
   ) {
@@ -56,8 +56,8 @@ function coerceValue(value: any, control: Control): any {
     return '[]'
   }
 
-  // rio_devices / site_timezones: stored as JSON — serialize object/array to string for round-trip.
-  if (control.type === 'rio_devices' || control.type === 'site_timezones') {
+  // site_timezones: stored as JSON — serialize object/array to string for round-trip.
+  if (control.type === 'site_timezones') {
     if (typeof value === 'string') return value
     if (Array.isArray(value) || (value && typeof value === 'object')) {
       return JSON.stringify(value)

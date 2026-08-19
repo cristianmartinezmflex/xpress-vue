@@ -26,11 +26,14 @@ const props = defineProps<{
   guid?:       string
   serviceBase?: string
   state?:      Record<string, any>
+  separator?:  string        // token joining the selected ids (default ","; e.g. "\b"/vbBack for AEOS)
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
+const sep = computed(() => props.separator || ',')
+
 const selectedIds = computed<string[]>(() =>
-  (props.modelValue ?? '').split(',').map((s) => s.trim()).filter(Boolean),
+  (props.modelValue ?? '').split(sep.value).map((s) => s.trim()).filter(Boolean),
 )
 
 // Options fetched once on mount from `loadFrom` (mirrors the WinForm showing the current list on open).
@@ -83,9 +86,9 @@ function toggle(id: string) {
   const next = new Set(selectedIds.value)
   if (next.has(id)) next.delete(id)
   else              next.add(id)
-  emit('update:modelValue', [...next].join(','))
+  emit('update:modelValue', [...next].join(sep.value))
 }
-function selectAll() { emit('update:modelValue', options.value.map((o) => o.id).join(',')) }
+function selectAll() { emit('update:modelValue', options.value.map((o) => o.id).join(sep.value)) }
 function clearAll()  { emit('update:modelValue', '') }
 </script>
 

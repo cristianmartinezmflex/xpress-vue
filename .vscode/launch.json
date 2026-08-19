@@ -1,0 +1,22 @@
+{
+  // F5 → levanta el Dev Server (si no está corriendo) y abre la app en Chrome con debugger.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch App (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/src",
+      "preLaunchTask": "Dev Server"
+    },
+    {
+      "name": "Launch App (Edge)",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/src",
+      "preLaunchTask": "Dev Server"
+    }
+  ]
+}
