@@ -31,15 +31,17 @@ const allSchemas: SchemaEntry[] = Object.entries(schemaModules).map(([path, mod]
 const norm = (s: string) => s.trim().toLowerCase()
 const schemaByName: Record<string, SchemaEntry> = Object.fromEntries(allSchemas.map((s) => [norm(s.key), s]))
 
-// Merge DB list with ./data schemas by name:
-//   - DB DM whose name matches a schema  → first section ("Data Managers")
-//   - schema with no matching DB DM       → second section ("Demo & Showcase")
+// EVERY data manager from the API is shown ("Data Managers" section). Its route key is the matching
+// ./data schema filename when present; otherwise the normalized DM name — OnGuard/Genetec have no
+// static json anymore and resolve their schema from the API in FormView (see SERVICE_SCHEMA_KEYS there).
 const matchedDms = computed(() =>
-  dataManagers.value
-    .map((dm) => ({ dm, schema: schemaByName[norm(dm.data_manager_name)] }))
-    .filter((x): x is { dm: DataManagerItem; schema: SchemaEntry } => !!x.schema),
+  dataManagers.value.map((dm) => {
+    const schema = schemaByName[norm(dm.data_manager_name)]
+    return { dm, key: schema ? schema.key : norm(dm.data_manager_name) }
+  }),
 )
 
+// ./data schemas with no matching DB DM → "Demo & Showcase" section.
 const dbNames = computed(() => new Set(dataManagers.value.map((dm) => norm(dm.data_manager_name))))
 const demoSchemas = computed(() => allSchemas.filter((s) => !dbNames.value.has(norm(s.key))))
 
@@ -177,13 +179,13 @@ async function onImportFile(e: Event) {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <div
-            v-for="{ dm, schema } in matchedDms"
+            v-for="{ dm, key } in matchedDms"
             :key="dm.dm_guid"
             role="button"
             tabindex="0"
             class="group text-left bg-white rounded-xl border border-gray-200 shadow-xp p-6 flex flex-col gap-4 hover:shadow-md hover:border-xp-primary transition cursor-pointer"
-            @click="openSchema(schema.key, dm.dm_guid)"
-            @keydown.enter="openSchema(schema.key, dm.dm_guid)"
+            @click="openSchema(key, dm.dm_guid)"
+            @keydown.enter="openSchema(key, dm.dm_guid)"
           >
             <span class="text-3xl">⚙️</span>
             <div class="flex-1">
@@ -214,7 +216,7 @@ async function onImportFile(e: Event) {
           </div>
 
           <div v-if="matchedDms.length === 0" class="col-span-full text-sm text-gray-400 py-8">
-            No database data managers have a schema in ./data.
+            No data managers returned by the service.
           </div>
         </div>
       </div>
