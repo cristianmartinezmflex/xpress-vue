@@ -359,6 +359,12 @@
             {
               "controls": [
                 {
+                  "id": "get_activities",
+                  "type": "boolean",
+                  "title": "Download OnGuard Activities",
+                  "default": false
+                },
+                {
                   "id": "ignore_last_dm_sync_hours",
                   "type": "boolean",
                   "title": "Ignore Last DM Sync Hours",
@@ -367,7 +373,7 @@
                 {
                   "id": "download_activity_timer",
                   "type": "number_spinner",
-                  "title": "Activity/Occupancy # Hours",
+                  "title": "Download Activity # Hours",
                   "default": 16,
                   "validations": [
                     {
@@ -377,6 +383,12 @@
                       "error": "Must be between 1 and 720"
                     }
                   ]
+                },
+                {
+                  "id": "get_occupancies",
+                  "type": "boolean",
+                  "title": "Download OnGuard Occupancy",
+                  "default": true
                 },
                 {
                   "id": "ignore_empty_area",
@@ -574,7 +586,7 @@
                 {
                   "id": "send_login_activities",
                   "type": "boolean",
-                  "title": "Send Login Activities as DataConduit Events",
+                  "title": "Send Login Activities as DataConduIT Events",
                   "default": false
                 },
                 {
@@ -603,10 +615,11 @@
             {
               "controls": [
                 {
-                  "id": "segments_list",
-                  "type": "text",
+                  "id": "occupancy_segments",
+                  "type": "checkbox_multiselect",
                   "title": "Segments",
-                  "default": ""
+                  "optionsKey": "_onguard_segments",
+                  "loadFrom": "/api/data-managers/{dmId}/dm-data?type=segments"
                 },
                 {
                   "id": "btn_bar_segments",

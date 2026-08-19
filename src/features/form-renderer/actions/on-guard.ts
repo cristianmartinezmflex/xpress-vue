@@ -35,11 +35,18 @@ export async function onguard_deleteSubscription({ guid, state, serviceBase }: A
   show({ success: result.success, title: 'Delete Subscription', message: result.message })
 }
 
-export async function onguard_updateSegmentList({ guid, serviceBase }: ActionContext): Promise<void> {
+export async function onguard_updateSegmentList({ guid, state, serviceBase }: ActionContext): Promise<void> {
   const { show } = useDialog()
   if (!guid) { show({ success: false, title: 'Update Segments', message: 'No GUID provided.' }); return }
   const result = await onGuardPost(serviceBase, guid, 'update-segments')
-  show({ success: result.success, title: 'Update Segment List', message: result.message })
+  // Cache the fetched segments so the occupancy_segments checkbox list can render them.
+  const segments: { id: string; name: string }[] = Array.isArray(result.segments) ? result.segments : []
+  if (result.success) state['_onguard_segments'] = JSON.stringify(segments)
+  show({
+    success: result.success,
+    title:   'Update Segment List',
+    message: result.success ? `Loaded ${segments.length} segment(s) from OnGuard.` : result.message,
+  })
 }
 
 export async function onguard_updatePanelList({ guid, state, serviceBase }: ActionContext): Promise<void> {
