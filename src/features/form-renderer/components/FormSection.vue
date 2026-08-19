@@ -30,6 +30,7 @@ const props = defineProps<{
   display?: DisplayProp
   guid?:        string
   serviceBase?: string
+  activeActionId?: string | null
 }>()
 
 const emit = defineEmits<{
@@ -184,7 +185,8 @@ function isControlVisible(control: Control): boolean {
               v-else-if="control.type === 'button_bar'"
               :buttons="control.buttons ?? []"
               :state="state"
-              @action="(id, handler) => emit('action', id, handler)"
+              :active-action-id="activeActionId"
+              @action="(id, handler, payload) => emit('action', id, handler, payload)"
             />
 
             <ControlLogView
@@ -243,6 +245,7 @@ function isControlVisible(control: Control): boolean {
               :title="control.title"
               :model-value="state[control.id] ?? ''"
               :buttons="control.buttons ?? []"
+              :active-action-id="activeActionId"
               @update:model-value="emit('update:state', control.id, $event)"
               @action="(id, handler, payload) => emit('action', id, handler, payload)"
             />

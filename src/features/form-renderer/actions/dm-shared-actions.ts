@@ -140,6 +140,31 @@ export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: Ac
   }
 }
 
+// ─── Generic REST button ───────────────────────────────────────────────────────
+// Runs a plain "verb + action URL" button (no dedicated handler): hits the URL the button declares in
+// its schema (`action`, with {dmId} → guid) and reports the outcome. Used for every button that has an
+// `action` instead of an `onClick` (OnGuard subscriptions/segments/panels/logical-source, the base
+// maintenance buttons, etc.). ControlButtonBar passes { verb, action, title } as the payload.
+export async function dm_shared_runAction({ guid, serviceBase, payload }: ActionContext): Promise<void> {
+  const { show } = useDialog()
+  const p = payload as { verb?: string; action?: string; title?: string } | undefined
+  const title = p?.title ?? 'Action'
+  if (!p?.action) return
+  if (!guid) { show({ success: false, title, message: 'No GUID provided.' }); return }
+
+  const url  = `${serviceBase}${p.action.replace(/\{dmId\}/g, guid)}`
+  const verb = (p.verb || 'POST').toUpperCase()
+  try {
+    const res  = await fetch(url, { method: verb })
+    const body = await res.json().catch(() => null)
+    const msg  = body?.message ?? body?.Error ?? body?.error ??
+      (res.ok ? 'Completed successfully.' : `The service returned ${res.status}.`)
+    show({ success: res.ok, title, message: oneLine(String(msg)) })
+  } catch {
+    show({ success: false, title, message: 'Could not reach the service.' })
+  }
+}
+
 // ─── Sync (fire & forget) ─────────────────────────────────────────────────────
 
 export async function dm_shared_runFullSync({ guid, serviceBase }: ActionContext): Promise<void> {

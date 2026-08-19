@@ -44,7 +44,9 @@ export interface ContextMenuItem {
 export interface Button {
   id:               string
   title:            string
-  onClick:          string
+  onClick?:         string   // frontend handler name (dispatched via useDmActions)
+  verb?:            string   // REST button: HTTP verb (default POST) — used when there's no onClick
+  action?:          string   // REST button: URL template (may contain {dmId}); clicking hits this URL
   tooltip?:         string
   rightClickMenu?:  ContextMenuItem[]
   enable?:          EnableProp

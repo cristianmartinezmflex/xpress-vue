@@ -8,8 +8,8 @@
  *   [{ siteId: string, siteName: string, timezone: string }]
  * On save, dm-shared-actions converts the array back to the flat object format.
  *
- * The parent can call rs2_loadSites to populate the available sites list,
- * which is stored in a shared state key "rs2_sites_cache" on the form state.
+ * Sites are loaded on demand by this control itself (the "Load Sites from RS2" button hits
+ * dm-data?type=sites) — it does not depend on any external DM action handler.
  */
 
 import { ref, computed } from 'vue'

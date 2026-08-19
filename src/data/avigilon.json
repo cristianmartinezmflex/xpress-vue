@@ -399,19 +399,9 @@
                   "title": "",
                   "key_header": "ACM Identity Field",
                   "value_header": "XPressEntry UDF Field",
+                  "loadFrom": "identity-fields",
+                  "destinationLoadFrom": "shared/entity-fields-users",
                   "default": []
-                },
-                {
-                  "id": "btn_load_fields",
-                  "type": "button_bar",
-                  "buttons": [
-                    {
-                      "id": "btn_load_fields",
-                      "title": "Load ACM Fields",
-                      "onClick": "avigilon_loadFields",
-                      "tooltip": "Load available identity fields from the Avigilon ACM system for custom field mapping."
-                    }
-                  ]
                 }
               ]
             }

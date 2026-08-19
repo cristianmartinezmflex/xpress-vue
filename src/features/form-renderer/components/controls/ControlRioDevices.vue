@@ -30,6 +30,7 @@ const props = defineProps<{
   title?:     string
   modelValue: string        // JSON array or empty string
   buttons?:   Button[]      // per-device action buttons, from the schema JSON
+  activeActionId?: string | null  // id of the button whose action is in-flight (shows a spinner)
 }>()
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -89,9 +90,13 @@ function toggleExpand(id: number) {
   expanded.value = s
 }
 
-// Dispatch a schema-declared button, passing the device as the action payload.
+// Dispatch a schema-declared button, passing the device as the action payload. The action id is made
+// unique per device so only the clicked device's button shows the spinner (many devices share btn.id).
+function deviceActionId(btn: Button, dev: RioDevice) {
+  return `${btn.id}:${dev.id}`
+}
 function runDeviceAction(btn: Button, dev: RioDevice) {
-  emit('action', btn.id, btn.onClick, dev)
+  emit('action', deviceActionId(btn, dev), btn.onClick ?? '', dev)
 }
 </script>
 
@@ -186,10 +191,24 @@ function runDeviceAction(btn: Button, dev: RioDevice) {
               v-for="btn in buttons"
               :key="btn.id"
               type="button"
-              class="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition"
+              class="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-300 text-gray-700 transition flex items-center gap-1.5"
+              :class="activeActionId === deviceActionId(btn, dev) ? 'cursor-wait opacity-80' : 'hover:bg-gray-50'"
+              :disabled="activeActionId === deviceActionId(btn, dev)"
               :title="btn.tooltip"
               @click="runDeviceAction(btn, dev)"
-            >{{ btn.title }}</button>
+            >
+              <svg
+                v-if="activeActionId === deviceActionId(btn, dev)"
+                class="animate-spin w-3.5 h-3.5 text-xp-primary"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              {{ btn.title }}
+            </button>
           </div>
         </div>
       </div>

@@ -203,18 +203,6 @@
             {
               "controls": [
                 {
-                  "id": "site_tz_buttons",
-                  "type": "button_bar",
-                  "buttons": [
-                    {
-                      "id": "btn_load_sites_tz",
-                      "title": "Load Sites from RS2",
-                      "onClick": "rs2_loadSites",
-                      "tooltip": "Load available sites from the RS2 system to assign per-site timezone overrides."
-                    }
-                  ]
-                },
-                {
                   "id": "site_timezones",
                   "type": "site_timezones",
                   "title": "Site Timezones"
@@ -234,25 +222,15 @@
             {
               "controls": [
                 {
-                  "id": "custom_fields_buttons",
-                  "type": "button_bar",
-                  "buttons": [
-                    {
-                      "id": "btn_load_user_fields",
-                      "title": "Load RS2 User Fields",
-                      "onClick": "rs2_loadUserFields",
-                      "tooltip": "Load available user fields from the RS2 system for custom field mapping."
-                    }
-                  ]
-                },
-                {
                   "id": "custom_fields_users",
                   "type": "customFields",
-                  "title": "Custom User Field Mapping (RS2 Field â†’ XPE Field)",
+                  "title": "Custom User Field Mapping (RS2 Field → XPE Field)",
                   "key_title": "Source Columns",
                   "key_header": "Source Columns",
                   "value_title": "Destination Columns",
-                  "value_header": "Destination Columns"
+                  "value_header": "Destination Columns",
+                  "loadFrom": "user-fields",
+                  "destinationLoadFrom": "shared/entity-fields-users"
                 }
               ]
             }

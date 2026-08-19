@@ -393,19 +393,9 @@
                   "title": "",
                   "key_header": "Source Field",
                   "value_header": "XPressEntry Field",
+                  "loadFrom": "employee-fields",
+                  "destinationLoadFrom": "shared/entity-fields-users",
                   "default": []
-                },
-                {
-                  "id": "btn_load_emp_fields",
-                  "type": "button_bar",
-                  "buttons": [
-                    {
-                      "id": "btn_load_emp_fields",
-                      "title": "Load AEOS Fields",
-                      "onClick": "aeos_loadUserFields",
-                      "tooltip": "Load available employee fields from the AEOS system for field mapping."
-                    }
-                  ]
                 }
               ]
             }
@@ -427,19 +417,9 @@
                   "title": "",
                   "key_header": "Source Field",
                   "value_header": "XPressEntry Field",
+                  "loadFrom": "visitor-fields",
+                  "destinationLoadFrom": "shared/entity-fields-users",
                   "default": []
-                },
-                {
-                  "id": "btn_load_visitor_fields",
-                  "type": "button_bar",
-                  "buttons": [
-                    {
-                      "id": "btn_load_visitor_fields",
-                      "title": "Load AEOS Fields",
-                      "onClick": "aeos_loadVisitorFields",
-                      "tooltip": "Load available visitor fields from the AEOS system for field mapping."
-                    }
-                  ]
                 }
               ]
             }
@@ -461,19 +441,9 @@
                   "title": "",
                   "key_header": "Source Field",
                   "value_header": "XPressEntry Field",
+                  "loadFrom": "contractor-fields",
+                  "destinationLoadFrom": "shared/entity-fields-users",
                   "default": []
-                },
-                {
-                  "id": "btn_load_contractor_fields",
-                  "type": "button_bar",
-                  "buttons": [
-                    {
-                      "id": "btn_load_contractor_fields",
-                      "title": "Load AEOS Fields",
-                      "onClick": "aeos_loadContractorFields",
-                      "tooltip": "Load available contractor fields from the AEOS system for field mapping."
-                    }
-                  ]
                 }
               ]
             }

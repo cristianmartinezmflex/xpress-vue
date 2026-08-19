@@ -39,6 +39,8 @@ const props = defineProps<{
   // Handler currently in-flight (set by the parent while it awaits the action). Used to show a
   // loading state on the button that triggered it — today only Save.
   activeAction?:  string | null
+  // Id of the button whose action is in-flight, so any button (not just Save) can show a spinner.
+  activeActionId?: string | null
 }>()
 
 // True while the Save action's API call is in progress.
@@ -263,6 +265,7 @@ onBeforeUnmount(() => {
           :display="section.display"
           :guid="guid"
           :service-base="serviceBase"
+          :active-action-id="activeActionId"
           @update:state="onUpdateState"
           @action="(id, handler, payload) => emit('action', id, handler, payload)"
         />

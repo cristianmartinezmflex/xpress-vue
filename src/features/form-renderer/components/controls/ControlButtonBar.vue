@@ -6,11 +6,25 @@ import { evaluateEnable } from '../../composables/useDisabled'
 const props = defineProps<{
   buttons: Button[]
   state?: Record<string, any>
+  // Id of the button whose action is currently in-flight (set by the parent). That button shows a
+  // spinner and is disabled until the API call resolves.
+  activeActionId?: string | null
 }>()
-const emit = defineEmits<{ action: [id: string, handler: string] }>()
+const emit = defineEmits<{ action: [id: string, handler: string, payload?: unknown] }>()
 
 function isButtonEnabled(btn: Button): boolean {
   return evaluateEnable(btn.enable, props.state ?? {})
+}
+
+function isButtonLoading(btn: Button): boolean {
+  return props.activeActionId === btn.id
+}
+
+// A button either names a frontend handler (onClick) or is a plain REST button (verb + action URL).
+// REST buttons are routed through the generic dm_shared_runAction handler, which hits the action URL.
+function onButtonClick(btn: Button) {
+  if (btn.onClick) emit('action', btn.id, btn.onClick)
+  else if (btn.action) emit('action', btn.id, 'dm_shared_runAction', { verb: btn.verb, action: btn.action, title: btn.title })
 }
 
 // Tooltip state
@@ -57,16 +71,28 @@ function handleContextMenuItem(handler: string) {
       v-for="btn in buttons"
       :key="btn.id"
       type="button"
-      class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 transition"
-      :class="isButtonEnabled(btn)
-        ? 'cursor-pointer hover:bg-gray-50'
-        : 'opacity-50 cursor-not-allowed pointer-events-none'"
-      :disabled="!isButtonEnabled(btn)"
-      @click="emit('action', btn.id, btn.onClick)"
+      class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 transition flex items-center gap-2"
+      :class="isButtonLoading(btn)
+        ? 'cursor-wait opacity-80'
+        : isButtonEnabled(btn)
+          ? 'cursor-pointer hover:bg-gray-50'
+          : 'opacity-50 cursor-not-allowed pointer-events-none'"
+      :disabled="!isButtonEnabled(btn) || isButtonLoading(btn)"
+      @click="onButtonClick(btn)"
       @contextmenu="onRightClick($event, btn)"
       @mouseenter="showTooltip($event, btn)"
       @mouseleave="hideTooltip"
     >
+      <svg
+        v-if="isButtonLoading(btn)"
+        class="animate-spin w-4 h-4 text-xp-primary"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+      </svg>
       {{ btn.title }}
     </button>
   </div>

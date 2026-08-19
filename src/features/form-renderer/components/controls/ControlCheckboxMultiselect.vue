@@ -37,10 +37,12 @@ const selectedIds = computed<string[]>(() =>
 // A subsequent live refresh via the "Update Panel List" button writes `optionsKey` and takes precedence.
 const fetchedOptions = ref<Option[]>([])
 const loadErr        = ref('')
+const loading        = ref(false)
 
 onMounted(async () => {
   const url = resolveLoadFromUrl(props.loadFrom, props.serviceBase ?? '', props.guid)
   if (!url) return
+  loading.value = true
   try {
     const res = await fetch(url)
     if (!res.ok) { loadErr.value = `Error ${res.status}`; return }
@@ -52,6 +54,8 @@ onMounted(async () => {
     }
   } catch {
     loadErr.value = 'Could not load'
+  } finally {
+    loading.value = false
   }
 })
 
@@ -95,7 +99,19 @@ function clearAll()  { emit('update:modelValue', '') }
       <button type="button" class="text-xs text-xp-primary hover:underline cursor-pointer" @click="clearAll">Clear All</button>
     </div>
 
-    <div class="border border-gray-200 rounded-lg overflow-hidden max-h-64 overflow-y-auto">
+    <!-- While the option list is being fetched from the API, show a spinner instead of the empty box. -->
+    <div
+      v-if="loading"
+      class="border border-gray-200 rounded-lg px-3 py-4 flex items-center justify-center gap-2 text-sm text-gray-400"
+    >
+      <svg class="animate-spin w-4 h-4 text-xp-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+      </svg>
+      Loading…
+    </div>
+
+    <div v-else class="border border-gray-200 rounded-lg overflow-hidden max-h-64 overflow-y-auto">
       <label
         v-for="o in options"
         :key="o.id"
