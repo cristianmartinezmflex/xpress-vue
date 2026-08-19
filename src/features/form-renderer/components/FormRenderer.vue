@@ -248,7 +248,9 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- Tab content -->
-    <div class="flex-1 overflow-y-auto p-6">
+    <!-- pb-72: extra bottom room so controls near the end of a tab (e.g. the customFields combos) have
+         space below to open their dropdown downward without being clipped by the viewport bottom. -->
+    <div class="flex-1 overflow-y-auto p-6 pb-72">
       <div v-if="sections.length" class="flex flex-col gap-4 max-w-5xl mx-auto">
         <FormSection
           v-for="(section, idx) in sections"

@@ -36,7 +36,7 @@ export async function genetec_syncDoors({ guid, serviceBase }: ActionContext): P
 
 export async function genetec_loadCustomFields({ guid, state, serviceBase }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/dm-data?type=cardholder-fields`)
+  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/dm-data?type=custom-fields-users`)
   if (!res.ok) { alert(`Error loading fields: ${res.status}`); return }
   const fields: string[] = await res.json()
   const existing: { key: string; value: string }[] = Array.isArray(state['customFields']) ? state['customFields'] : []

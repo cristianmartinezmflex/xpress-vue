@@ -11,7 +11,6 @@ import ControlSelect        from './controls/ControlSelect.vue'
 import ControlSelectDynamic from './controls/ControlSelectDynamic.vue'
 import ControlRadio from './controls/ControlRadio.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
-import ControlKeyValue             from './controls/ControlKeyValue.vue'
 import ControlCustomFields         from './controls/ControlCustomFields.vue'
 import ControlLogView              from './controls/ControlLogView.vue'
 import ControlMultiselectDynamic   from './controls/ControlMultiselectDynamic.vue'
@@ -20,6 +19,7 @@ import ControlIpBadgeMappings      from './controls/ControlIpBadgeMappings.vue'
 import ControlRioDevices           from './controls/ControlRioDevices.vue'
 import ControlSiteTimezones        from './controls/ControlSiteTimezones.vue'
 import ControlCheckboxMultiselect   from './controls/ControlCheckboxMultiselect.vue'
+import ControlTable                 from './controls/ControlTable.vue'
 
 const props = defineProps<{
   title?: string
@@ -193,20 +193,10 @@ function isControlVisible(control: Control): boolean {
               :service-base="serviceBase"
             />
 
-            <ControlKeyValue
-              v-else-if="control.type === 'keyvalue'"
-              :title="control.title"
-              :key-title="control.key_title"
-              :key-header="control.key_header"
-              :value-title="control.value_title"
-              :value-header="control.value_header"
-              :model-value="state[control.id] ?? []"
-              @update:model-value="emit('update:state', control.id, $event)"
-            />
-
             <ControlCustomFields
               v-else-if="control.type === 'customFields'"
               :title="control.title"
+              :entity="control.entity"
               :key-title="control.key_title"
               :key-header="control.key_header"
               :value-title="control.value_title"
@@ -264,6 +254,16 @@ function isControlVisible(control: Control): boolean {
               :guid="guid"
               :service-base="serviceBase"
               :state="state"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlTable
+              v-else-if="control.type === 'table'"
+              :title="control.title"
+              :fields="control.fields ?? []"
+              :model-value="state[control.id] ?? '[]'"
+              :guid="guid"
+              :service-base="serviceBase"
               @update:model-value="emit('update:state', control.id, $event)"
             />
 

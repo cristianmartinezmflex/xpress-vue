@@ -20,8 +20,8 @@ function coerceValue(value: any, control: Control): any {
     return isNaN(n) ? value : n
   }
 
-  // keyvalue / customFields: the service may return an array, a plain object, or a JSON string.
-  if (control.type === 'keyvalue' || control.type === 'customFields') {
+  // customFields: the service may return an array, a plain object, or a JSON string.
+  if (control.type === 'customFields') {
     if (Array.isArray(value)) return value
     if (typeof value === 'string') {
       try {
@@ -46,6 +46,14 @@ function coerceValue(value: any, control: Control): any {
     control.type === 'ip_badge_mappings'
   ) {
     return typeof value === 'string' ? value : ''
+  }
+
+  // table: a JSON array of row objects. Normalize to a JSON string so the control (and dirty-tracking)
+  // work on a stable string; the control parses/serializes it.
+  if (control.type === 'table') {
+    if (typeof value === 'string') return value
+    if (Array.isArray(value)) return JSON.stringify(value)
+    return '[]'
   }
 
   // rio_devices / site_timezones: stored as JSON — serialize object/array to string for round-trip.

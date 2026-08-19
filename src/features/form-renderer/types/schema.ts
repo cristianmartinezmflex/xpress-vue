@@ -66,7 +66,6 @@ export type ControlType =
   | 'multiselect_dynamic'
   | 'radio'
   | 'button_bar'
-  | 'keyvalue'
   | 'customFields'
   | 'log_view'
   | 'socket_interfaces'
@@ -74,6 +73,7 @@ export type ControlType =
   | 'rio_devices'
   | 'site_timezones'
   | 'checkbox_multiselect'
+  | 'table'
 
 export interface Control {
   id: string
@@ -83,6 +83,8 @@ export interface Control {
   validations?: Validation[]
   values?: SelectOption[]
   buttons?: Button[]
+  fields?: Control[]   // table: column/field defs (each a control) that drive the grid + Add-row modal
+  isKey?: boolean      // table field: marks the row's identity/display column
   key_title?: string
   key_header?: string
   value_title?: string

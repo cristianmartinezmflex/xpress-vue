@@ -144,29 +144,42 @@
                   "id": "card_num_start_bit",
                   "type": "number_spinner",
                   "title": "Card Number Start Bit",
-                  "default": 0,
-                  "enable": "custom_card_format == true"
+                  "default": 0
                 },
                 {
                   "id": "card_num_bit_length",
                   "type": "number_spinner",
                   "title": "Card Number Bit Length",
-                  "default": 0,
-                  "enable": "custom_card_format == true"
+                  "default": 0
                 },
                 {
                   "id": "fc_start_bit",
                   "type": "number_spinner",
                   "title": "Facility Code Start Bit",
-                  "default": 0,
-                  "enable": "custom_card_format == true"
+                  "default": 0
                 },
                 {
                   "id": "fc_bit_length",
                   "type": "number_spinner",
                   "title": "Facility Code Bit Length",
-                  "default": 0,
-                  "enable": "custom_card_format == true"
+                  "default": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "customFields",
+                  "type": "customFields",
+                  "title": "",
+                  "entity": "Users",
+                  "loadFrom": "/api/data-managers/{dmId}/dm-data?type=custom-fields-users",
+                  "destinationLoadFrom": "/api/shared/entity-fields-users"
                 }
               ]
             }
@@ -177,6 +190,48 @@
     {
       "title": "CloudLink",
       "sections": [
+        {
+          "title": "CloudLink Devices",
+          "columns": [
+            {
+              "controls": [
+                {
+                  "id": "rio_list",
+                  "type": "table",
+                  "title": "CloudLink Devices",
+                  "fields": [
+                    {
+                      "id": "Name",
+                      "type": "text",
+                      "title": "Device Name",
+                      "isKey": true
+                    },
+                    {
+                      "id": "Server",
+                      "type": "text",
+                      "title": "Device IP"
+                    },
+                    {
+                      "id": "Username",
+                      "type": "text",
+                      "title": "RIO User"
+                    },
+                    {
+                      "id": "Password",
+                      "type": "password",
+                      "title": "RIO Password"
+                    },
+                    {
+                      "id": "AcceptUntrustedCert",
+                      "type": "boolean",
+                      "title": "Accept Untrusted Certificate"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
         {
           "title": "Global RIO Settings",
           "columns": [
@@ -197,47 +252,6 @@
               ]
             }
           ]
-        },
-        {
-          "title": "CloudLink (RIO) Devices",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "cloudlink_buttons",
-                  "type": "button_bar",
-                  "buttons": [
-                    {
-                      "id": "btn_sync_doors",
-                      "title": "Sync Doors from Genetec",
-                      "onClick": "genetec_syncDoors",
-                      "enable": "rio_enabled == true",
-                      "tooltip": "Synchronize door and reader data from the Genetec Security Center into XPressEntry."
-                    }
-                  ]
-                },
-                {
-                  "id": "rio_list",
-                  "type": "rio_devices",
-                  "title": "CloudLink Devices",
-                  "buttons": [
-                    {
-                      "id": "btn_ping_rio",
-                      "title": "Ping",
-                      "onClick": "genetec_pingRio",
-                      "tooltip": "Test connectivity to this CloudLink (RIO) device."
-                    },
-                    {
-                      "id": "btn_update_rio",
-                      "title": "Update RIO Readers",
-                      "onClick": "genetec_updateRio",
-                      "tooltip": "Push the current reader/door configuration to this CloudLink (RIO) device."
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
         }
       ]
     },
@@ -245,68 +259,38 @@
       "title": "Custom",
       "sections": [
         {
-          "title": "Custom Field Mapping",
-          "columns": [
-            {
-              "controls": [
-                {
-                  "id": "customfields_buttons",
-                  "type": "button_bar",
-                  "buttons": [
-                    {
-                      "id": "btn_load_fields",
-                      "title": "Load Genetec Custom Fields",
-                      "onClick": "genetec_loadCustomFields",
-                      "tooltip": "Load available custom cardholder fields from the Genetec Security Center."
-                    }
-                  ]
-                },
-                {
-                  "id": "customFields",
-                  "type": "customFields",
-                  "title": "Custom Fields (Genetec Field â†’ XPE Field)",
-                  "key_title": "Genetec Field",
-                  "key_header": "Genetec Field",
-                  "value_title": "XPE Field",
-                  "value_header": "XPE Field"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "title": "Event Names",
+          "title": "Custom Events",
           "columns": [
             {
               "controls": [
                 {
                   "id": "cardholder_event_name",
                   "type": "text",
-                  "title": "Cardholder Event Name",
+                  "title": "Custom Cardholder Granted",
                   "default": ""
                 },
                 {
                   "id": "cardholder_event_name_denied",
                   "type": "text",
-                  "title": "Cardholder Denied Event Name",
+                  "title": "Custom Cardholder Denied",
                   "default": ""
                 },
                 {
                   "id": "credential_event_name",
                   "type": "text",
-                  "title": "Credential Event Name",
+                  "title": "Custom Credential Granted",
                   "default": ""
                 },
                 {
                   "id": "credential_event_name_denied",
                   "type": "text",
-                  "title": "Credential Denied Event Name",
+                  "title": "Custom Credential Denied",
                   "default": ""
                 },
                 {
                   "id": "zone_event_name",
                   "type": "text",
-                  "title": "Zone / Area Event Name",
+                  "title": "Custom Area Event",
                   "default": ""
                 }
               ]
@@ -314,20 +298,20 @@
           ]
         },
         {
-          "title": "Credential Fields",
+          "title": "Credential Custom Fields",
           "columns": [
             {
               "controls": [
                 {
                   "id": "custom_credential_field_1",
                   "type": "text",
-                  "title": "Custom Credential Field 1",
+                  "title": "Credential Field 1",
                   "default": ""
                 },
                 {
                   "id": "custom_credential_field_2",
                   "type": "text",
-                  "title": "Custom Credential Field 2",
+                  "title": "Credential Field 2",
                   "default": ""
                 }
               ]
@@ -337,7 +321,7 @@
                 {
                   "id": "custom_credential_field_3",
                   "type": "text",
-                  "title": "Custom Credential Field 3",
+                  "title": "Credential Field 3",
                   "default": ""
                 }
               ]

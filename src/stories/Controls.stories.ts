@@ -179,25 +179,6 @@ export const ButtonBar = story(
   },
 )
 
-export const KeyValue = story(
-  {
-    id: 'customFields',
-    type: 'keyvalue',
-    title: 'Custom Field Mapping',
-    key_title: 'External Field',
-    key_header: 'External Field',
-    value_title: 'XPE Field',
-    value_header: 'XPE Field',
-  },
-  {
-    docs: [
-      '**Uso:** mapeos clave→valor — típicamente custom field mappings (campo externo → campo XPE).',
-      '',
-      '**Props soportadas:** `key_title`, `key_header`, `value_title`, `value_header` (labels de las columnas). Se serializa como objeto (Hashtable) al guardar.',
-    ].join('\n'),
-  },
-)
-
 export const LogView = story(
   { id: 'sync_log', type: 'log_view' },
   {
