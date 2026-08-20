@@ -251,14 +251,14 @@ A group of mutually exclusive radio buttons.
 
 ---
 
-### `checkbox_multiselect`
+### `multiselect_dynamic`
 
-A multi-select checkbox list (with Select All / Clear All). Options auto-load from `loadFrom` on mount (spinner while loading) and/or from a form-state key (`optionsKey`) written by an action to refresh the list live. Selected values are stored as a separator-joined string of ids.
+A multi-select checkbox list (with Select All / Clear All). Options auto-load from `loadFrom` on mount (spinner while loading). Selected values are stored as a separator-joined string of ids.
 
 ```json
 {
   "id": "identifier_types_selected",
-  "type": "checkbox_multiselect",
+  "type": "multiselect_dynamic",
   "title": "Identifier Types",
   "loadFrom": "shared/badge_types",
   "separator": "\b",
@@ -268,8 +268,7 @@ A multi-select checkbox list (with Select All / Clear All). Options auto-load fr
 
 | Field | Description |
 |---|---|
-| `loadFrom` | Options source (same convention as `select`'s dynamic `loadFrom`). Returns `[{ id, name }]`. |
-| `optionsKey` | (Optional) Form-state key holding the option list, written by an action/button to refresh it in-place. Merged over `loadFrom`. |
+| `loadFrom` | Options source (same convention as `select_dynamic`'s `loadFrom`). Returns `[{ id, name }]`. |
 | `separator` | (Optional) Token joining the selected ids. Default `,`. Use `"\b"` (vbBack) for AEOS to match the WinForm format. |
 
 ---

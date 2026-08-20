@@ -28,7 +28,7 @@ const meta: Meta<typeof ControlShowcase> = {
           '- **REST (recomendada)** — el botón declara `{ verb, action }`: al clickearlo se hace `verb <serviceBase><action>` (con `{dmId}` reemplazado por el guid del DM). No requiere código front. Es la forma que usan OnGuard y Genetec (ej. `check-subscriptions`, `update-panels`, `clear-external-data`).',
           '- **Handler front (`onClick`)** — nombre de una función resuelta **por prefijo**: `dm_shared_*` (compartidas, en `actions/dm-shared-actions.ts`). Los handlers específicos por DM (`aeos_*`, `avigilon_*`, `genetec_*`, `rs2_*`, `on-guard`) fueron eliminados: la carga de campos ahora la hace el propio control (`customFields` con `loadFrom`), no un botón.',
           '',
-          '**Loading:** mientras una acción está en vuelo, el botón que la disparó muestra un spinner y queda deshabilitado (igual que Save). Los dropdowns que cargan de la API (`select_dynamic`, `checkbox_multiselect`, `customFields`) muestran un spinner mientras traen sus opciones.',
+          '**Loading:** mientras una acción está en vuelo, el botón que la disparó muestra un spinner y queda deshabilitado (igual que Save). Los dropdowns que cargan de la API (`select_dynamic`, `multiselect_dynamic`, `customFields`) muestran un spinner mientras traen sus opciones.',
         ].join('\n'),
       },
     },
@@ -121,25 +121,18 @@ export const SelectDynamic = story(
   },
 )
 
-export const CheckboxMultiselect = story(
-  { id: 'panel_filter', type: 'checkbox_multiselect', title: 'Panels', loadFrom: 'panels', optionsKey: '_onguard_panels' },
+export const MultiselectDynamic = story(
+  { id: 'panel_filter', type: 'multiselect_dynamic', title: 'Panels', loadFrom: 'panels' },
   {
-    note: 'Las opciones se auto-cargan de la API vía `loadFrom` al montar (como en OnGuard). Un botón/acción puede refrescarlas escribiendo `optionsKey`. Acá se siembran para la demo. El valor es una lista de ids separados por coma.',
-    initial: {
-      _onguard_panels: JSON.stringify([
-        { id: '1', name: 'Main Building' },
-        { id: '5', name: 'Warehouse' },
-        { id: '9', name: 'Parking Gate' },
-      ]),
-      panel_filter: '5',
-    },
+    note: 'Las opciones se auto-cargan de la API vía `loadFrom` al montar (como en OnGuard). En el catálogo no hay DM vivo, así que la lista queda vacía (spinner y luego vacío). El valor es una lista de ids separados por el `separator`.',
+    initial: { panel_filter: '5' },
     docs: [
       '**Uso:** multi-select de checkboxes **genérico** (no atado a ningún DM), con Select All / Clear All. Ej.: los filtros de "Panels" / "Segments" / "Badge Types" de OnGuard.',
       '',
       '**Props soportadas:**',
       '- `loadFrom` — URL para **auto-cargar** la lista al montar (misma convención que `select_dynamic`: `"<type>"` → `dm-data?type=`, `"shared/<type>"` → `/api/shared/`). Muestra un spinner mientras carga.',
-      '- `optionsKey` (opcional) — key del **form state** con la lista de opciones (`[{ id, name }]`); una acción/botón la escribe para **refrescar** la lista en vivo. Si está presente, se mergea sobre lo cargado por `loadFrom`.',
-      '- **Valor**: string de ids separados por coma (ej. `"1,5,9"`). Los ids seleccionados que aún no están en las opciones se muestran igual (labeleados por id) para no perder la selección guardada.',
+      '- `separator` (opcional) — token que une los ids seleccionados (default `","`; `"\\b"`/vbBack para AEOS).',
+      '- **Valor**: string de ids separados por el separador (ej. `"1,5,9"`). Los ids seleccionados que aún no están en las opciones se muestran igual (labeleados por id) para no perder la selección guardada.',
     ].join('\n'),
   },
 )
@@ -233,7 +226,7 @@ export const Table = story(
     type: 'table',
     title: 'CloudLink Devices',
     fields: [
-      { id: 'Name', type: 'text', title: 'Device Name', isKey: true },
+      { id: 'Name', type: 'text', title: 'Device Name' },
       { id: 'Server', type: 'text', title: 'Device IP' },
       { id: 'Username', type: 'text', title: 'RIO User' },
       { id: 'Password', type: 'password', title: 'RIO Password' },
@@ -247,8 +240,8 @@ export const Table = story(
       '**Uso:** lista/grilla editable **genérica** de filas tipadas (ej. dispositivos CloudLink de Genetec). Nada hardcodeado: la tabla y el formulario de alta/edición se derivan de `fields`.',
       '',
       '**Props soportadas:**',
-      '- `fields` — array de controls (cada uno una columna + un campo del modal): `{ id, type, title, isKey? }`. `type` reutiliza los controles base (`text`, `password`, `boolean`, `number`, `number_spinner`, `select`).',
-      '- `isKey` — marca la columna de identidad/display de la fila.',
+      '- `fields` — array de controls (cada uno una columna + un campo del modal): `{ id, type, title }`. `type` reutiliza los controles base (`text`, `password`, `boolean`, `number`, `number_spinner`, `select`).',
+      '- La **primera** columna es la key/display de la fila (obligatoria para agregar).',
       '- **Valor**: string JSON de un array de objetos (`[{ ... }]`). Las props extra de cada fila que el form no expone (ej. `ID`, `DoorList`) se **preservan** al guardar.',
       '',
       '**Backend:** en un DM tipado, se declara con `ControlType.Table` sobre una `List(Of T)`; el generador refleja el tipo `T` de la fila para producir `fields`.',

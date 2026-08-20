@@ -16,7 +16,7 @@ import ControlLogView              from './controls/ControlLogView.vue'
 import ControlSocketInterfaces     from './controls/ControlSocketInterfaces.vue'
 import ControlIpBadgeMappings      from './controls/ControlIpBadgeMappings.vue'
 import ControlSiteTimezones        from './controls/ControlSiteTimezones.vue'
-import ControlCheckboxMultiselect   from './controls/ControlCheckboxMultiselect.vue'
+import ControlMultiselectDynamic    from './controls/ControlMultiselectDynamic.vue'
 import ControlTable                 from './controls/ControlTable.vue'
 
 const props = defineProps<{
@@ -248,16 +248,14 @@ function isControlVisible(control: Control): boolean {
               @update:model-value="emit('update:state', control.id, $event)"
             />
 
-            <ControlCheckboxMultiselect
-              v-else-if="control.type === 'checkbox_multiselect'"
+            <ControlMultiselectDynamic
+              v-else-if="control.type === 'multiselect_dynamic'"
               :title="control.title"
               :model-value="state[control.id] ?? ''"
-              :options-key="control.optionsKey"
               :load-from="control.loadFrom"
               :separator="control.separator"
               :guid="guid"
               :service-base="serviceBase"
-              :state="state"
               @update:model-value="emit('update:state', control.id, $event)"
             />
           </div>

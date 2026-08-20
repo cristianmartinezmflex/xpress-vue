@@ -229,7 +229,7 @@
               "controls": [
                 {
                   "id": "identifier_types_selected",
-                  "type": "checkbox_multiselect",
+                  "type": "multiselect_dynamic",
                   "title": "Identifier Types",
                   "loadFrom": "shared/badge_types",
                   "separator": "\b",

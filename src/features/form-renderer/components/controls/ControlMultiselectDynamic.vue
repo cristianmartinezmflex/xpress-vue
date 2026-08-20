@@ -1,17 +1,12 @@
 <script setup lang="ts">
 /**
- * ControlCheckboxMultiselect
+ * ControlMultiselectDynamic
  *
- * A checkbox multi-select whose OPTIONS come from form state (populated by an action/button, not
- * fetched on mount) and whose VALUE is a comma-separated string of the selected option ids.
+ * A checkbox multi-select whose OPTIONS are auto-loaded from the API on mount (`loadFrom` →
+ * `[{ id, name }]`) and whose VALUE is a separator-joined string of the selected option ids.
  *
- * Generic and NOT tied to any Data Manager:
- * - `optionsKey` names the form-state key holding the option list (a JSON string or array of
- *   `{ id, name }`). Some action writes it — e.g. after fetching a list from the external system —
- *   and this control renders it. Which key, and the action that fills it, are declared per form in
- *   the schema, so the same control works for any DM.
- * - Any currently-selected id not present in the options is still shown, so a saved selection stays
- *   visible before the option list is (re)loaded.
+ * Generic and NOT tied to any Data Manager. Any currently-selected id not present in the loaded
+ * options is still shown, so a saved selection stays visible before/without the option list.
  */
 import { computed, ref, onMounted } from 'vue'
 import { resolveLoadFromUrl } from '../../utils/loadFrom'
@@ -20,12 +15,10 @@ interface Option { id: string; name: string }
 
 const props = defineProps<{
   title?:      string
-  modelValue:  string        // comma-separated selected ids
-  optionsKey?: string        // form-state key holding the [{ id, name }] option list
-  loadFrom?:   string        // optional URL to auto-load the option list on mount (like the WinForm's list)
+  modelValue:  string        // separator-joined selected ids
+  loadFrom?:   string        // URL to auto-load the option list on mount (like the WinForm's list)
   guid?:       string
   serviceBase?: string
-  state?:      Record<string, any>
   separator?:  string        // token joining the selected ids (default ","; e.g. "\b"/vbBack for AEOS)
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
@@ -37,7 +30,6 @@ const selectedIds = computed<string[]>(() =>
 )
 
 // Options fetched once on mount from `loadFrom` (mirrors the WinForm showing the current list on open).
-// A subsequent live refresh via the "Update Panel List" button writes `optionsKey` and takes precedence.
 const fetchedOptions = ref<Option[]>([])
 const loadErr        = ref('')
 const loading        = ref(false)
@@ -63,18 +55,9 @@ onMounted(async () => {
 })
 
 const options = computed<Option[]>(() => {
-  let provided: Option[] = []
-  const raw = props.optionsKey ? props.state?.[props.optionsKey] : undefined
-  if (typeof raw === 'string' && raw) {
-    try { const parsed = JSON.parse(raw); if (Array.isArray(parsed)) provided = parsed } catch { /* ignore */ }
-  } else if (Array.isArray(raw)) {
-    provided = raw
-  }
-  // Merge by id: mount-fetched list first, then the button-provided list (a live refresh wins), then any
-  // saved-but-not-listed ids so a selection is never silently dropped.
+  // Loaded list first, then any saved-but-not-listed ids so a selection is never silently dropped.
   const byId = new Map<string, Option>()
   for (const o of fetchedOptions.value) byId.set(String(o.id), { id: String(o.id), name: o.name })
-  for (const o of provided)             byId.set(String(o.id), { id: String(o.id), name: o.name })
   for (const id of selectedIds.value)   if (!byId.has(id)) byId.set(id, { id, name: id })
   return [...byId.values()]
 })

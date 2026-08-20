@@ -95,7 +95,8 @@ function openEdit(idx: number) {
 
 function closeModal() { modalOpen.value = false }
 
-const keyField = computed(() => props.fields.find((f) => f.isKey) ?? props.fields[0])
+// The first field is the row's key/display column (must be non-empty to add a row).
+const keyField = computed(() => props.fields[0])
 
 const isEditing = computed(() => editIndex.value !== null)
 const isDirty   = computed(() => JSON.stringify(draft.value) !== JSON.stringify(original.value))
