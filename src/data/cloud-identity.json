@@ -81,21 +81,21 @@
                   "id": "environment",
                   "type": "select",
                   "title": "Environment",
-                  "values": [
+                  "default": "prod",
+                  "options": [
                     {
-                      "text": "Production",
-                      "value": "prod"
+                      "id": "prod",
+                      "name": "Production"
                     },
                     {
-                      "text": "Staging",
-                      "value": "stage"
+                      "id": "stage",
+                      "name": "Staging"
                     },
                     {
-                      "text": "Development",
-                      "value": "dev"
+                      "id": "dev",
+                      "name": "Development"
                     }
-                  ],
-                  "default": "prod"
+                  ]
                 }
               ]
             }
@@ -284,22 +284,22 @@
                   "id": "field_enable_select",
                   "type": "select",
                   "title": "Select (enable: \"enable_fields_demo == true\")",
-                  "values": [
-                    {
-                      "text": "Option A",
-                      "value": "a"
-                    },
-                    {
-                      "text": "Option B",
-                      "value": "b"
-                    },
-                    {
-                      "text": "Option C",
-                      "value": "c"
-                    }
-                  ],
                   "default": "a",
-                  "enable": "enable_fields_demo == true"
+                  "enable": "enable_fields_demo == true",
+                  "options": [
+                    {
+                      "id": "a",
+                      "name": "Option A"
+                    },
+                    {
+                      "id": "b",
+                      "name": "Option B"
+                    },
+                    {
+                      "id": "c",
+                      "name": "Option C"
+                    }
+                  ]
                 }
               ]
             }
@@ -379,18 +379,18 @@
                   "id": "field_display_select",
                   "type": "select",
                   "title": "Select (display: \"show_fields_demo == true\")",
-                  "values": [
+                  "default": "x",
+                  "display": "show_fields_demo == true",
+                  "options": [
                     {
-                      "text": "Option X",
-                      "value": "x"
+                      "id": "x",
+                      "name": "Option X"
                     },
                     {
-                      "text": "Option Y",
-                      "value": "y"
+                      "id": "y",
+                      "name": "Option Y"
                     }
-                  ],
-                  "default": "x",
-                  "display": "show_fields_demo == true"
+                  ]
                 }
               ]
             },
@@ -475,17 +475,17 @@
                   "id": "col_display_select",
                   "type": "select",
                   "title": "Select (in left column)",
-                  "values": [
+                  "default": "a",
+                  "options": [
                     {
-                      "text": "Option A",
-                      "value": "a"
+                      "id": "a",
+                      "name": "Option A"
                     },
                     {
-                      "text": "Option B",
-                      "value": "b"
+                      "id": "b",
+                      "name": "Option B"
                     }
-                  ],
-                  "default": "a"
+                  ]
                 }
               ]
             },
@@ -552,41 +552,41 @@
                   "id": "col2_select",
                   "type": "select",
                   "title": "Select",
-                  "values": [
+                  "default": "1",
+                  "options": [
                     {
-                      "text": "Option 1",
-                      "value": "1"
+                      "id": "1",
+                      "name": "Option 1"
                     },
                     {
-                      "text": "Option 2",
-                      "value": "2"
+                      "id": "2",
+                      "name": "Option 2"
                     },
                     {
-                      "text": "Option 3",
-                      "value": "3"
+                      "id": "3",
+                      "name": "Option 3"
                     }
-                  ],
-                  "default": "1"
+                  ]
                 },
                 {
                   "id": "col2_radio",
                   "type": "radio",
                   "title": "Radio",
-                  "values": [
+                  "default": "alpha",
+                  "options": [
                     {
-                      "text": "Alpha",
-                      "value": "alpha"
+                      "id": "alpha",
+                      "name": "Alpha"
                     },
                     {
-                      "text": "Beta",
-                      "value": "beta"
+                      "id": "beta",
+                      "name": "Beta"
                     },
                     {
-                      "text": "Gamma",
-                      "value": "gamma"
+                      "id": "gamma",
+                      "name": "Gamma"
                     }
-                  ],
-                  "default": "alpha"
+                  ]
                 }
               ]
             }

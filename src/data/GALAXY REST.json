@@ -53,29 +53,29 @@
                   "id": "timezoneinfo",
                   "type": "select",
                   "title": "Server Timezone",
-                  "values": [
+                  "default": "US Mountain Standard Time",
+                  "options": [
                     {
-                      "text": "US Eastern Standard Time",
-                      "value": "US Eastern Standard Time"
+                      "id": "US Eastern Standard Time",
+                      "name": "US Eastern Standard Time"
                     },
                     {
-                      "text": "US Central Standard Time",
-                      "value": "US Central Standard Time"
+                      "id": "US Central Standard Time",
+                      "name": "US Central Standard Time"
                     },
                     {
-                      "text": "US Mountain Standard Time",
-                      "value": "US Mountain Standard Time"
+                      "id": "US Mountain Standard Time",
+                      "name": "US Mountain Standard Time"
                     },
                     {
-                      "text": "US Pacific Standard Time",
-                      "value": "US Pacific Standard Time"
+                      "id": "US Pacific Standard Time",
+                      "name": "US Pacific Standard Time"
                     },
                     {
-                      "text": "UTC",
-                      "value": "UTC"
+                      "id": "UTC",
+                      "name": "UTC"
                     }
-                  ],
-                  "default": "US Mountain Standard Time"
+                  ]
                 }
               ]
             }

@@ -199,16 +199,16 @@ A single-choice dropdown with a **static** list of options, known at schema-auth
   "type": "select",
   "title": "Sync Type",
   "default": "Standard",
-  "values": [
-    { "text": "Standard",    "value": "Standard"    },
-    { "text": "DataConduit", "value": "DataConduit" }
+  "options": [
+    { "id": "Standard",    "name": "Standard"    },
+    { "id": "DataConduit", "name": "DataConduit" }
   ]
 }
 ```
 
 | Field | Description |
 |---|---|
-| `values` | Array of `{ text, value }` objects. `text` is displayed; `value` is stored. |
+| `options` | Array of `{ id, name }` objects. `name` is displayed; `id` is stored. |
 
 ---
 
@@ -242,9 +242,9 @@ A group of mutually exclusive radio buttons.
   "type": "radio",
   "title": "Direction",
   "default": "pull",
-  "values": [
-    { "text": "Pull", "value": "pull" },
-    { "text": "Push", "value": "push" }
+  "options": [
+    { "id": "pull", "name": "Pull" },
+    { "id": "push", "name": "Push" }
   ]
 }
 ```
@@ -514,9 +514,9 @@ The `onClick` value is a handler name resolved by the form renderer. Use these r
                   "type": "select",
                   "title": "Sync Type",
                   "default": "Standard",
-                  "values": [
-                    { "text": "Standard",    "value": "Standard"    },
-                    { "text": "DataConduit", "value": "DataConduit" }
+                  "options": [
+                    { "id": "Standard",    "name": "Standard"    },
+                    { "id": "DataConduit", "name": "DataConduit" }
                   ]
                 },
                 {

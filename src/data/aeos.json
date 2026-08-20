@@ -302,18 +302,18 @@
                   "type": "select",
                   "title": "Events User Search Limit",
                   "default": "Visitor",
-                  "values": [
+                  "options": [
                     {
-                      "text": "Visitor",
-                      "value": "Visitor"
+                      "id": "Visitor",
+                      "name": "Visitor"
                     },
                     {
-                      "text": "Employee",
-                      "value": "Employee"
+                      "id": "Employee",
+                      "name": "Employee"
                     },
                     {
-                      "text": "Contractor",
-                      "value": "Contractor"
+                      "id": "Contractor",
+                      "name": "Contractor"
                     }
                   ]
                 },

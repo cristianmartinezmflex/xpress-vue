@@ -106,33 +106,33 @@
                   "id": "sync_type_select",
                   "type": "select",
                   "title": "Sync Type (select)",
-                  "values": [
+                  "default": 17,
+                  "options": [
                     {
-                      "text": "OpenAccess",
-                      "value": 17
+                      "id": 17,
+                      "name": "OpenAccess"
                     },
                     {
-                      "text": "DataConduit",
-                      "value": 18
+                      "id": 18,
+                      "name": "DataConduit"
                     }
-                  ],
-                  "default": 17
+                  ]
                 },
                 {
                   "id": "sync_type_radio",
                   "type": "radio",
                   "title": "Sync Type (radio)",
-                  "values": [
+                  "default": 17,
+                  "options": [
                     {
-                      "text": "OpenAccess",
-                      "value": 17
+                      "id": 17,
+                      "name": "OpenAccess"
                     },
                     {
-                      "text": "DataConduit",
-                      "value": 18
+                      "id": 18,
+                      "name": "DataConduit"
                     }
-                  ],
-                  "default": 17
+                  ]
                 },
                 {
                   "id": "btn_bar_1",

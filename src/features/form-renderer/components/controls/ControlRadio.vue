@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import type { SelectOption } from '../../types/schema'
 
-const props = defineProps<{
+defineProps<{
   title?: string
   modelValue: string | number
-  values: SelectOption[]
+  options: SelectOption[]   // [{ id, name }] — id is the stored value, name the label
   id: string
 }>()
 defineEmits<{ 'update:modelValue': [value: string | number] }>()
-
-function resolveValue(opt: SelectOption) {
-  return opt.value !== undefined ? opt.value : opt.text
-}
 </script>
 
 <template>
@@ -19,19 +15,19 @@ function resolveValue(opt: SelectOption) {
     <span v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</span>
     <div class="flex flex-wrap gap-4">
       <label
-        v-for="opt in values"
-        :key="resolveValue(opt)"
+        v-for="opt in options"
+        :key="opt.id"
         class="flex items-center gap-2 cursor-pointer text-sm text-gray-700"
       >
         <input
           type="radio"
           :name="id"
-          :value="resolveValue(opt)"
-          :checked="modelValue === resolveValue(opt)"
+          :value="opt.id"
+          :checked="modelValue === opt.id"
           class="text-xp-primary focus:ring-xp-primary"
-          @change="$emit('update:modelValue', resolveValue(opt))"
+          @change="$emit('update:modelValue', opt.id)"
         />
-        {{ opt.text }}
+        {{ opt.name }}
       </label>
     </div>
   </div>

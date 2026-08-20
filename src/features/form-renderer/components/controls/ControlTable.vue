@@ -186,7 +186,7 @@ function saveRow() {
                 <ControlSelect
                   v-else-if="f.type === 'select'"
                   :title="f.title"
-                  :values="f.values ?? []"
+                  :options="f.options ?? []"
                   v-model="draft[f.id]"
                 />
                 <ControlNumberSpinner

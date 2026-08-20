@@ -98,12 +98,12 @@ export const Select = story(
     type: 'select',
     title: 'Mode',
     default: 'incremental',
-    values: [
-      { text: 'Incremental', value: 'incremental' },
-      { text: 'Full', value: 'full' },
+    options: [
+      { id: 'incremental', name: 'Incremental' },
+      { id: 'full', name: 'Full' },
     ],
   },
-  { docs: '**Uso:** elegir **una** opción de una lista **fija** (valores conocidos en tiempo de compilación).\n\n**Props soportadas:** `values` (`[{ text, value }]`), `default`. Para opciones cargadas de la API usá `select_dynamic`.' },
+  { docs: '**Uso:** elegir **una** opción de una lista **fija** (valores conocidos en tiempo de compilación).\n\n**Props soportadas:** `options` (`[{ id, name }]` — `id` es el valor guardado, `name` el label), `default`. Para opciones cargadas de la API usá `select_dynamic`.' },
 )
 
 export const SelectDynamic = story(
@@ -149,12 +149,12 @@ export const Radio = story(
     id: 'direction',
     type: 'radio',
     title: 'Access Direction',
-    values: [
-      { text: 'In', value: 'in' },
-      { text: 'Out', value: 'out' },
+    options: [
+      { id: 'in', name: 'In' },
+      { id: 'out', name: 'Out' },
     ],
   },
-  { docs: '**Uso:** elegir una opción entre **pocas**, todas visibles (radio buttons).\n\n**Props soportadas:** `values` (`[{ text, value }]`).' },
+  { docs: '**Uso:** elegir una opción entre **pocas**, todas visibles (radio buttons).\n\n**Props soportadas:** `options` (`[{ id, name }]`).' },
 )
 
 export const ButtonBar = story(

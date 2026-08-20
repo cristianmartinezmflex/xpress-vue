@@ -36,54 +36,54 @@
                   "type": "select",
                   "title": "Server Timezone",
                   "default": "US Mountain Standard Time",
-                  "values": [
+                  "options": [
                     {
-                      "text": "Eastern Standard Time",
-                      "value": "Eastern Standard Time"
+                      "id": "Eastern Standard Time",
+                      "name": "Eastern Standard Time"
                     },
                     {
-                      "text": "Central Standard Time",
-                      "value": "Central Standard Time"
+                      "id": "Central Standard Time",
+                      "name": "Central Standard Time"
                     },
                     {
-                      "text": "US Mountain Standard Time",
-                      "value": "US Mountain Standard Time"
+                      "id": "US Mountain Standard Time",
+                      "name": "US Mountain Standard Time"
                     },
                     {
-                      "text": "Mountain Standard Time",
-                      "value": "Mountain Standard Time"
+                      "id": "Mountain Standard Time",
+                      "name": "Mountain Standard Time"
                     },
                     {
-                      "text": "Pacific Standard Time",
-                      "value": "Pacific Standard Time"
+                      "id": "Pacific Standard Time",
+                      "name": "Pacific Standard Time"
                     },
                     {
-                      "text": "Alaskan Standard Time",
-                      "value": "Alaskan Standard Time"
+                      "id": "Alaskan Standard Time",
+                      "name": "Alaskan Standard Time"
                     },
                     {
-                      "text": "Hawaiian Standard Time",
-                      "value": "Hawaiian Standard Time"
+                      "id": "Hawaiian Standard Time",
+                      "name": "Hawaiian Standard Time"
                     },
                     {
-                      "text": "GMT Standard Time",
-                      "value": "GMT Standard Time"
+                      "id": "GMT Standard Time",
+                      "name": "GMT Standard Time"
                     },
                     {
-                      "text": "UTC",
-                      "value": "UTC"
+                      "id": "UTC",
+                      "name": "UTC"
                     },
                     {
-                      "text": "Central European Standard Time",
-                      "value": "Central European Standard Time"
+                      "id": "Central European Standard Time",
+                      "name": "Central European Standard Time"
                     },
                     {
-                      "text": "W. Europe Standard Time",
-                      "value": "W. Europe Standard Time"
+                      "id": "W. Europe Standard Time",
+                      "name": "W. Europe Standard Time"
                     },
                     {
-                      "text": "AUS Eastern Standard Time",
-                      "value": "AUS Eastern Standard Time"
+                      "id": "AUS Eastern Standard Time",
+                      "name": "AUS Eastern Standard Time"
                     }
                   ]
                 }

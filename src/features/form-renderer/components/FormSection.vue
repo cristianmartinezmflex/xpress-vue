@@ -154,7 +154,7 @@ function isControlVisible(control: Control): boolean {
               v-else-if="control.type === 'select'"
               :title="control.title"
               :model-value="state[control.id]"
-              :values="control.values ?? []"
+              :options="control.options ?? []"
               :error="errors[control.id]"
               @update:model-value="emit('update:state', control.id, $event)"
             />
@@ -175,7 +175,7 @@ function isControlVisible(control: Control): boolean {
               :id="control.id"
               :title="control.title"
               :model-value="state[control.id]"
-              :values="control.values ?? []"
+              :options="control.options ?? []"
               @update:model-value="emit('update:state', control.id, $event)"
             />
 

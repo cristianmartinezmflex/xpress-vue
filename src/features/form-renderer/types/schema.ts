@@ -32,8 +32,8 @@ export interface Validation {
 }
 
 export interface SelectOption {
-  text: string
-  value?: string | number
+  id:   string | number   // stored value
+  name: string            // label shown to the user
 }
 
 export interface ContextMenuItem {
@@ -81,7 +81,7 @@ export interface Control {
   title?: string
   default?: any
   validations?: Validation[]
-  values?: SelectOption[]
+  options?: SelectOption[]
   buttons?: Button[]
   fields?: Control[]   // table: column/field defs (each a control) that drive the grid + Add-row modal
   isKey?: boolean      // table field: marks the row's identity/display column

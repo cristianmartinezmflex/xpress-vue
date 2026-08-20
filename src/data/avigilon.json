@@ -159,21 +159,21 @@
                   "id": "convert_act_to_muster_type",
                   "type": "select",
                   "title": "Convert Activity to Muster Type",
-                  "values": [
+                  "default": "0",
+                  "options": [
                     {
-                      "text": "None (don't convert)",
-                      "value": "0"
+                      "id": "0",
+                      "name": "None (don't convert)"
                     },
                     {
-                      "text": "Muster Success",
-                      "value": "1"
+                      "id": "1",
+                      "name": "Muster Success"
                     },
                     {
-                      "text": "Muster Success or Failure",
-                      "value": "2"
+                      "id": "2",
+                      "name": "Muster Success or Failure"
                     }
-                  ],
-                  "default": "0"
+                  ]
                 },
                 {
                   "id": "retry_send_activities_count",
