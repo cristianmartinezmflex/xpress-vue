@@ -1,12 +1,5 @@
 {
   "title": "Cloud Identity Sync (Demo)",
-  "customSyncTables": [
-    "USERS",
-    "BADGES",
-    "GROUPS",
-    "GROUPS_USERS",
-    "COMPANIES"
-  ],
   "tabs": [
     {
       "title": "Settings",

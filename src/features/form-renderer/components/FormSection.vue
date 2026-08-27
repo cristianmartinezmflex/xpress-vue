@@ -16,8 +16,12 @@ import ControlLogView              from './controls/ControlLogView.vue'
 import ControlSocketInterfaces     from './controls/ControlSocketInterfaces.vue'
 import ControlIpBadgeMappings      from './controls/ControlIpBadgeMappings.vue'
 import ControlSiteTimezones        from './controls/ControlSiteTimezones.vue'
+import ControlSyncTimer            from './controls/ControlSyncTimer.vue'
+import ControlCustomSync           from './controls/ControlCustomSync.vue'
 import ControlMultiselectDynamic    from './controls/ControlMultiselectDynamic.vue'
 import ControlTable                 from './controls/ControlTable.vue'
+import ControlDiagnostics           from './controls/ControlDiagnostics.vue'
+import type { DiagnosticIssue }     from '../types/schema'
 
 const props = defineProps<{
   title?: string
@@ -29,6 +33,7 @@ const props = defineProps<{
   guid?:        string
   serviceBase?: string
   activeActionId?: string | null
+  diagnostics?: DiagnosticIssue[]
 }>()
 
 const emit = defineEmits<{
@@ -228,6 +233,22 @@ function isControlVisible(control: Control): boolean {
               @update:model-value="emit('update:state', control.id, $event)"
             />
 
+            <ControlSyncTimer
+              v-else-if="control.type === 'sync_timer'"
+              :title="control.title"
+              :model-value="state[control.id] ?? ''"
+              :service-base="serviceBase"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlCustomSync
+              v-else-if="control.type === 'custom_sync'"
+              :title="control.title"
+              :model-value="state[control.id] ?? ''"
+              :options="control.options"
+              @update:model-value="emit('update:state', control.id, $event)"
+            />
+
             <ControlSiteTimezones
               v-else-if="control.type === 'site_timezones'"
               :title="control.title"
@@ -246,6 +267,11 @@ function isControlVisible(control: Control): boolean {
               :guid="guid"
               :service-base="serviceBase"
               @update:model-value="emit('update:state', control.id, $event)"
+            />
+
+            <ControlDiagnostics
+              v-else-if="control.type === 'diagnostics'"
+              :diagnostics="diagnostics"
             />
 
             <ControlMultiselectDynamic

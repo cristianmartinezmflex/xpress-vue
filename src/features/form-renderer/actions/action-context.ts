@@ -5,7 +5,6 @@ export interface ActionContext {
   state:             Record<string, any>
   serviceBase:       string
   schemaKey?:        string
-  customSyncTables?: string[]
   navigate?:         (path: string) => void
   /** Resets the form controls to their schema defaults (provided by the view). */
   resetToDefaults?:  () => void

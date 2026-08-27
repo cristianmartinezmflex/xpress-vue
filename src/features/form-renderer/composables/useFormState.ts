@@ -48,9 +48,9 @@ function coerceValue(value: any, control: Control): any {
     return typeof value === 'string' ? value : ''
   }
 
-  // table: a JSON array of row objects. Normalize to a JSON string so the control (and dirty-tracking)
-  // work on a stable string; the control parses/serializes it.
-  if (control.type === 'table') {
+  // table / custom_sync: a JSON array of row objects. Normalize to a JSON string so the control (and
+  // dirty-tracking) work on a stable string; the control parses/serializes it.
+  if (control.type === 'table' || control.type === 'custom_sync') {
     if (typeof value === 'string') return value
     if (Array.isArray(value)) return JSON.stringify(value)
     return '[]'

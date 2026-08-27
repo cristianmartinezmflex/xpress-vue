@@ -3,7 +3,6 @@ import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FormRenderer from '@/features/form-renderer/components/FormRenderer.vue'
 import DialogMessage    from '@/features/form-renderer/components/DialogMessage.vue'
-import CustomSyncDialog from '@/features/form-renderer/components/CustomSyncDialog.vue'
 import type { FormSchema } from '@/features/form-renderer/types/schema'
 import { useDmActions } from '@/features/form-renderer/composables/useDmActions'
 
@@ -45,6 +44,9 @@ const title = computed(() =>
   schema.value?.title ?? prettifyKey((route.params.schema as string) ?? 'Form'),
 )
 
+// Header shows the data manager type in uppercase, e.g. "Type: ONGUARD".
+const typeLabel = computed(() => `Type: ${String(route.params.schema ?? '').toUpperCase()}`)
+
 async function loadSchema(key: string) {
   loading.value  = true
   notFound.value = false
@@ -59,7 +61,7 @@ async function loadSchema(key: string) {
   // GET /api/data-managers/{guid}/settings-schema. Every other DM keeps using its static
   // src/data/<key>.json for now. Falls back to the static schema if the endpoint is unavailable.
   // Compared case-insensitively because the route key is the ./data filename (e.g. "ONGUARD").
-  const SERVICE_SCHEMA_KEYS = new Set(['genetec', 'onguard'])
+  const SERVICE_SCHEMA_KEYS = new Set(['genetec', 'onguard', 'gallagher'])
 
   let schemaFromService = false
   if (guid && SERVICE_SCHEMA_KEYS.has(key.toLowerCase())) {
@@ -118,7 +120,6 @@ const { dispatch } = useDmActions(() => ({
   state:            formRenderer.value?.state ?? {},
   serviceBase:      DM_SERVICE_BASE,
   schemaKey:        route.params.schema as string,
-  customSyncTables: schema.value?.customSyncTables,
   navigate:         (path: string) => router.push(path),
   resetToDefaults:  () => formRenderer.value?.resetToDefaults(),
 }))
@@ -160,7 +161,7 @@ async function handleAction(id: string, handler: string, payload?: unknown) {
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
-      <h1 class="text-base font-semibold text-gray-800">{{ title }}</h1>
+      <h1 class="text-base font-semibold text-gray-800">{{ typeLabel }}</h1>
 
       <!-- Save result indicator -->
       <span
@@ -221,7 +222,6 @@ async function handleAction(id: string, handler: string, payload?: unknown) {
     />
 
     <DialogMessage />
-    <CustomSyncDialog />
 
   </div>
 </template>

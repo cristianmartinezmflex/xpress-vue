@@ -1,12 +1,13 @@
-// dm-shared-actions — actions COMMON to every Data Manager.
+// dm-shared-actions — the few actions COMMON to every Data Manager.
 //
-// Naming convention: every exported function is named `dm_shared_{fn}` and matches
-// exactly the onClick value used in JSON schemas, e.g. onClick="dm_shared_runFullSync".
-// Data-Manager-specific actions do NOT live here — they live in their own file
-// (genetec.ts, on-guard.ts, …) and are dispatched by prefix (see useDmActions.ts).
+// Only three remain: `dm_shared_save` (Save), `dm_shared_setDefaults` (Defaults) and the generic
+// `dm_shared_runAction`, which every button_bar button routes through to hit its declared `action`
+// (verb + URL) REST endpoint. Sync/activity/etc. buttons are plain REST `action`s now — there are no
+// per-operation onClick handlers here anymore.
+// Naming convention: every exported function is `dm_shared_{fn}`, matching the onClick used by the
+// two special action-bar buttons (Save/Defaults). Buttons in the schema use `action`, not `onClick`.
 
 import { useDialog }           from '../composables/useDialog'
-import { useCustomSyncDialog } from '../composables/useCustomSyncDialog'
 import type { ActionContext }  from './action-context'
 
 export type { ActionContext, ActionFn } from './action-context'
@@ -161,101 +162,3 @@ export async function dm_shared_runAction({ guid, serviceBase, payload }: Action
   }
 }
 
-// ─── Sync (fire & forget) ─────────────────────────────────────────────────────
-
-export async function dm_shared_runFullSync({ guid, serviceBase }: ActionContext): Promise<void> {
-  if (!guid) { alert('No GUID provided — cannot run sync.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync?syncType=FULL_SYNC`, { method: 'POST' })
-  if (!res.ok) alert(`Error starting full sync: the service returned ${res.status}`)
-}
-
-export async function dm_shared_runPartialSync({ guid, serviceBase }: ActionContext): Promise<void> {
-  if (!guid) { alert('No GUID provided — cannot run sync.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync?syncType=PARTIAL_SYNC`, { method: 'POST' })
-  if (!res.ok) alert(`Error starting partial sync: the service returned ${res.status}`)
-}
-
-export function dm_shared_runCustomSync({ guid, state, serviceBase, customSyncTables }: ActionContext): void {
-  if (!guid) { alert('No GUID provided — cannot run sync.'); return }
-  const currentJson = state['custom_sync_settings'] as string | undefined
-  useCustomSyncDialog().show(currentJson, async (tables) => {
-    state['custom_sync_settings'] = JSON.stringify(tables)
-    const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync?syncType=CUSTOM_SYNC`, {
-      method: 'POST',
-      headers: JSON_HEADERS,
-      body: JSON.stringify(tables),
-    })
-    if (!res.ok) alert(`Error starting custom sync: the service returned ${res.status}`)
-  }, customSyncTables)
-}
-
-// ─── Sync (wait for result) ───────────────────────────────────────────────────
-
-export async function dm_shared_runFullSyncForResult({ guid, serviceBase }: ActionContext): Promise<void> {
-  if (!guid) { alert('No GUID provided — cannot run sync.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync-for-result?syncType=FULL_SYNC`, { method: 'POST' })
-  if (!res.ok) {
-    const result = await res.json().catch(() => null)
-    alert(`Sync failed: ${result?.Error ?? `The service returned ${res.status}`}`)
-  }
-}
-
-export async function dm_shared_runPartialSyncForResult({ guid, serviceBase }: ActionContext): Promise<void> {
-  if (!guid) { alert('No GUID provided — cannot run sync.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/run-sync-for-result?syncType=PARTIAL_SYNC`, { method: 'POST' })
-  if (!res.ok) {
-    const result = await res.json().catch(() => null)
-    alert(`Sync failed: ${result?.Error ?? `The service returned ${res.status}`}`)
-  }
-}
-
-// ─── Status ───────────────────────────────────────────────────────────────────
-
-export async function dm_shared_getSyncStatus({ guid, serviceBase }: ActionContext): Promise<void> {
-  if (!guid) { alert('No GUID provided — cannot get sync status.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/sync-status`)
-  if (!res.ok) { alert(`Error getting status: the service returned ${res.status}`); return }
-  const result = await res.json()
-  alert(`Sync status: ${JSON.stringify(result, null, 2)}`)
-}
-
-// ─── Cancel ───────────────────────────────────────────────────────────────────
-
-export async function dm_shared_cancelSync({ guid, serviceBase }: ActionContext): Promise<void> {
-  if (!guid) { alert('No GUID provided — cannot cancel sync.'); return }
-  const res = await fetch(`${serviceBase}/api/data-managers/${guid}/cancel-sync?syncType=FULL_SYNC`, { method: 'POST' })
-  if (!res.ok) alert(`Error canceling sync: the service returned ${res.status}`)
-}
-
-// ─── Navigation ───────────────────────────────────────────────────────────────
-
-export function dm_shared_setupDataManager({ guid, schemaKey, navigate }: ActionContext): void {
-  if (!guid || !schemaKey) return
-  const path = `/form/${schemaKey}?guid=${guid}`
-  if (navigate) navigate(path)
-  else window.location.href = path
-}
-
-// ─── Custom Sync Editor ──────────────────────────────────────────────────────
-
-export function dm_shared_editCustomSync({ guid, state, serviceBase, customSyncTables }: ActionContext): void {
-  const currentJson = state['custom_sync_settings'] as string | undefined
-  useCustomSyncDialog().show(currentJson, async (tables) => {
-    const json = JSON.stringify(tables)
-    state['custom_sync_settings'] = json
-    if (guid) {
-      await fetch(`${serviceBase}/api/data-managers/${guid}`, {
-        method: 'PUT',
-        headers: JSON_HEADERS,
-        body: JSON.stringify(state),
-      })
-    }
-  }, customSyncTables)
-}
-
-// ─── Activity ─────────────────────────────────────────────────────────────────
-
-export async function dm_shared_sendActivitySync({ serviceBase }: ActionContext): Promise<void> {
-  const res = await fetch(`${serviceBase}/api/data-managers/send-activity-sync`, { method: 'POST' })
-  if (!res.ok) alert(`Error in activity sync: the service returned ${res.status}`)
-}

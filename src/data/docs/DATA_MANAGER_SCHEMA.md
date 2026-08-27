@@ -8,15 +8,15 @@ This document explains how to write the JSON schema that drives the Vue form UI 
 
 ```json
 {
-  "tabs": [ ...Tab ],
-  "customSyncTables": [ "TableName1", "TableName2" ]
+  "tabs": [ ...Tab ]
 }
 ```
 
 | Field | Type | Description |
 |---|---|---|
 | `tabs` | `Tab[]` | Required. One entry per tab rendered in the DM settings UI. |
-| `customSyncTables` | `string[]` | Optional. List of table names shown in the "Edit Custom Sync" dialog, triggered by right-clicking the Custom Sync button. |
+
+> The list of syncable entities offered by a `custom_sync` control comes from that control's own `options` (`[{ id, name }]`). For typed DMs this is generated from `DataManagerSettingCustomSyncEntities` (base default, overridable per DM); a static JSON schema declares the `options` directly on its `custom_sync` control.
 
 ---
 

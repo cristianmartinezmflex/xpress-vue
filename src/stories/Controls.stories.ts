@@ -156,19 +156,17 @@ export const ButtonBar = story(
     type: 'button_bar',
     buttons: [
       { id: 'btn_update_panels', title: 'Update Panel List', verb: 'POST', action: '/api/data-managers/{dmId}/update-panels', tooltip: 'Botón REST: pega a la URL de `action` (con {dmId} reemplazado).' },
-      { id: 'btn_custom', title: 'Custom Sync Now', onClick: 'dm_shared_runCustomSync', rightClickMenu: [{ label: 'Edit Custom Sync', onClick: 'dm_shared_editCustomSync' }] },
+      { id: 'btn_full_sync',     title: 'Full Sync Now',      verb: 'POST', action: '/api/data-managers/{dmId}/run-sync?syncType=FULL_SYNC', tooltip: 'Otro botón REST: dispara un sync vía run-sync.' },
     ],
   },
   {
-    note: 'El primer botón es REST ({verb, action}); el segundo usa un handler front compartido (onClick). Mientras la acción corre, el botón muestra spinner y se deshabilita.',
+    note: 'Los botones ejecutan su `action` REST (verb + URL) vía el handler genérico dm_shared_runAction. Mientras la acción corre, el botón muestra spinner y se deshabilita.',
     docs: [
       '**Uso:** fila de botones de acción (sync, actualizar listas del sistema externo, mantenimiento, etc.).',
       '',
-      '**Props soportadas:** `buttons` — array de `{ id, title, tooltip?, enable?, rightClickMenu? }` **más una de estas dos formas de acción**:',
-      '- **REST:** `{ verb, action }` — `verb` (default `POST`) + `action` (URL, puede contener `{dmId}`). Al clickear se hace `verb <serviceBase><action>`. Forma recomendada (OnGuard/Genetec).',
-      '- **Handler front:** `onClick` — nombre resuelto por prefijo `dm_shared_*`.',
+      '**Props soportadas:** `buttons` — array de `{ id, title, verb, action, tooltip?, enable? }`:',
+      '- `{ verb, action }` — `verb` (default `POST`) + `action` (URL, puede contener `{dmId}`). Al clickear se hace `verb <serviceBase><action>` vía `dm_shared_runAction`. Es la forma estándar.',
       '- `enable` por botón acepta expresión contra el state.',
-      '- `rightClickMenu` agrega un menú contextual (click derecho) con items `{ label, onClick }`.',
       '- **Loading:** el botón cuya acción está en vuelo muestra un spinner y queda deshabilitado.',
     ].join('\n'),
   },

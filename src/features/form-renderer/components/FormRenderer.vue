@@ -1,35 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import type { FormSchema, Control, Button, Tab } from '../types/schema'
+import type { FormSchema, Control, Tab } from '../types/schema'
 import { useFormState } from '../composables/useFormState'
 import { evaluateEnable, evaluateDisplay } from '../composables/useDisabled'
 import { useCentrifugo } from '../composables/useCentrifugo'
 import FormSection from './FormSection.vue'
 
-// Sync operations are common to EVERY Data Manager, so the whole "Sync" tab is fixed here
-// in the component (prepended to the DM's own tabs) instead of being declared in each DM JSON.
-const COMMON_SYNC_BUTTONS: Button[] = [
-  { id: 'btn_partial_sync', title: 'Partial Sync Now', onClick: 'dm_shared_runPartialSync', tooltip: 'Pull the latest table changes from the external system. Partial syncs are incremental changes to Users and Badges, if allowed by the external system\'s API.' },
-  { id: 'btn_full_sync',    title: 'Full Sync Now',    onClick: 'dm_shared_runFullSync',    tooltip: 'Pull all records from the external system. Replaces the full local dataset with the current state of the external system.' },
-  { id: 'btn_custom_sync',  title: 'Custom Sync Now',  onClick: 'dm_shared_runCustomSync',  tooltip: 'Run a custom sync operation defined by this data manager. Right-click to edit the custom sync tables.', rightClickMenu: [{ label: 'Edit Custom Sync', onClick: 'dm_shared_editCustomSync' }] },
-]
-
-const SYNC_TAB: Tab = {
-  title: 'Sync',
-  sections: [
-    {
-      title: 'Sync Operations',
-      columns: [
-        {
-          controls: [
-            { id: 'sync_buttons', type: 'button_bar', buttons: COMMON_SYNC_BUTTONS },
-            { id: 'sync_log',     type: 'log_view' },
-          ],
-        },
-      ],
-    },
-  ],
-}
+// The whole "Sync" tab (Enable Data Manager, Disable Concurrent Syncs, the 5 sync timers, the "run
+// now" button row and the live log) is common to every DM and comes ENTIRELY from the schema — it is
+// declared on the base DataManagerSettings and laid out by DataManagerSettings.layout.json. Nothing
+// about it is hardcoded here.
 
 const props = defineProps<{
   schema:         FormSchema
@@ -49,8 +29,53 @@ const emit = defineEmits<{ action: [id: string, handler: string, payload?: unkno
 
 const activeTab = ref(0)
 
-// The fixed generic Sync tab always comes first, then the Data Manager's own tabs.
-const allTabs = computed<Tab[]>(() => [SYNC_TAB, ...props.schema.tabs])
+// The sync operations block (the "run now" buttons + the live log) is defined in the schema (base
+// DataManagerSettings), but must appear FIXED at the end of EVERY tab as one card. So we pull those
+// two controls out of wherever the schema placed them and render them as a persistent footer.
+const FOOTER_IDS = ['sync_now_buttons', 'sync_log']
+
+// The footer controls, in a fixed render order (log on top, the "run now" buttons below it), taken
+// from the schema.
+const FOOTER_ORDER = ['sync_log', 'sync_now_buttons']
+const footerControls = computed<Control[]>(() => {
+  const byId: Record<string, Control> = {}
+  props.schema.tabs.forEach((t) => t.sections?.forEach((s) => s.columns?.forEach((c) =>
+    c.controls?.forEach((ct) => { if (FOOTER_IDS.includes(ct.id)) byId[ct.id] = ct }))))
+  return FOOTER_ORDER.map((id) => byId[id]).filter(Boolean)
+})
+
+// Schema tabs with the footer controls removed (and any section/column left empty by that removal
+// dropped), so they render only in the footer, never inline.
+const allTabs = computed<Tab[]>(() => {
+  const stripped = props.schema.tabs.map((tab) => ({
+    ...tab,
+    sections: (tab.sections ?? [])
+      .map((s) => ({
+        ...s,
+        columns: (s.columns ?? [])
+          .map((c) => ({ ...c, controls: (c.controls ?? []).filter((ct) => !FOOTER_IDS.includes(ct.id)) }))
+          .filter((c) => (c.controls?.length ?? 0) > 0),
+      }))
+      .filter((s) => (s.columns?.length ?? 0) > 0),
+  }))
+  // The common "Custom Sync" tab always goes last (before Diagnostic).
+  const ordered = [
+    ...stripped.filter((t) => t.title !== 'Custom Sync'),
+    ...stripped.filter((t) => t.title === 'Custom Sync'),
+  ]
+  // Diagnostic tab: present only on Debug builds (the schema carries a `diagnostics` key then), always
+  // the very last tab. Synthesized here — it holds a single `diagnostics` control fed from the schema.
+  if (props.schema.diagnostics) {
+    ordered.push({
+      title: 'Diagnostic',
+      sections: [{
+        title: 'Settings Diagnostics',
+        columns: [{ controls: [{ id: '_diagnostics', type: 'diagnostics', title: '' } as Control] }],
+      }],
+    })
+  }
+  return ordered
+})
 
 const visibleTabs = computed(() =>
   allTabs.value.filter((tab) =>
@@ -66,9 +91,6 @@ function isTabEnabled(tab: (typeof visibleTabs.value)[number]): boolean {
 const showTabs   = computed(() => visibleTabs.value.length > 1)
 const currentTab = computed(() => visibleTabs.value[activeTab.value])
 
-// The fixed Sync tab has its own operations (Partial/Full/Custom Sync) and no settings to persist,
-// so the Defaults/Save action bar is irrelevant there — hide it while that tab is active.
-const isSyncTab = computed(() => currentTab.value === SYNC_TAB)
 
 const sections = computed(() =>
   (currentTab.value?.sections ?? []).filter((s) =>
@@ -208,9 +230,8 @@ onBeforeUnmount(() => {
 
     <!-- Sticky action bar: settings actions common to every DM (fixed here), centered.
          Save is the single action (it saves + tests the connection); no Test Connect button.
-         Hidden on the Sync tab, which has no settings to save. -->
+         Shown on every tab now that the Sync tab also holds savable settings. -->
     <div
-      v-if="!isSyncTab"
       class="flex flex-wrap items-center justify-center gap-3 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
       <button
         type="button"
@@ -260,7 +281,7 @@ onBeforeUnmount(() => {
     <!-- pb-72: extra bottom room so controls near the end of a tab (e.g. the customFields combos) have
          space below to open their dropdown downward without being clipped by the viewport bottom. -->
     <div class="flex-1 overflow-y-auto p-6 pb-72">
-      <div v-if="sections.length" class="flex flex-col gap-4 max-w-5xl mx-auto">
+      <div class="flex flex-col gap-4 max-w-5xl mx-auto">
         <FormSection
           v-for="(section, idx) in sections"
           :key="idx"
@@ -273,12 +294,30 @@ onBeforeUnmount(() => {
           :guid="guid"
           :service-base="serviceBase"
           :active-action-id="activeActionId"
+          :diagnostics="schema.diagnostics"
           @update:state="onUpdateState"
           @action="(id, handler, payload) => emit('action', id, handler, payload)"
         />
-      </div>
-      <div v-else class="flex items-center justify-center h-40 text-gray-400 text-sm">
-        No content defined for this tab.
+
+        <div v-if="!sections.length && !footerControls.length" class="flex items-center justify-center h-40 text-gray-400 text-sm">
+          No content defined for this tab.
+        </div>
+
+        <!-- Sync operations (run-now buttons + live log): one card, fixed at the end of EVERY tab.
+             Defined in the schema (base DataManagerSettings), rendered here as a persistent footer. -->
+        <FormSection
+          v-if="footerControls.length"
+          :columns="[{ controls: footerControls }]"
+          :state="state"
+          :errors="errors"
+          :enable="true"
+          :display="true"
+          :guid="guid"
+          :service-base="serviceBase"
+          :active-action-id="activeActionId"
+          @update:state="onUpdateState"
+          @action="(id, handler, payload) => emit('action', id, handler, payload)"
+        />
       </div>
     </div>
 

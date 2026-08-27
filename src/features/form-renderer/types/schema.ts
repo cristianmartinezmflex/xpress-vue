@@ -73,6 +73,9 @@ export type ControlType =
   | 'ip_badge_mappings'
   | 'site_timezones'
   | 'multiselect_dynamic'
+  | 'sync_timer'
+  | 'custom_sync'
+  | 'diagnostics'
   | 'table'
 
 export interface Control {
@@ -128,11 +131,23 @@ export interface SchemaMeta {
   badgeColor?: string
 }
 
+// One settings-hygiene diagnostic emitted by the backend SettingsValidator. Present in the schema
+// only on Debug builds (the "diagnostics" key), and surfaced in the Diagnostic tab.
+export interface DiagnosticIssue {
+  severity:      string
+  code:          string
+  message:       string
+  declaringType?: string
+  propertyName?: string
+  settingKey?:   string | null
+}
+
 export interface FormSchema {
   /** Display title shown in the form header. Falls back to a prettified schema key if omitted. */
   title?: string
   /** Card presentation (icon/badge) used on the Home listing. */
   meta?: SchemaMeta
   tabs: Tab[]
-  customSyncTables?: string[]
+  /** Debug-only settings-hygiene diagnostics (present ⇒ show the Diagnostic tab). */
+  diagnostics?: DiagnosticIssue[]
 }
