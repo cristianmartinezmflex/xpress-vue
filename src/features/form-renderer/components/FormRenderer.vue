@@ -58,11 +58,9 @@ const allTabs = computed<Tab[]>(() => {
       }))
       .filter((s) => (s.columns?.length ?? 0) > 0),
   }))
-  // The common "Custom Sync" tab always goes last (before Diagnostic).
-  const ordered = [
-    ...stripped.filter((t) => t.title !== 'Custom Sync'),
-    ...stripped.filter((t) => t.title === 'Custom Sync'),
-  ]
+  // Tab order comes straight from the schema: the base layout emits "General" then "Custom Sync", and
+  // the per-DM layout's tabs follow — so the effective order is General → Custom Sync → DM-specific.
+  const ordered = [...stripped]
   // Diagnostic tab: present only on Debug builds (the schema carries a `diagnostics` key then), always
   // the very last tab. Synthesized here — it holds a single `diagnostics` control fed from the schema.
   if (props.schema.diagnostics) {
