@@ -144,7 +144,7 @@ export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: Ac
 // maintenance buttons, etc.). ControlButtonBar passes { verb, action, title } as the payload.
 export async function dm_shared_runAction({ guid, serviceBase, payload }: ActionContext): Promise<void> {
   const { show } = useDialog()
-  const p = payload as { verb?: string; action?: string; title?: string } | undefined
+  const p = payload as { verb?: string; action?: string; title?: string; fireAndForget?: boolean } | undefined
   const title = p?.title ?? 'Action'
   if (!p?.action) return
   if (!guid) { show({ success: false, title, message: 'No GUID provided.' }); return }
@@ -154,9 +154,20 @@ export async function dm_shared_runAction({ guid, serviceBase, payload }: Action
   try {
     const res  = await fetch(url, { method: verb })
     const body = await res.json().catch(() => null)
-    const msg  = body?.message ?? body?.Error ?? body?.error ??
-      (res.ok ? 'Completed successfully.' : `The service returned ${res.status}.`)
-    show({ success: res.ok, title, message: oneLine(String(msg)) })
+
+    if (!res.ok) {
+      const msg = body?.message ?? body?.Error ?? body?.error ?? `The service returned ${res.status}.`
+      show({ success: false, title, message: oneLine(String(msg)) })
+      return
+    }
+
+    // Fire-and-forget triggers (the "run now" sync buttons) return as soon as the op is queued — the
+    // sync is still running, so DON'T claim it "Completed successfully". Progress is visible in the live
+    // log and the active-sync indicator. Errors above are still surfaced.
+    if (p.fireAndForget) return
+
+    const msg = body?.message ?? body?.Error ?? body?.error ?? 'Completed successfully.'
+    show({ success: true, title, message: oneLine(String(msg)) })
   } catch {
     show({ success: false, title, message: 'Could not reach the service.' })
   }

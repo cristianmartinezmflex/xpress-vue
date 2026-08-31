@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FormRenderer from '@/features/form-renderer/components/FormRenderer.vue'
+import SyncActionFooter from '@/features/form-renderer/components/SyncActionFooter.vue'
 import DialogMessage    from '@/features/form-renderer/components/DialogMessage.vue'
 import type { FormSchema } from '@/features/form-renderer/types/schema'
 import { useDmActions } from '@/features/form-renderer/composables/useDmActions'
@@ -147,7 +148,7 @@ async function handleAction(id: string, handler: string, payload?: unknown) {
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-full overflow-hidden">
 
     <!-- Header -->
     <div class="flex items-center gap-3 px-6 py-4 bg-white border-b border-gray-200 shrink-0">
@@ -217,7 +218,17 @@ async function handleAction(id: string, handler: string, payload?: unknown) {
       :service-base="DM_SERVICE_BASE"
       :active-action="activeAction"
       :active-action-id="activeActionId"
-      class="flex-1 overflow-hidden"
+      class="flex-1 min-h-0 overflow-hidden"
+      @action="handleAction"
+    />
+
+    <!-- Common sync log + "run now" buttons: fixed, full-width page footer, always visible under the
+         form regardless of the active tab. Not schema-driven (see SyncActionFooter.vue). -->
+    <SyncActionFooter
+      v-if="schema && !loading && !notFound"
+      :guid="route.query.guid as string | undefined"
+      :service-base="DM_SERVICE_BASE"
+      :active-action-id="activeActionId"
       @action="handleAction"
     />
 

@@ -29,38 +29,12 @@ const emit = defineEmits<{ action: [id: string, handler: string, payload?: unkno
 
 const activeTab = ref(0)
 
-// The sync operations block (the "run now" buttons + the live log) is defined in the schema (base
-// DataManagerSettings), but must appear FIXED at the end of EVERY tab as one card. So we pull those
-// two controls out of wherever the schema placed them and render them as a persistent footer.
-const FOOTER_IDS = ['sync_now_buttons', 'sync_log']
-
-// The footer controls, in a fixed render order (log on top, the "run now" buttons below it), taken
-// from the schema.
-const FOOTER_ORDER = ['sync_log', 'sync_now_buttons']
-const footerControls = computed<Control[]>(() => {
-  const byId: Record<string, Control> = {}
-  props.schema.tabs.forEach((t) => t.sections?.forEach((s) => s.columns?.forEach((c) =>
-    c.controls?.forEach((ct) => { if (FOOTER_IDS.includes(ct.id)) byId[ct.id] = ct }))))
-  return FOOTER_ORDER.map((id) => byId[id]).filter(Boolean)
-})
-
-// Schema tabs with the footer controls removed (and any section/column left empty by that removal
-// dropped), so they render only in the footer, never inline.
+// Tab order comes straight from the schema: the base layout emits "General" then "Custom Sync", and
+// the per-DM layout's tabs follow — so the effective order is General → Custom Sync → DM-specific.
+// (The live log + "run now" buttons are no longer schema controls — they live in the page-level
+// SyncActionFooter rendered by FormView, always visible at the bottom of the page.)
 const allTabs = computed<Tab[]>(() => {
-  const stripped = props.schema.tabs.map((tab) => ({
-    ...tab,
-    sections: (tab.sections ?? [])
-      .map((s) => ({
-        ...s,
-        columns: (s.columns ?? [])
-          .map((c) => ({ ...c, controls: (c.controls ?? []).filter((ct) => !FOOTER_IDS.includes(ct.id)) }))
-          .filter((c) => (c.controls?.length ?? 0) > 0),
-      }))
-      .filter((s) => (s.columns?.length ?? 0) > 0),
-  }))
-  // Tab order comes straight from the schema: the base layout emits "General" then "Custom Sync", and
-  // the per-DM layout's tabs follow — so the effective order is General → Custom Sync → DM-specific.
-  const ordered = [...stripped]
+  const ordered = [...props.schema.tabs]
   // Diagnostic tab: present only on Debug builds (the schema carries a `diagnostics` key then), always
   // the very last tab. Synthesized here — it holds a single `diagnostics` control fed from the schema.
   if (props.schema.diagnostics) {
@@ -96,9 +70,9 @@ const sections = computed(() =>
   ),
 )
 
-const { state, errors, validate, resetToDefaults, isDirty, markPristine } = useFormState(props.schema, props.initialValues)
+const { state, errors, validate, resetToDefaults, revertChanges, isDirty, markPristine } = useFormState(props.schema, props.initialValues)
 
-defineExpose({ state, resetToDefaults, markPristine })
+defineExpose({ state, resetToDefaults, revertChanges, markPristine })
 
 const controlMap = computed<Record<string, Control>>(() => {
   const map: Record<string, Control> = {}
@@ -230,7 +204,7 @@ onBeforeUnmount(() => {
          Save is the single action (it saves + tests the connection); no Test Connect button.
          Shown on every tab now that the Sync tab also holds savable settings. -->
     <div
-      class="flex flex-wrap items-center justify-center gap-3 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
+      class="flex flex-wrap items-center justify-end gap-3 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
       <button
         type="button"
         class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
@@ -263,6 +237,22 @@ onBeforeUnmount(() => {
         {{ isSaving ? 'Saving…' : 'Save' }}
       </button>
 
+      <!-- Cancel: revert every field to the values loaded from the service (discard unsaved edits),
+           leaving the form not-dirty. WinForm parity (frmSettings1.btnCancel_Click → LoadData). Does
+           NOT navigate away. Enabled only while there are unsaved changes. -->
+      <button
+        type="button"
+        :disabled="!isDirty || isSaving"
+        class="px-4 py-2 text-sm font-medium rounded-lg border transition"
+        :class="(isDirty && !isSaving)
+          ? 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 cursor-pointer'
+          : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'"
+        :title="isDirty ? 'Discard unsaved changes and restore the loaded values' : 'No changes to cancel'"
+        @click="revertChanges"
+      >
+        Cancel
+      </button>
+
       <!-- Active-sync indicator: only shown while a sync is running for this DM (WinForm parity). -->
       <div
         v-if="isSyncing"
@@ -276,9 +266,9 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- Tab content -->
-    <!-- pb-72: extra bottom room so controls near the end of a tab (e.g. the customFields combos) have
-         space below to open their dropdown downward without being clipped by the viewport bottom. -->
-    <div class="flex-1 overflow-y-auto p-6 pb-72">
+    <!-- pb-16: modest bottom room so a dropdown near the end of a tab still has space; kept small so the
+         content sits close to the fixed page footer. -->
+    <div class="flex-1 overflow-y-auto p-6 pb-16">
       <div class="flex flex-col gap-4 max-w-5xl mx-auto">
         <FormSection
           v-for="(section, idx) in sections"
@@ -297,25 +287,9 @@ onBeforeUnmount(() => {
           @action="(id, handler, payload) => emit('action', id, handler, payload)"
         />
 
-        <div v-if="!sections.length && !footerControls.length" class="flex items-center justify-center h-40 text-gray-400 text-sm">
+        <div v-if="!sections.length" class="flex items-center justify-center h-40 text-gray-400 text-sm">
           No content defined for this tab.
         </div>
-
-        <!-- Sync operations (run-now buttons + live log): one card, fixed at the end of EVERY tab.
-             Defined in the schema (base DataManagerSettings), rendered here as a persistent footer. -->
-        <FormSection
-          v-if="footerControls.length"
-          :columns="[{ controls: footerControls }]"
-          :state="state"
-          :errors="errors"
-          :enable="true"
-          :display="true"
-          :guid="guid"
-          :service-base="serviceBase"
-          :active-action-id="activeActionId"
-          @update:state="onUpdateState"
-          @action="(id, handler, payload) => emit('action', id, handler, payload)"
-        />
       </div>
     </div>
 

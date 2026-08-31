@@ -208,10 +208,13 @@ function isControlVisible(control: Control): boolean {
               :value-header="control.value_header"
               :load-from="control.loadFrom"
               :destination-load-from="control.destinationLoadFrom"
+              :check-columns="control.checkColumns"
+              :state="state"
               :guid="guid"
               :service-base="serviceBase"
               :model-value="state[control.id] ?? []"
               @update:model-value="emit('update:state', control.id, $event)"
+              @update:state-key="(key, value) => emit('update:state', key, value)"
             />
 
             <ControlSocketInterfaces

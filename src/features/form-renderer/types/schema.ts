@@ -50,6 +50,9 @@ export interface Button {
   tooltip?:         string
   rightClickMenu?:  ContextMenuItem[]
   enable?:          EnableProp
+  // REST button that only TRIGGERS a long-running async op (e.g. a sync): the request returns
+  // immediately, so no "Completed successfully" dialog is shown — only an error if the trigger fails.
+  fireAndForget?:   boolean
 }
 
 export interface KeyValuePair {
@@ -91,6 +94,9 @@ export interface Control {
   key_header?: string
   value_title?: string
   value_header?: string
+  // customFields: optional extra per-row BOOLEAN column(s). Each column's checked source fields
+  // round-trip as a CSV in its own separate form-state key (e.g. OnGuard "Map ID to Value").
+  checkColumns?: { header: string; key: string }[]
   entity?: string              // customFields: which local entity the mapping targets (Users/Badges/...)
   destinationLoadFrom?: string // customFields: source for the "Destination Columns" (XPressEntry fields)
   loadFrom?: string   // select_dynamic/multiselect_dynamic/customFields source (options fetched from the API):

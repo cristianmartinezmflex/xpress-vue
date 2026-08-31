@@ -5,6 +5,7 @@
  * from the API at runtime use `select_dynamic` instead.
  */
 import type { SelectOption } from '../../types/schema'
+import { truncateLabel } from '../../utils/text'
 
 defineProps<{
   title?: string
@@ -20,7 +21,7 @@ defineEmits<{ 'update:modelValue': [value: string | number] }>()
     <label v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</label>
     <select
       :value="modelValue"
-      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
+      class="w-full max-w-full truncate rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
       :class="{ 'border-xp-red': error }"
       @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
     >
@@ -28,7 +29,8 @@ defineEmits<{ 'update:modelValue': [value: string | number] }>()
         v-for="opt in options"
         :key="opt.id"
         :value="opt.id"
-      >{{ opt.name }}</option>
+        :title="opt.name"
+      >{{ truncateLabel(opt.name) }}</option>
     </select>
     <p v-if="error" class="text-xs text-xp-red">{{ error }}</p>
   </div>

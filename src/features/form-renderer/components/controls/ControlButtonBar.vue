@@ -24,7 +24,7 @@ function isButtonLoading(btn: Button): boolean {
 // REST buttons are routed through the generic dm_shared_runAction handler, which hits the action URL.
 function onButtonClick(btn: Button) {
   if (btn.onClick) emit('action', btn.id, btn.onClick)
-  else if (btn.action) emit('action', btn.id, 'dm_shared_runAction', { verb: btn.verb, action: btn.action, title: btn.title })
+  else if (btn.action) emit('action', btn.id, 'dm_shared_runAction', { verb: btn.verb, action: btn.action, title: btn.title, fireAndForget: btn.fireAndForget })
 }
 
 // Tooltip state

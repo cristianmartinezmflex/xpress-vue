@@ -158,8 +158,22 @@ export function useFormState(schema: FormSchema, initialValues?: Record<string, 
 
   const isDirty = computed(() => snapshot() !== baseline.value)
 
+  /**
+   * Reverts every field back to the pristine baseline — the values loaded from the service (or the
+   * state at the last successful save). Discards unsaved edits and leaves the form not-dirty. This is
+   * the WinForm "Cancel" behavior (frmSettings1.btnCancel_Click → LoadData), distinct from
+   * resetToDefaults (which goes to the schema's default values).
+   */
+  function revertChanges(): void {
+    let base: Record<string, any>
+    try { base = JSON.parse(baseline.value || '{}') } catch { return }
+    // Drop keys added since the baseline, then restore the baseline values.
+    for (const k of Object.keys(state)) if (!(k in base)) delete state[k]
+    Object.assign(state, base)
+  }
+
   initState()
   markPristine()
 
-  return { state, errors: readonly(errors), validate, resetToDefaults, isDirty, markPristine }
+  return { state, errors: readonly(errors), validate, resetToDefaults, revertChanges, isDirty, markPristine }
 }

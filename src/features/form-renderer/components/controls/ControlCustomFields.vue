@@ -23,8 +23,31 @@ const props = defineProps<{
   guid?:                string
   serviceBase?:         string
   modelValue:           KeyValuePair[]
+  // Optional extra per-row boolean column(s). Each column's checked source fields round-trip as a CSV
+  // in its own separate form-state key (e.g. OnGuard "Map ID to Value" → customFieldsMappingEnabled).
+  checkColumns?:        { header: string; key: string }[]
+  state?:               Record<string, any>
 }>()
-const emit = defineEmits<{ 'update:modelValue': [value: KeyValuePair[]] }>()
+const emit = defineEmits<{
+  'update:modelValue': [value: KeyValuePair[]]
+  'update:stateKey':   [key: string, value: any]   // update an arbitrary form-state key (a check column's CSV)
+}>()
+
+const checkCols = computed(() => props.checkColumns ?? [])
+
+// Each check column stores its checked SOURCE fields as a CSV in its own state key (WinForm parity).
+function csvToSet(v: any): Set<string> {
+  return new Set(String(v ?? '').split(',').map((s) => s.trim()).filter(Boolean))
+}
+function isColChecked(colKey: string, sourceField: string): boolean {
+  return csvToSet(props.state?.[colKey]).has(sourceField)
+}
+function toggleCol(colKey: string, sourceField: string, checked: boolean) {
+  const set = csvToSet(props.state?.[colKey])
+  if (checked) set.add(sourceField)
+  else set.delete(sourceField)
+  emit('update:stateKey', colKey, [...set].join(','))
+}
 
 // Title: an explicit title wins; otherwise derive a generic one from the entity ("Users Custom Mapping",
 // "Badges Custom Mapping", …). Falls back to nothing when neither is provided.
@@ -136,7 +159,17 @@ function addMapping() {
 }
 
 function removeRow(index: number) {
-  emit('update:modelValue', (props.modelValue ?? []).filter((_, i) => i !== index))
+  const rows = props.modelValue ?? []
+  const removed = rows[index]?.key
+  emit('update:modelValue', rows.filter((_, i) => i !== index))
+  // Prune the removed source field from every check column (mirrors the WinForm rebuilding the CSV from
+  // the rows present at save time).
+  if (removed) {
+    for (const col of checkCols.value) {
+      const set = csvToSet(props.state?.[col.key])
+      if (set.delete(removed)) emit('update:stateKey', col.key, [...set].join(','))
+    }
+  }
 }
 </script>
 
@@ -246,6 +279,11 @@ function removeRow(index: number) {
           <tr>
             <th class="text-left px-3 py-2 font-medium text-gray-600">{{ keyHeader ?? 'Source Field' }}</th>
             <th class="text-left px-3 py-2 font-medium text-gray-600">{{ valueHeader ?? 'XPressEntry Field' }}</th>
+            <th
+              v-for="col in checkCols"
+              :key="col.key"
+              class="text-center px-3 py-2 font-medium text-gray-600 whitespace-nowrap"
+            >{{ col.header }}</th>
             <th class="w-8"></th>
           </tr>
         </thead>
@@ -257,6 +295,14 @@ function removeRow(index: number) {
           >
             <td class="px-3 py-2">{{ row.key }}</td>
             <td class="px-3 py-2">{{ row.value }}</td>
+            <td v-for="col in checkCols" :key="col.key" class="px-3 py-2 text-center">
+              <input
+                type="checkbox"
+                class="w-4 h-4 rounded accent-xp-primary cursor-pointer"
+                :checked="isColChecked(col.key, row.key)"
+                @change="toggleCol(col.key, row.key, ($event.target as HTMLInputElement).checked)"
+              />
+            </td>
             <td class="px-3 py-2 text-center">
               <button
                 type="button"
@@ -266,7 +312,7 @@ function removeRow(index: number) {
             </td>
           </tr>
           <tr v-if="(modelValue ?? []).length === 0">
-            <td colspan="3" class="px-3 py-4 text-center text-gray-400 text-sm">No field mappings</td>
+            <td :colspan="3 + checkCols.length" class="px-3 py-4 text-center text-gray-400 text-sm">No field mappings</td>
           </tr>
         </tbody>
       </table>

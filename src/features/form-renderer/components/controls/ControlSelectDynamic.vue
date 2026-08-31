@@ -6,6 +6,7 @@
  */
 import { ref, onMounted } from 'vue'
 import { resolveLoadFromUrl } from '../../utils/loadFrom'
+import { truncateLabel } from '../../utils/text'
 
 const props = defineProps<{
   title?:      string
@@ -53,7 +54,7 @@ function onChange(e: Event) {
     <div class="relative">
       <select
         :value="modelValue"
-        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
+        class="w-full max-w-full truncate rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary"
         :class="[{ 'border-xp-red': error }, loading ? 'pr-9 text-gray-400' : '']"
         :disabled="loading"
         @change="onChange"
@@ -61,7 +62,7 @@ function onChange(e: Event) {
         <!-- Blank "unset" option — mirrors the WinForm (empty combo when no value is set). -->
         <option :value="-1"></option>
         <option v-if="loading" value="" disabled>Loading…</option>
-        <option v-for="opt in options" :key="opt.id" :value="opt.id">{{ opt.name }}</option>
+        <option v-for="opt in options" :key="opt.id" :value="opt.id" :title="opt.name">{{ truncateLabel(opt.name) }}</option>
       </select>
       <!-- Spinner overlaid at the right while the option list is being fetched from the API. -->
       <svg
