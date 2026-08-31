@@ -117,16 +117,25 @@ async function loadInto(url: string | null, combo: Combo) {
   }
 }
 
-onMounted(() => {
+// (Re)load both combos from the API. Runs on mount and whenever a "reload custom fields" signal fires
+// (the "Load Genetec Custom Fields" button re-fetches the live source fields, mirroring the WinForm).
+function loadCombos() {
+  loadErr.msg = ''
   loadInto(resolveLoadFromUrl(effectiveLoadFrom.value, props.serviceBase ?? '', props.guid), source)
   loadInto(resolveLoadFromUrl(effectiveDestinationLoadFrom.value, props.serviceBase ?? '', props.guid), dest)
+}
+
+onMounted(() => {
+  loadCombos()
   window.addEventListener('scroll', reposition, true)
   window.addEventListener('resize', reposition)
+  window.addEventListener('dm:reload-custom-fields', loadCombos)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', reposition, true)
   window.removeEventListener('resize', reposition)
+  window.removeEventListener('dm:reload-custom-fields', loadCombos)
 })
 
 // While loading show a loading hint; otherwise the normal prompt.

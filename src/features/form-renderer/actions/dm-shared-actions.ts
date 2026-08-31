@@ -94,6 +94,13 @@ export function dm_shared_setDefaults({ resetToDefaults }: ActionContext): void 
   resetToDefaults?.()
 }
 
+// Re-fetch the source/destination field lists of every customFields control on the page. Mirrors the
+// WinForm "Load Genetec Custom Fields" button (LoadUDFs → re-pulls the live fields via GetTableDataFields).
+// Generic — the customFields controls already auto-load on mount; this just triggers a manual refresh.
+export function dm_shared_reloadCustomFields(): void {
+  window.dispatchEvent(new CustomEvent('dm:reload-custom-fields'))
+}
+
 // ─── Settings ─────────────────────────────────────────────────────────────────
 
 export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: ActionContext): Promise<void> {
