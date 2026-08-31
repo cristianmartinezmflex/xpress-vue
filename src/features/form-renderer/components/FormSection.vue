@@ -8,7 +8,6 @@ import ControlBoolean from './controls/ControlBoolean.vue'
 import ControlNumber from './controls/ControlNumber.vue'
 import ControlNumberSpinner from './controls/ControlNumberSpinner.vue'
 import ControlSelect        from './controls/ControlSelect.vue'
-import ControlSelectDynamic from './controls/ControlSelectDynamic.vue'
 import ControlRadio from './controls/ControlRadio.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
 import ControlCustomFields         from './controls/ControlCustomFields.vue'
@@ -18,7 +17,7 @@ import ControlIpBadgeMappings      from './controls/ControlIpBadgeMappings.vue'
 import ControlSiteTimezones        from './controls/ControlSiteTimezones.vue'
 import ControlSyncTimer            from './controls/ControlSyncTimer.vue'
 import ControlCustomSync           from './controls/ControlCustomSync.vue'
-import ControlMultiselectDynamic    from './controls/ControlMultiselectDynamic.vue'
+import ControlMultiselect          from './controls/ControlMultiselect.vue'
 import ControlTable                 from './controls/ControlTable.vue'
 import ControlDiagnostics           from './controls/ControlDiagnostics.vue'
 import type { DiagnosticIssue }     from '../types/schema'
@@ -155,20 +154,15 @@ function isControlVisible(control: Control): boolean {
               @update:model-value="emit('update:state', control.id, $event)"
             />
 
+            <!-- Unified select: static (options) OR dynamic (dynOptions / legacy loadFrom). The
+                 select_dynamic type is kept only for legacy static-JSON schemas and renders here too. -->
             <ControlSelect
-              v-else-if="control.type === 'select'"
+              v-else-if="control.type === 'select' || control.type === 'select_dynamic'"
               :title="control.title"
-              :model-value="state[control.id]"
+              :model-value="control.dynOptions || control.loadFrom ? (state[control.id] ?? -1) : state[control.id]"
               :options="control.options ?? []"
-              :error="errors[control.id]"
-              @update:model-value="emit('update:state', control.id, $event)"
-            />
-
-            <ControlSelectDynamic
-              v-else-if="control.type === 'select_dynamic'"
-              :title="control.title"
-              :model-value="state[control.id] ?? -1"
-              :load-from="control.loadFrom ?? ''"
+              :dyn-options="control.dynOptions"
+              :load-from="control.loadFrom"
               :guid="guid"
               :service-base="serviceBase"
               :error="errors[control.id]"
@@ -277,10 +271,12 @@ function isControlVisible(control: Control): boolean {
               :diagnostics="diagnostics"
             />
 
-            <ControlMultiselectDynamic
+            <ControlMultiselect
               v-else-if="control.type === 'multiselect_dynamic'"
               :title="control.title"
               :model-value="state[control.id] ?? ''"
+              :options="control.options"
+              :dyn-options="control.dynOptions"
               :load-from="control.loadFrom"
               :separator="control.separator"
               :guid="guid"

@@ -99,9 +99,11 @@ export interface Control {
   checkColumns?: { header: string; key: string }[]
   entity?: string              // customFields: which local entity the mapping targets (Users/Badges/...)
   destinationLoadFrom?: string // customFields: source for the "Destination Columns" (XPressEntry fields)
-  loadFrom?: string   // select_dynamic/multiselect_dynamic/customFields source (options fetched from the API):
+  loadFrom?: string   // multiselect_dynamic / customFields / legacy static-JSON select_dynamic source:
                       //   "shared/<type>" → GET /api/shared/<type>              (DM-agnostic local data)
                       //   "<type>"        → GET .../{guid}/dm-data?type=<type>  (DM-specific data)
+  dynOptions?: string // select: when set, load options dynamically from this source key (same short-form
+                      // convention as loadFrom). Absent ⇒ static `options`. Unifies select + select_dynamic.
   separator?: string  // multiselect_dynamic: token joining selected ids (default ","; "\b"/vbBack for AEOS)
   enable?: EnableProp
   display?: DisplayProp

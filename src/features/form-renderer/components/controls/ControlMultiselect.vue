@@ -1,25 +1,30 @@
 <script setup lang="ts">
 /**
- * ControlMultiselectDynamic
+ * ControlMultiselect — a checkbox multi-select. Unifies static and dynamic options (like Select):
  *
- * A checkbox multi-select whose OPTIONS are auto-loaded from the API on mount (`loadFrom` →
- * `[{ id, name }]`) and whose VALUE is a separator-joined string of the selected option ids.
+ *  - STATIC: pass `options` ([{ id, name }]).
+ *  - DYNAMIC: pass `dynOptions` (a source key, "users"/"shared/zones") OR a legacy full-URL `loadFrom`;
+ *    the list is fetched from the API on mount.
  *
- * Generic and NOT tied to any Data Manager. Any currently-selected id not present in the loaded
- * options is still shown, so a saved selection stays visible before/without the option list.
+ * VALUE is a separator-joined string of the selected option ids (default separator ","). Generic and
+ * NOT tied to any Data Manager. Any selected id not present in the option list is still shown, so a
+ * saved selection is never silently dropped.
  */
 import { computed, ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import type { SelectOption } from '../../types/schema'
 import { resolveLoadFromUrl } from '../../utils/loadFrom'
 
 interface Option { id: string; name: string }
 
 const props = defineProps<{
   title?:      string
-  modelValue:  string        // separator-joined selected ids
-  loadFrom?:   string        // URL to auto-load the option list on mount (like the WinForm's list)
+  modelValue:  string           // separator-joined selected ids
+  options?:    SelectOption[]    // static options (schema-declared)
+  dynOptions?: string           // dynamic source key (preferred)
+  loadFrom?:   string           // legacy dynamic source (full URL / short form) — static JSON schemas
   guid?:       string
   serviceBase?: string
-  separator?:  string        // token joining the selected ids (default ","; e.g. "\b"/vbBack for AEOS)
+  separator?:  string           // token joining the selected ids (default ","; e.g. "\b"/vbBack for AEOS)
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
@@ -29,24 +34,23 @@ const selectedIds = computed<string[]>(() =>
   (props.modelValue ?? '').split(sep.value).map((s) => s.trim()).filter(Boolean),
 )
 
-// Options fetched once on mount from `loadFrom` (mirrors the WinForm showing the current list on open).
-const fetchedOptions = ref<Option[]>([])
+// Options fetched from the API (when a dynamic source is declared). Falls back to the static `options`.
+const fetchedOptions = ref<Option[] | null>(null)
 const loadErr        = ref('')
 const loading        = ref(false)
 
 onMounted(async () => {
-  const url = resolveLoadFromUrl(props.loadFrom, props.serviceBase ?? '', props.guid)
+  const source = props.dynOptions || props.loadFrom
+  const url = resolveLoadFromUrl(source, props.serviceBase ?? '', props.guid)
   if (!url) return
   loading.value = true
   try {
     const res = await fetch(url)
     if (!res.ok) { loadErr.value = `Error ${res.status}`; return }
     const data = await res.json()
-    if (Array.isArray(data)) {
-      fetchedOptions.value = data
-        .map((o: any) => ({ id: String(o?.id ?? ''), name: String(o?.name ?? o?.id ?? '') }))
-        .filter((o) => o.id)
-    }
+    fetchedOptions.value = Array.isArray(data)
+      ? data.map((o: any) => ({ id: String(o?.id ?? ''), name: String(o?.name ?? o?.id ?? '') })).filter((o) => o.id)
+      : []
   } catch {
     loadErr.value = 'Could not load'
   } finally {
@@ -55,10 +59,11 @@ onMounted(async () => {
 })
 
 const options = computed<Option[]>(() => {
-  // Loaded list first, then any saved-but-not-listed ids so a selection is never silently dropped.
+  const src = fetchedOptions.value ?? (props.options ?? []).map((o) => ({ id: String(o.id), name: o.name }))
   const byId = new Map<string, Option>()
-  for (const o of fetchedOptions.value) byId.set(String(o.id), { id: String(o.id), name: o.name })
-  for (const id of selectedIds.value)   if (!byId.has(id)) byId.set(id, { id, name: id })
+  for (const o of src) byId.set(o.id, o)
+  // Keep any saved-but-not-listed ids visible so a selection is never silently dropped.
+  for (const id of selectedIds.value) if (!byId.has(id)) byId.set(id, { id, name: id })
   return [...byId.values()]
 })
 
