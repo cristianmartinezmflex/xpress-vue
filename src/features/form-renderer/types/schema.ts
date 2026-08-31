@@ -75,8 +75,8 @@ export type ControlType =
   | 'socket_interfaces'
   | 'ip_badge_mappings'
   | 'site_timezones'
-  | 'multiselect_dynamic'
-  | 'sync_timer'
+  | 'multiselect'
+  | 'timer'
   | 'custom_sync'
   | 'diagnostics'
   | 'table'
@@ -99,12 +99,12 @@ export interface Control {
   checkColumns?: { header: string; key: string }[]
   entity?: string              // customFields: which local entity the mapping targets (Users/Badges/...)
   destinationLoadFrom?: string // customFields: source for the "Destination Columns" (XPressEntry fields)
-  loadFrom?: string   // multiselect_dynamic / customFields / legacy static-JSON select_dynamic source:
+  loadFrom?: string   // multiselect / customFields / legacy static-JSON select_dynamic source:
                       //   "shared/<type>" → GET /api/shared/<type>              (DM-agnostic local data)
                       //   "<type>"        → GET .../{guid}/dm-data?type=<type>  (DM-specific data)
   dynOptions?: string // select: when set, load options dynamically from this source key (same short-form
                       // convention as loadFrom). Absent ⇒ static `options`. Unifies select + select_dynamic.
-  separator?: string  // multiselect_dynamic: token joining selected ids (default ","; "\b"/vbBack for AEOS)
+  separator?: string  // multiselect: token joining selected ids (default ","; "\b"/vbBack for AEOS)
   enable?: EnableProp
   display?: DisplayProp
   disabled?: boolean

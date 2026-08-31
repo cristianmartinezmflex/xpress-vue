@@ -231,7 +231,7 @@ function isControlVisible(control: Control): boolean {
             />
 
             <ControlSyncTimer
-              v-else-if="control.type === 'sync_timer'"
+              v-else-if="control.type === 'timer'"
               :title="control.title"
               :model-value="state[control.id] ?? ''"
               :service-base="serviceBase"
@@ -272,7 +272,7 @@ function isControlVisible(control: Control): boolean {
             />
 
             <ControlMultiselect
-              v-else-if="control.type === 'multiselect_dynamic'"
+              v-else-if="control.type === 'multiselect'"
               :title="control.title"
               :model-value="state[control.id] ?? ''"
               :options="control.options"

@@ -251,14 +251,14 @@ A group of mutually exclusive radio buttons.
 
 ---
 
-### `multiselect_dynamic`
+### `multiselect`
 
 A multi-select checkbox list (with Select All / Clear All). Options auto-load from `loadFrom` on mount (spinner while loading). Selected values are stored as a separator-joined string of ids.
 
 ```json
 {
   "id": "identifier_types_selected",
-  "type": "multiselect_dynamic",
+  "type": "multiselect",
   "title": "Identifier Types",
   "loadFrom": "shared/badge_types",
   "separator": "\b",

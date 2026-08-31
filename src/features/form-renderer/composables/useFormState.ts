@@ -38,10 +38,10 @@ function coerceValue(value: any, control: Control): any {
     return []
   }
 
-  // multiselect_dynamic: value is a separator-joined string of ids — pass through.
+  // multiselect: value is a separator-joined string of ids — pass through.
   // socket_interfaces / ip_badge_mappings: already a vbBack-separated XML string — pass through.
   if (
-    control.type === 'multiselect_dynamic' ||
+    control.type === 'multiselect' ||
     control.type === 'socket_interfaces' ||
     control.type === 'ip_badge_mappings'
   ) {

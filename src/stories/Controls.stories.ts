@@ -28,7 +28,7 @@ const meta: Meta<typeof ControlShowcase> = {
           '- **REST (recomendada)** — el botón declara `{ verb, action }`: al clickearlo se hace `verb <serviceBase><action>` (con `{dmId}` reemplazado por el guid del DM). No requiere código front. Es la forma que usan OnGuard y Genetec (ej. `check-subscriptions`, `update-panels`, `clear-external-data`).',
           '- **Handler front (`onClick`)** — nombre de una función resuelta **por prefijo**: `dm_shared_*` (compartidas, en `actions/dm-shared-actions.ts`). Los handlers específicos por DM (`aeos_*`, `avigilon_*`, `genetec_*`, `rs2_*`, `on-guard`) fueron eliminados: la carga de campos ahora la hace el propio control (`customFields` con `loadFrom`), no un botón.',
           '',
-          '**Loading:** mientras una acción está en vuelo, el botón que la disparó muestra un spinner y queda deshabilitado (igual que Save). Los dropdowns que cargan de la API (`select_dynamic`, `multiselect_dynamic`, `customFields`) muestran un spinner mientras traen sus opciones.',
+          '**Loading:** mientras una acción está en vuelo, el botón que la disparó muestra un spinner y queda deshabilitado (igual que Save). Los dropdowns que cargan de la API (`select_dynamic`, `multiselect`, `customFields`) muestran un spinner mientras traen sus opciones.',
         ].join('\n'),
       },
     },
@@ -122,7 +122,7 @@ export const SelectDynamic = story(
 )
 
 export const MultiselectDynamic = story(
-  { id: 'panel_filter', type: 'multiselect_dynamic', title: 'Panels', loadFrom: 'panels' },
+  { id: 'panel_filter', type: 'multiselect', title: 'Panels', loadFrom: 'panels' },
   {
     note: 'Las opciones se auto-cargan de la API vía `loadFrom` al montar (como en OnGuard). En el catálogo no hay DM vivo, así que la lista queda vacía (spinner y luego vacío). El valor es una lista de ids separados por el `separator`.',
     initial: { panel_filter: '5' },
