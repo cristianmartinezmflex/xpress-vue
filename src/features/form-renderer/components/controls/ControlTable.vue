@@ -11,6 +11,7 @@
  */
 import { ref, computed } from 'vue'
 import type { Control } from '../../types/schema'
+import { useTableSelection } from '../../composables/useTableSelection'
 import ControlText          from './ControlText.vue'
 import ControlBoolean       from './ControlBoolean.vue'
 import ControlNumber        from './ControlNumber.vue'
@@ -28,6 +29,10 @@ const props = defineProps<{
   serviceBase?:  string
   // Optional action button(s) in the modal footer (between Cancel and Save), e.g. Genetec "Ping".
   modalActions?: { label: string; action: string }[]
+  // Master-detail: when true, clicking a row SELECTS it (a detail control keyed by controlId edits it)
+  // instead of opening the modal — editing is via a per-row pencil button. Needs controlId.
+  selectable?:   boolean
+  controlId?:    string
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
@@ -45,6 +50,25 @@ function emitRows(next: Row[]) {
   emit('update:modelValue', JSON.stringify(next))
 }
 
+// ─── Master-detail selection ────────────────────────────────────────────────────
+// The selected row index lives in the shared registry keyed by this control's id, so a detail control
+// (e.g. RIO Door Settings) can read/edit the selected row.
+const selection = useTableSelection()
+const selKey = computed(() => props.controlId ?? '')
+const selectedIndex = computed<number | null>(() =>
+  props.selectable && selKey.value ? (selection[selKey.value] ?? null) : null,
+)
+
+function selectRow(idx: number) {
+  if (!selKey.value) return
+  selection[selKey.value] = selection[selKey.value] === idx ? null : idx
+}
+
+function onRowClick(idx: number) {
+  if (props.selectable) selectRow(idx)
+  else                  openEdit(idx)
+}
+
 // Columns: every field EXCEPT password (secrets aren't shown in the grid, matching the WinForm).
 const columns = computed(() => props.fields.filter((f) => f.type !== 'password'))
 
@@ -56,6 +80,14 @@ function cellText(row: Row, field: Control): string {
 
 function removeRow(idx: number) {
   emitRows(rows.value.filter((_, i) => i !== idx))
+  // Keep the shared selection pointing at the same row (or clear it if that row was removed).
+  if (props.selectable && selKey.value) {
+    const cur = selection[selKey.value]
+    if (cur != null) {
+      if (cur === idx)      selection[selKey.value] = null
+      else if (cur > idx)   selection[selKey.value] = cur - 1
+    }
+  }
 }
 
 // ─── Add / Edit modal ──────────────────────────────────────────────────────────
@@ -183,11 +215,20 @@ function saveRow() {
           <tr
             v-for="(row, idx) in rows"
             :key="idx"
-            class="border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
-            @click="openEdit(idx)"
+            class="border-b border-gray-100 last:border-0 cursor-pointer transition-colors"
+            :class="selectedIndex === idx ? 'bg-xp-primary/10 hover:bg-xp-primary/15' : 'hover:bg-gray-50'"
+            @click="onRowClick(idx)"
           >
             <td v-for="col in columns" :key="col.id" class="px-3 py-2 whitespace-nowrap">{{ cellText(row, col) }}</td>
-            <td class="px-3 py-2 text-center">
+            <td class="px-3 py-2 text-center whitespace-nowrap">
+              <!-- Selectable tables separate select (row click) from edit (this pencil). -->
+              <button
+                v-if="selectable"
+                type="button"
+                class="text-gray-400 hover:text-xp-primary text-xs cursor-pointer mr-2"
+                title="Edit"
+                @click.stop="openEdit(idx)"
+              >✎</button>
               <button
                 type="button"
                 class="text-xp-red hover:text-xp-red-hover text-xs cursor-pointer"

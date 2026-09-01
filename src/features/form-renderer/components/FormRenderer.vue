@@ -4,7 +4,11 @@ import type { FormSchema, Control, Tab } from '../types/schema'
 import { useFormState } from '../composables/useFormState'
 import { evaluateEnable, evaluateDisplay } from '../composables/useDisabled'
 import { useCentrifugo } from '../composables/useCentrifugo'
+import { provideTableSelection } from '../composables/useTableSelection'
 import FormSection from './FormSection.vue'
+
+// Shared master-detail selection registry (e.g. CloudLink Devices table ↔ RIO Door Settings detail).
+provideTableSelection()
 
 // The whole "Sync" tab (Enable Data Manager, Disable Concurrent Syncs, the 5 sync timers, the "run
 // now" button row and the live log) is common to every DM and comes ENTIRELY from the schema — it is

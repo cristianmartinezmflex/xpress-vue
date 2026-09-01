@@ -20,6 +20,7 @@ import ControlCustomSync           from './controls/ControlCustomSync.vue'
 import ControlMultiselect          from './controls/ControlMultiselect.vue'
 import ControlTable                 from './controls/ControlTable.vue'
 import ControlDiagnostics           from './controls/ControlDiagnostics.vue'
+import { useTableSelection }        from '../composables/useTableSelection'
 import type { DiagnosticIssue }     from '../types/schema'
 
 const props = defineProps<{
@@ -65,11 +66,58 @@ function isColumnVisible(col: Column): boolean {
 }
 
 function isControlEnabled(control: Control, col: Column): boolean {
-  return isColumnEnabled(col) && evaluateEnable(control.enable, props.state)
+  if (!isColumnEnabled(col) || !evaluateEnable(control.enable, props.state)) return false
+  // Master-detail: a control bound to a table's selected row is disabled until a row is selected.
+  if (control.detailOf && detailRow(control.detailOf) === null) return false
+  return true
 }
 
 function isControlVisible(control: Control): boolean {
   return evaluateDisplay(control.display, props.state)
+}
+
+// ─── Master-detail helpers ───────────────────────────────────────────────────────
+// A control (or button_bar) with `detailOf` edits the SELECTED row of that table: its value lives on the
+// row under the control's own id, so plain generic controls (Boolean, MultiSelect, a button_bar) act as
+// the detail editor of a table's selected row.
+const selection = useTableSelection()
+
+function detailRows(tableId: string): Record<string, any>[] {
+  const raw = props.state[tableId]
+  if (Array.isArray(raw)) return raw
+  if (typeof raw === 'string' && raw.trim()) {
+    try { const p = JSON.parse(raw); return Array.isArray(p) ? p : [] } catch { return [] }
+  }
+  return []
+}
+function detailIndex(tableId: string): number | null {
+  return selection[tableId] ?? null
+}
+function detailRow(tableId: string): Record<string, any> | null {
+  const i = detailIndex(tableId)
+  const rows = detailRows(tableId)
+  return i != null && i >= 0 && i < rows.length ? rows[i] : null
+}
+
+// The value a control shows: the selected row's field (detail) or the plain top-level state value.
+function controlModel(control: Control, fallback: any): any {
+  if (control.detailOf) {
+    const row = detailRow(control.detailOf)
+    return row ? (row[control.id] ?? fallback) : fallback
+  }
+  return props.state[control.id] ?? fallback
+}
+// Persist a control's new value: patch the selected row (detail) or emit a plain top-level state update.
+function updateControl(control: Control, value: any): void {
+  if (control.detailOf) {
+    const i = detailIndex(control.detailOf)
+    const rows = detailRows(control.detailOf)
+    if (i == null || i < 0 || i >= rows.length) return
+    const next = rows.map((r, idx) => (idx === i ? { ...r, [control.id]: value } : r))
+    emit('update:state', control.detailOf, JSON.stringify(next))
+    return
+  }
+  emit('update:state', control.id, value)
 }
 </script>
 
@@ -128,13 +176,17 @@ function isControlVisible(control: Control): boolean {
             <ControlBoolean
               v-else-if="control.type === 'boolean'"
               :title="control.title"
-              :model-value="control.value_from
-                ? (control.invert ? !state[control.value_from] : !!state[control.value_from])
-                : (state[control.id] ?? false)"
+              :model-value="control.detailOf
+                ? !!controlModel(control, false)
+                : (control.value_from
+                    ? (control.invert ? !state[control.value_from] : !!state[control.value_from])
+                    : (state[control.id] ?? false))"
               :disabled="control.disabled || !isControlEnabled(control, col)"
-              @update:model-value="control.inverts
-                ? emit('update:state', control.inverts, !$event)
-                : emit('update:state', control.id, $event)"
+              @update:model-value="control.detailOf
+                ? updateControl(control, $event)
+                : (control.inverts
+                    ? emit('update:state', control.inverts, !$event)
+                    : emit('update:state', control.id, $event))"
             />
 
             <ControlNumber
@@ -264,6 +316,8 @@ function isControlVisible(control: Control): boolean {
               :guid="guid"
               :service-base="serviceBase"
               :modal-actions="control.modalActions"
+              :selectable="control.selectable"
+              :control-id="control.id"
               @update:model-value="emit('update:state', control.id, $event)"
             />
 
@@ -275,14 +329,14 @@ function isControlVisible(control: Control): boolean {
             <ControlMultiselect
               v-else-if="control.type === 'multiselect'"
               :title="control.title"
-              :model-value="state[control.id] ?? ''"
+              :model-value="control.detailOf ? (controlModel(control, '') ?? '') : (state[control.id] ?? '')"
               :options="control.options"
               :dyn-options="control.dynOptions"
               :load-from="control.loadFrom"
               :separator="control.separator"
               :guid="guid"
               :service-base="serviceBase"
-              @update:model-value="emit('update:state', control.id, $event)"
+              @update:model-value="control.detailOf ? updateControl(control, $event) : emit('update:state', control.id, $event)"
             />
           </div>
         </template>

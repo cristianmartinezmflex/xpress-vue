@@ -2,6 +2,21 @@
 import { ref, nextTick } from 'vue'
 import type { Button } from '../../types/schema'
 import { evaluateEnable } from '../../composables/useDisabled'
+import { useTableSelection } from '../../composables/useTableSelection'
+
+const selection = useTableSelection()
+
+// Master-detail buttons (detailOf): resolve the currently-selected row of that table so it can be POSTed
+// as the action body (e.g. Genetec Update RIO / Sync Doors act on the selected CloudLink device).
+function selectedRow(tableId: string): Record<string, any> | undefined {
+  const idx = selection[tableId]
+  if (idx == null) return undefined
+  const raw = props.state?.[tableId]
+  let rows: any[] = []
+  if (Array.isArray(raw)) rows = raw
+  else if (typeof raw === 'string' && raw.trim()) { try { const p = JSON.parse(raw); if (Array.isArray(p)) rows = p } catch { /* ignore */ } }
+  return idx >= 0 && idx < rows.length ? rows[idx] : undefined
+}
 
 const props = defineProps<{
   buttons: Button[]
@@ -23,8 +38,14 @@ function isButtonLoading(btn: Button): boolean {
 // A button either names a frontend handler (onClick) or is a plain REST button (verb + action URL).
 // REST buttons are routed through the generic dm_shared_runAction handler, which hits the action URL.
 function onButtonClick(btn: Button) {
-  if (btn.onClick) emit('action', btn.id, btn.onClick)
-  else if (btn.action) emit('action', btn.id, 'dm_shared_runAction', { verb: btn.verb, action: btn.action, title: btn.title, fireAndForget: btn.fireAndForget })
+  if (btn.onClick) { emit('action', btn.id, btn.onClick); return }
+  if (btn.action) {
+    // A detail button POSTs the selected master row as its JSON body.
+    const body = btn.detailOf ? selectedRow(btn.detailOf) : undefined
+    emit('action', btn.id, 'dm_shared_runAction', {
+      verb: btn.verb, action: btn.action, title: btn.title, fireAndForget: btn.fireAndForget, body,
+    })
+  }
 }
 
 // Tooltip state. `above` flips it over the button when there isn't room below (e.g. the footer's sync

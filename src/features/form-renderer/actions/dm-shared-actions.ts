@@ -151,7 +151,7 @@ export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: Ac
 // maintenance buttons, etc.). ControlButtonBar passes { verb, action, title } as the payload.
 export async function dm_shared_runAction({ guid, serviceBase, payload }: ActionContext): Promise<void> {
   const { show } = useDialog()
-  const p = payload as { verb?: string; action?: string; title?: string; fireAndForget?: boolean } | undefined
+  const p = payload as { verb?: string; action?: string; title?: string; fireAndForget?: boolean; body?: unknown } | undefined
   const title = p?.title ?? 'Action'
   if (!p?.action) return
   if (!guid) { show({ success: false, title, message: 'No GUID provided.' }); return }
@@ -159,7 +159,13 @@ export async function dm_shared_runAction({ guid, serviceBase, payload }: Action
   const url  = `${serviceBase}${p.action.replace(/\{dmId\}/g, guid)}`
   const verb = (p.verb || 'POST').toUpperCase()
   try {
-    const res  = await fetch(url, { method: verb })
+    // Master-detail buttons carry a `body` (the selected row) → POST it as JSON.
+    const init: RequestInit = { method: verb }
+    if (p.body !== undefined) {
+      init.headers = { 'Content-Type': 'application/json' }
+      init.body = JSON.stringify(p.body)
+    }
+    const res  = await fetch(url, init)
     const body = await res.json().catch(() => null)
 
     if (!res.ok) {

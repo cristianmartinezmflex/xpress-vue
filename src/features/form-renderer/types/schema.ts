@@ -53,6 +53,9 @@ export interface Button {
   // REST button that only TRIGGERS a long-running async op (e.g. a sync): the request returns
   // immediately, so no "Completed successfully" dialog is shown — only an error if the trigger fails.
   fireAndForget?:   boolean
+  // Master-detail: id of a `selectable` table whose SELECTED row is POSTed as this button's request
+  // body (e.g. Genetec Update RIO / Sync Doors act on the selected CloudLink device).
+  detailOf?:        string
 }
 
 export interface KeyValuePair {
@@ -93,6 +96,12 @@ export interface Control {
   // table: optional action button(s) in the Add/Edit row MODAL footer (between Cancel and Save), e.g.
   // Genetec's "Ping". Each POSTs the draft row to dm-action?type=<action> and shows the result inline.
   modalActions?: { label: string; action: string }[]
+  // table: when true the grid is a master in a master-detail pair — clicking a row selects it (controls
+  // with detailOf pointing at this table's id then edit that selected row) instead of opening the modal.
+  selectable?: boolean
+  // Master-detail DETAIL binding: id of a `selectable` table whose SELECTED row this control edits (its
+  // own id names the row field). The control is disabled until a row is selected. Also valid on buttons.
+  detailOf?: string
   key_title?: string
   key_header?: string
   value_title?: string
