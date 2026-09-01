@@ -8,9 +8,13 @@
  * definitions (ids, actions, tooltips) live here in the frontend and are dispatched through the same
  * generic `dm_shared_runAction` handler as before (via the `action` event the parent already wires).
  */
+import { ref } from 'vue'
 import type { Button } from '../types/schema'
 import ControlLogView from './controls/ControlLogView.vue'
 import ControlButtonBar from './controls/ControlButtonBar.vue'
+
+// Mirrors the log's minimized state so the "run now" buttons hide when the log is collapsed.
+const logCollapsed = ref(false)
 
 defineProps<{
   guid?:           string
@@ -57,11 +61,17 @@ const SYNC_NOW_BUTTONS: Button[] = [
 </script>
 
 <template>
-  <!-- Compact footer: the live log on top (full width), the "run now" buttons BELOW it, right-aligned. -->
+  <!-- Compact footer: the live log on top (full width), the "run now" buttons BELOW it, right-aligned.
+       Minimizing the log collapses the whole footer to a single row — the buttons hide with it. -->
   <footer class="shrink-0 w-full border-t border-gray-200 bg-white px-6 py-3">
     <div class="flex flex-col gap-3">
-      <ControlLogView :guid="guid" :service-base="serviceBase" height-class="h-36" />
-      <div class="flex justify-end">
+      <ControlLogView
+        :guid="guid"
+        :service-base="serviceBase"
+        height-class="h-36"
+        @update:collapsed="logCollapsed = $event"
+      />
+      <div v-show="!logCollapsed" class="flex justify-end">
         <ControlButtonBar
           :buttons="SYNC_NOW_BUTTONS"
           :active-action-id="activeActionId"

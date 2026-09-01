@@ -73,9 +73,12 @@ async function showTooltip(event: MouseEvent, btn: Button) {
   // Prefer below; flip above only when the tooltip doesn't fit under the button but does fit over it.
   const above = spaceBelow < h + GAP + PAD && rect.top > h + GAP + PAD
   let top = above ? rect.top - GAP - h : rect.bottom + GAP
-  // Clamp to the viewport so it can never be cut off at either edge.
+  // Clamp to the viewport so it can never be cut off at either edge (vertical AND horizontal — buttons
+  // near the right edge, e.g. "Custom Sync Now", would otherwise overflow the right side).
   top = Math.max(PAD, Math.min(top, window.innerHeight - h - PAD))
-  tooltip.value = { text: btn.tooltip, x: rect.left, y: top, above }
+  const w = tooltipEl.value?.offsetWidth ?? 256
+  const left = Math.max(PAD, Math.min(rect.left, window.innerWidth - w - PAD))
+  tooltip.value = { text: btn.tooltip, x: left, y: top, above }
 }
 
 function hideTooltip() {

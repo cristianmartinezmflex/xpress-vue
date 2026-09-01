@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useCentrifugo } from '../../composables/useCentrifugo'
 import type { DmLogEntry } from '../../composables/useCentrifugo'
+
+// Notify the parent (e.g. the footer) when the log is minimized, so it can hide its own siblings
+// (the "run now" buttons) and leave just the single collapsed row.
+const emit = defineEmits<{ 'update:collapsed': [value: boolean] }>()
 
 const props = withDefaults(defineProps<{
   guid?:        string
@@ -16,6 +20,7 @@ const fullscreen = ref(false)
 // Minimized: the log body is hidden and only a single compact row remains at the bottom, restorable to
 // its original height with the expand button.
 const collapsed  = ref(false)
+watch(collapsed, (v) => emit('update:collapsed', v))
 // True while the log lives in its own pop-out window — the in-page panel is then hidden so the log is
 // shown EXCLUSIVELY in the new window (not duplicated here).
 const poppedOut  = ref(false)
