@@ -21,11 +21,13 @@ import ControlPassword      from './ControlPassword.vue'
 type Row = Record<string, any>
 
 const props = defineProps<{
-  title?:       string
-  modelValue:   string | Row[]   // JSON string (or array) of row objects
-  fields:       Control[]
-  guid?:        string
-  serviceBase?: string
+  title?:        string
+  modelValue:    string | Row[]   // JSON string (or array) of row objects
+  fields:        Control[]
+  guid?:         string
+  serviceBase?:  string
+  // Optional action button(s) in the modal footer (between Cancel and Save), e.g. Genetec "Ping".
+  modalActions?: { label: string; action: string }[]
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
@@ -63,6 +65,11 @@ const editIndex = ref<number | null>(null)
 const draft     = ref<Row>({})
 const original  = ref<Row>({})   // snapshot to detect changes when editing
 
+// Modal action (e.g. Ping) state: inline result message + which action is in-flight — mirrors the
+// WinForm's status label ("Device ping successful!" / "Device ping failed: …").
+const actionStatus = ref<{ ok: boolean; message: string } | null>(null)
+const actionBusy   = ref<string | null>(null)
+
 function fieldDefault(f: Control): any {
   if (f.default !== undefined) return f.default
   if (f.type === 'boolean') return false
@@ -76,6 +83,7 @@ function openAdd() {
   draft.value = d
   original.value = { ...d }
   editIndex.value = null
+  actionStatus.value = null
   modalOpen.value = true
 }
 
@@ -90,10 +98,38 @@ function openEdit(idx: number) {
   draft.value = d
   original.value = { ...d }
   editIndex.value = idx
+  actionStatus.value = null
   modalOpen.value = true
 }
 
 function closeModal() { modalOpen.value = false }
+
+// Run a modal action button (e.g. Ping): POST the current draft row to the DM's dm-action endpoint and
+// show the returned { success, message } inline. Purely a device check — never mutates the table rows.
+async function runModalAction(a: { label: string; action: string }) {
+  if (!props.guid || !props.serviceBase) {
+    actionStatus.value = { ok: false, message: 'No service connection.' }
+    return
+  }
+  actionBusy.value = a.action
+  actionStatus.value = null
+  try {
+    const url = `${props.serviceBase}/api/data-managers/${props.guid}/dm-action?type=${encodeURIComponent(a.action)}`
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(draft.value),
+    })
+    const body = await res.json().catch(() => null)
+    const ok = res.ok && body?.success !== false
+    const message = body?.message ?? body?.Error ?? body?.error ?? (ok ? 'Success.' : `The service returned ${res.status}.`)
+    actionStatus.value = { ok, message: String(message) }
+  } catch {
+    actionStatus.value = { ok: false, message: 'Could not reach the service.' }
+  } finally {
+    actionBusy.value = null
+  }
+}
 
 // The first field is the row's key/display column (must be non-empty to add a row).
 const keyField = computed(() => props.fields[0])
@@ -214,7 +250,14 @@ function saveRow() {
               </div>
             </div>
 
-            <div class="flex justify-end gap-2">
+            <!-- Inline action result (e.g. Ping outcome), styled like the WinForm status label. -->
+            <p
+              v-if="actionStatus"
+              class="text-xs -mt-1"
+              :class="actionStatus.ok ? 'text-green-600' : 'text-xp-red'"
+            >{{ actionStatus.message }}</p>
+
+            <div class="flex items-center justify-end gap-2">
               <button
                 type="button"
                 class="px-4 py-1.5 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 cursor-pointer transition"
@@ -222,6 +265,28 @@ function saveRow() {
               >
                 Cancel
               </button>
+
+              <!-- Schema-driven modal action button(s), e.g. Genetec "Ping" — sits between Cancel and Save. -->
+              <button
+                v-for="a in (modalActions ?? [])"
+                :key="a.action"
+                type="button"
+                :disabled="actionBusy === a.action"
+                class="px-4 py-1.5 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 transition flex items-center gap-2"
+                :class="actionBusy === a.action ? 'cursor-wait opacity-80' : 'hover:bg-gray-50 cursor-pointer'"
+                @click="runModalAction(a)"
+              >
+                <svg
+                  v-if="actionBusy === a.action"
+                  class="animate-spin w-4 h-4 text-xp-primary"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                >
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                {{ a.label }}
+              </button>
+
               <button
                 type="button"
                 :disabled="!canSave"

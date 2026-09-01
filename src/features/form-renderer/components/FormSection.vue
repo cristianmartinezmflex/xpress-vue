@@ -263,6 +263,7 @@ function isControlVisible(control: Control): boolean {
               :model-value="state[control.id] ?? '[]'"
               :guid="guid"
               :service-base="serviceBase"
+              :modal-actions="control.modalActions"
               @update:model-value="emit('update:state', control.id, $event)"
             />
 

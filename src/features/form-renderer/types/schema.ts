@@ -90,6 +90,9 @@ export interface Control {
   options?: SelectOption[]
   buttons?: Button[]
   fields?: Control[]   // table: column/field defs (each a control) that drive the grid + Add-row modal
+  // table: optional action button(s) in the Add/Edit row MODAL footer (between Cancel and Save), e.g.
+  // Genetec's "Ping". Each POSTs the draft row to dm-action?type=<action> and shows the result inline.
+  modalActions?: { label: string; action: string }[]
   key_title?: string
   key_header?: string
   value_title?: string

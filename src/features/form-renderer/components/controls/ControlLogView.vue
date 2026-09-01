@@ -13,8 +13,12 @@ const logs       = ref<DmLogEntry[]>([])
 const logEl      = ref<HTMLDivElement | null>(null)
 const autoScroll = ref(true)
 const fullscreen = ref(false)
+// True while the log lives in its own pop-out window — the in-page panel is then hidden so the log is
+// shown EXCLUSIVELY in the new window (not duplicated here).
+const poppedOut  = ref(false)
 
 let stopStream: (() => void) | null = null
+let popWatch: ReturnType<typeof setInterval> | null = null
 
 function scrollToBottom() {
   if (autoScroll.value) nextTick(() => { if (logEl.value) logEl.value.scrollTop = logEl.value.scrollHeight })
@@ -33,6 +37,7 @@ onMounted(() => {
 onUnmounted(() => {
   stopStream?.()
   window.removeEventListener('keydown', onKeydown)
+  if (popWatch) { clearInterval(popWatch); popWatch = null }
   if (logWindow.value && !logWindow.value.closed) logWindow.value.close()
 })
 
@@ -110,7 +115,24 @@ function openLogWindow() {
   w.document.body.innerHTML = POPOUT_HTML
   w.document.getElementById('clear')?.addEventListener('click', clearLogs)
   logWindow.value = w
+  poppedOut.value = true
   logs.value.forEach(appendToWindow)   // backfill the current buffer
+
+  // Watch for the pop-out being closed (there's no reliable cross-browser close event) so the in-page
+  // panel comes back automatically.
+  if (popWatch) clearInterval(popWatch)
+  popWatch = setInterval(() => {
+    if (!logWindow.value || logWindow.value.closed) {
+      poppedOut.value = false
+      logWindow.value = null
+      if (popWatch) { clearInterval(popWatch); popWatch = null }
+      scrollToBottom()
+    }
+  }, 500)
+}
+
+function focusLogWindow() {
+  if (logWindow.value && !logWindow.value.closed) logWindow.value.focus()
 }
 </script>
 
@@ -168,7 +190,21 @@ function openLogWindow() {
       </div>
     </div>
 
+    <!-- Popped out: the log lives exclusively in the separate window; show a placeholder here instead. -->
     <div
+      v-if="poppedOut"
+      class="flex-1 w-full flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 text-sm text-gray-500"
+    >
+      <span>Log opened in a separate window.</span>
+      <button
+        type="button"
+        class="text-xs text-xp-primary hover:underline cursor-pointer"
+        @click="focusLogWindow"
+      >Bring window to front</button>
+    </div>
+
+    <div
+      v-else
       ref="logEl"
       class="flex-1 w-full overflow-y-auto rounded-lg border border-gray-200 bg-gray-950 font-mono text-xs p-3 leading-relaxed"
     >

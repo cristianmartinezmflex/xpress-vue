@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import type { Button } from '../../types/schema'
 import { evaluateEnable } from '../../composables/useDisabled'
 
@@ -27,17 +27,29 @@ function onButtonClick(btn: Button) {
   else if (btn.action) emit('action', btn.id, 'dm_shared_runAction', { verb: btn.verb, action: btn.action, title: btn.title, fireAndForget: btn.fireAndForget })
 }
 
-// Tooltip state
-const tooltip = ref<{ text: string; x: number; y: number } | null>(null)
+// Tooltip state. `above` flips it over the button when there isn't room below (e.g. the footer's sync
+// buttons sit at the bottom of the screen, where a tooltip rendered below would be clipped off-screen).
+// `y` is the FINAL clamped top in px (no CSS translate) — computed after measuring the real height so
+// tall multi-line tooltips can't be clipped at the top or bottom of the viewport.
+const tooltip   = ref<{ text: string; x: number; y: number; above: boolean } | null>(null)
+const tooltipEl = ref<HTMLElement | null>(null)
+const GAP = 6   // px between the button and the tooltip
+const PAD = 8   // px min margin from a viewport edge
 
-function showTooltip(event: MouseEvent, btn: Button) {
+async function showTooltip(event: MouseEvent, btn: Button) {
   if (!btn.tooltip) return
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-  tooltip.value = {
-    text: btn.tooltip,
-    x: rect.left,
-    y: rect.bottom + 6,
-  }
+  // Render first (position provisional), then measure the actual box and place it precisely.
+  tooltip.value = { text: btn.tooltip, x: rect.left, y: rect.bottom + GAP, above: false }
+  await nextTick()
+  const h = tooltipEl.value?.offsetHeight ?? 96
+  const spaceBelow = window.innerHeight - rect.bottom
+  // Prefer below; flip above only when the tooltip doesn't fit under the button but does fit over it.
+  const above = spaceBelow < h + GAP + PAD && rect.top > h + GAP + PAD
+  let top = above ? rect.top - GAP - h : rect.bottom + GAP
+  // Clamp to the viewport so it can never be cut off at either edge.
+  top = Math.max(PAD, Math.min(top, window.innerHeight - h - PAD))
+  tooltip.value = { text: btn.tooltip, x: rect.left, y: top, above }
 }
 
 function hideTooltip() {
@@ -101,10 +113,15 @@ function handleContextMenuItem(handler: string) {
   <Teleport to="body">
     <div
       v-if="tooltip"
+      ref="tooltipEl"
       class="fixed z-[70] w-64 rounded-lg bg-gray-800 px-3 py-2 text-xs text-white shadow-lg pointer-events-none"
       :style="{ top: tooltip.y + 'px', left: tooltip.x + 'px' }"
     >
-      <div class="absolute bottom-full left-4 border-4 border-transparent border-b-gray-800" />
+      <!-- Arrow: points up (tooltip below the button) or down (tooltip flipped above it). -->
+      <div
+        class="absolute left-4 border-4 border-transparent"
+        :class="tooltip.above ? 'top-full border-t-gray-800' : 'bottom-full border-b-gray-800'"
+      />
       {{ tooltip.text }}
     </div>
   </Teleport>
