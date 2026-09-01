@@ -57,14 +57,11 @@ const SYNC_NOW_BUTTONS: Button[] = [
 </script>
 
 <template>
-  <!-- Compact footer: log on the LEFT, "run now" buttons on the RIGHT (side by side on wide screens,
-       stacked on narrow ones), and a shorter log so the form isn't covered on small/laptop monitors. -->
+  <!-- Compact footer: the live log on top (full width), the "run now" buttons BELOW it, right-aligned. -->
   <footer class="shrink-0 w-full border-t border-gray-200 bg-white px-6 py-3">
-    <div class="flex flex-col lg:flex-row gap-4 lg:items-stretch">
-      <div class="flex-1 min-w-0">
-        <ControlLogView :guid="guid" :service-base="serviceBase" height-class="h-36" />
-      </div>
-      <div class="lg:w-[26rem] shrink-0">
+    <div class="flex flex-col gap-3">
+      <ControlLogView :guid="guid" :service-base="serviceBase" height-class="h-36" />
+      <div class="flex justify-end">
         <ControlButtonBar
           :buttons="SYNC_NOW_BUTTONS"
           :active-action-id="activeActionId"

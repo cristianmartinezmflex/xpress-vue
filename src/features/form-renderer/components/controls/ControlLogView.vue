@@ -13,6 +13,9 @@ const logs       = ref<DmLogEntry[]>([])
 const logEl      = ref<HTMLDivElement | null>(null)
 const autoScroll = ref(true)
 const fullscreen = ref(false)
+// Minimized: the log body is hidden and only a single compact row remains at the bottom, restorable to
+// its original height with the expand button.
+const collapsed  = ref(false)
 // True while the log lives in its own pop-out window — the in-page panel is then hidden so the log is
 // shown EXCLUSIVELY in the new window (not duplicated here).
 const poppedOut  = ref(false)
@@ -140,8 +143,25 @@ function focusLogWindow() {
   <!-- Normal: fixed-height panel. Fullscreen: a full-page overlay (F11-like) covering the whole page. -->
   <div
     class="flex flex-col gap-1"
-    :class="fullscreen ? 'fixed inset-0 z-[90] bg-white p-4' : props.heightClass"
+    :class="fullscreen ? 'fixed inset-0 z-[90] bg-white p-4' : (collapsed ? '' : props.heightClass)"
   >
+    <!-- Minimized: a single compact row with a restore (expand) button. -->
+    <div v-if="collapsed && !fullscreen" class="flex items-center gap-2 py-1">
+      <span class="text-xs text-gray-400">Sync log</span>
+      <button
+        type="button"
+        class="ml-auto flex items-center justify-center w-6 h-6 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer transition"
+        title="Show log"
+        @click="collapsed = false"
+      >
+        <!-- chevron up (expand) -->
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+        </svg>
+      </button>
+    </div>
+
+    <template v-else>
     <div class="flex items-center gap-3">
       <label class="flex items-center gap-1.5 text-xs text-gray-400 cursor-pointer select-none">
         <input v-model="autoScroll" type="checkbox" class="cursor-pointer" />
@@ -155,8 +175,22 @@ function focusLogWindow() {
         Clear
       </button>
 
-      <!-- Right-aligned tool buttons: [maximize] [open in new window] -->
+      <!-- Right-aligned tool buttons: [minimize] [maximize] [open in new window] -->
       <div class="ml-auto flex items-center gap-1">
+        <!-- Minimize: collapse the log to a single row (restore with the expand button). -->
+        <button
+          v-if="!fullscreen"
+          type="button"
+          class="flex items-center justify-center w-6 h-6 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer transition"
+          title="Minimize logs"
+          @click="collapsed = true"
+        >
+          <!-- chevron down (collapse) -->
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
         <!-- Maximize / fullscreen toggle (icon: expand corners; minimize when active) -->
         <button
           type="button"
@@ -216,5 +250,6 @@ function focusLogWindow() {
         [{{ entry.timestamp }}] [{{ entry.type }}] {{ entry.message }}
       </div>
     </div>
+    </template>
   </div>
 </template>

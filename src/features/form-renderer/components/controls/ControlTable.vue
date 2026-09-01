@@ -33,6 +33,9 @@ const props = defineProps<{
   // instead of opening the modal — editing is via a per-row pencil button. Needs controlId.
   selectable?:   boolean
   controlId?:    string
+  // Name of a numeric identity field kept UNIQUE per row (e.g. RIODevice "ID"). The backend keys its
+  // device dictionary by it, so duplicate/missing ids would silently overwrite rows on save.
+  idField?:      string
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
@@ -46,8 +49,29 @@ const rows = computed<Row[]>(() => {
   return []
 })
 
+// Guarantee a unique numeric id per row when `idField` is set. The backend stores rows in a dictionary
+// keyed by this id (e.g. RIODevice.ID), so a missing/duplicate/negative id makes rows overwrite each
+// other on save (the classic "the first device disappears" bug). Valid, unique, non-negative ids are
+// preserved; everything else is assigned the next free id (matching the WinForm's incrementing counter).
+function normalizeIds(list: Row[]): Row[] {
+  const key = props.idField
+  if (!key) return list
+  let maxId = -1
+  for (const r of list) {
+    const v = Number(r[key])
+    if (Number.isInteger(v) && v >= 0) maxId = Math.max(maxId, v)
+  }
+  const seen = new Set<number>()
+  return list.map((r) => {
+    let v = Number(r[key])
+    if (!Number.isInteger(v) || v < 0 || seen.has(v)) v = ++maxId
+    seen.add(v)
+    return r[key] === v ? r : { ...r, [key]: v }
+  })
+}
+
 function emitRows(next: Row[]) {
-  emit('update:modelValue', JSON.stringify(next))
+  emit('update:modelValue', JSON.stringify(normalizeIds(next)))
 }
 
 // ─── Master-detail selection ────────────────────────────────────────────────────

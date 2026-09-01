@@ -318,6 +318,7 @@ function updateControl(control: Control, value: any): void {
               :modal-actions="control.modalActions"
               :selectable="control.selectable"
               :control-id="control.id"
+              :id-field="control.idField"
               @update:model-value="emit('update:state', control.id, $event)"
             />
 

@@ -99,6 +99,9 @@ export interface Control {
   // table: when true the grid is a master in a master-detail pair — clicking a row selects it (controls
   // with detailOf pointing at this table's id then edit that selected row) instead of opening the modal.
   selectable?: boolean
+  // table: name of a numeric identity field kept UNIQUE per row (e.g. RIODevice "ID"). New rows get a
+  // fresh unique value and duplicates/missing ids are repaired, so rows can't collide server-side.
+  idField?: string
   // Master-detail DETAIL binding: id of a `selectable` table whose SELECTED row this control edits (its
   // own id names the row field). The control is disabled until a row is selected. Also valid on buttons.
   detailOf?: string
