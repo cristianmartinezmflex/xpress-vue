@@ -3,6 +3,7 @@ import { ref, nextTick } from 'vue'
 import type { Button } from '../../types/schema'
 import { evaluateEnable } from '../../composables/useDisabled'
 import { useTableSelection } from '../../composables/useTableSelection'
+import { sortRowsForDisplay } from '../../utils/tableRows'
 
 const selection = useTableSelection()
 
@@ -15,6 +16,8 @@ function selectedRow(tableId: string): Record<string, any> | undefined {
   let rows: any[] = []
   if (Array.isArray(raw)) rows = raw
   else if (typeof raw === 'string' && raw.trim()) { try { const p = JSON.parse(raw); if (Array.isArray(p)) rows = p } catch { /* ignore */ } }
+  // Same display order as the grid so the selection index resolves to the correct row.
+  rows = sortRowsForDisplay(rows, props.idField)
   return idx >= 0 && idx < rows.length ? rows[idx] : undefined
 }
 
@@ -24,6 +27,8 @@ const props = defineProps<{
   // Id of the button whose action is currently in-flight (set by the parent). That button shows a
   // spinner and is disabled until the API call resolves.
   activeActionId?: string | null
+  // Master table's idField, so a detail button resolves the selected row in the grid's display order.
+  idField?: string
 }>()
 const emit = defineEmits<{ action: [id: string, handler: string, payload?: unknown] }>()
 

@@ -21,6 +21,7 @@ import ControlMultiselect          from './controls/ControlMultiselect.vue'
 import ControlTable                 from './controls/ControlTable.vue'
 import ControlDiagnostics           from './controls/ControlDiagnostics.vue'
 import { useTableSelection }        from '../composables/useTableSelection'
+import { sortRowsForDisplay }       from '../utils/tableRows'
 import type { DiagnosticIssue }     from '../types/schema'
 
 const props = defineProps<{
@@ -82,13 +83,21 @@ function isControlVisible(control: Control): boolean {
 // the detail editor of a table's selected row.
 const selection = useTableSelection()
 
+// The master table's idField, so detail rows are ordered identically to the grid (indices stay in sync).
+function masterIdField(tableId: string): string | undefined {
+  for (const col of props.columns)
+    for (const c of (col.controls ?? []))
+      if (c.id === tableId) return c.idField
+  return undefined
+}
 function detailRows(tableId: string): Record<string, any>[] {
   const raw = props.state[tableId]
-  if (Array.isArray(raw)) return raw
-  if (typeof raw === 'string' && raw.trim()) {
-    try { const p = JSON.parse(raw); return Array.isArray(p) ? p : [] } catch { return [] }
+  let parsed: Record<string, any>[] = []
+  if (Array.isArray(raw)) parsed = raw
+  else if (typeof raw === 'string' && raw.trim()) {
+    try { const p = JSON.parse(raw); if (Array.isArray(p)) parsed = p } catch { parsed = [] }
   }
-  return []
+  return sortRowsForDisplay(parsed, masterIdField(tableId))
 }
 function detailIndex(tableId: string): number | null {
   return selection[tableId] ?? null
@@ -235,6 +244,7 @@ function updateControl(control: Control, value: any): void {
               :buttons="control.buttons ?? []"
               :state="state"
               :active-action-id="activeActionId"
+              :id-field="control.detailOf ? masterIdField(control.detailOf) : undefined"
               @action="(id, handler, payload) => emit('action', id, handler, payload)"
             />
 

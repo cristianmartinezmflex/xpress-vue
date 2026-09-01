@@ -12,6 +12,7 @@
 import { ref, computed } from 'vue'
 import type { Control } from '../../types/schema'
 import { useTableSelection } from '../../composables/useTableSelection'
+import { sortRowsForDisplay } from '../../utils/tableRows'
 import ControlText          from './ControlText.vue'
 import ControlBoolean       from './ControlBoolean.vue'
 import ControlNumber        from './ControlNumber.vue'
@@ -40,13 +41,16 @@ const props = defineProps<{
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
 // ─── Rows ────────────────────────────────────────────────────────────────────
+// Rows in DISPLAY order (by idField desc — same order the WinForm's Hashtable-by-id shows). All row
+// operations and the shared selection index below use this order, so it stays in sync with the detail.
 const rows = computed<Row[]>(() => {
   const v = props.modelValue
-  if (Array.isArray(v)) return v
-  if (typeof v === 'string' && v.trim()) {
-    try { const p = JSON.parse(v); return Array.isArray(p) ? p : [] } catch { return [] }
+  let parsed: Row[] = []
+  if (Array.isArray(v)) parsed = v
+  else if (typeof v === 'string' && v.trim()) {
+    try { const p = JSON.parse(v); if (Array.isArray(p)) parsed = p } catch { parsed = [] }
   }
-  return []
+  return sortRowsForDisplay(parsed, props.idField)
 })
 
 // Guarantee a unique numeric id per row when `idField` is set. The backend stores rows in a dictionary
