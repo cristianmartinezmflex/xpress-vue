@@ -39,7 +39,7 @@ const fetchedOptions = ref<Option[] | null>(null)
 const loadErr        = ref('')
 const loading        = ref(false)
 
-onMounted(async () => {
+async function loadOptions() {
   const source = props.dynOptions || props.loadFrom
   const url = resolveLoadFromUrl(source, props.serviceBase ?? '', props.guid)
   if (!url) return
@@ -51,12 +51,23 @@ onMounted(async () => {
     fetchedOptions.value = Array.isArray(data)
       ? data.map((o: any) => ({ id: String(o?.id ?? ''), name: String(o?.name ?? o?.id ?? '') })).filter((o) => o.id)
       : []
+    loadErr.value = ''
   } catch {
     loadErr.value = 'Could not load'
   } finally {
     loading.value = false
   }
+}
+
+// A DM action that mutates server data (e.g. Genetec "Sync Doors" importing doors into XPressEntry)
+// fires "dm:data-changed" on success — re-fetch so the list reflects the new data without a reload.
+function onDataChanged() { if (props.dynOptions || props.loadFrom) loadOptions() }
+
+onMounted(() => {
+  loadOptions()
+  window.addEventListener('dm:data-changed', onDataChanged)
 })
+onBeforeUnmount(() => window.removeEventListener('dm:data-changed', onDataChanged))
 
 const options = computed<Option[]>(() => {
   const src = fetchedOptions.value ?? (props.options ?? []).map((o) => ({ id: String(o.id), name: o.name }))

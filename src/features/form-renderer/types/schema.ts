@@ -56,6 +56,9 @@ export interface Button {
   // Master-detail: id of a `selectable` table whose SELECTED row is POSTed as this button's request
   // body (e.g. Genetec Update RIO / Sync Doors act on the selected CloudLink device).
   detailOf?:        string
+  // On success, tell dynamic-option controls (Select/MultiSelect) to re-fetch — for actions that CHANGE
+  // the data those lists read (e.g. Genetec "Sync Doors" imports doors, so the doors list must refresh).
+  refreshOnSuccess?: boolean
 }
 
 export interface KeyValuePair {

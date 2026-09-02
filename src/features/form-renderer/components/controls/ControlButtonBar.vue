@@ -49,6 +49,7 @@ function onButtonClick(btn: Button) {
     const body = btn.detailOf ? selectedRow(btn.detailOf) : undefined
     emit('action', btn.id, 'dm_shared_runAction', {
       verb: btn.verb, action: btn.action, title: btn.title, fireAndForget: btn.fireAndForget, body,
+      refreshOnSuccess: btn.refreshOnSuccess,
     })
   }
 }

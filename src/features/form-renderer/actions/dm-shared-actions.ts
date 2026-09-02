@@ -151,7 +151,7 @@ export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: Ac
 // maintenance buttons, etc.). ControlButtonBar passes { verb, action, title } as the payload.
 export async function dm_shared_runAction({ guid, serviceBase, payload }: ActionContext): Promise<void> {
   const { show } = useDialog()
-  const p = payload as { verb?: string; action?: string; title?: string; fireAndForget?: boolean; body?: unknown } | undefined
+  const p = payload as { verb?: string; action?: string; title?: string; fireAndForget?: boolean; body?: unknown; refreshOnSuccess?: boolean } | undefined
   const title = p?.title ?? 'Action'
   if (!p?.action) return
   if (!guid) { show({ success: false, title, message: 'No GUID provided.' }); return }
@@ -178,6 +178,12 @@ export async function dm_shared_runAction({ guid, serviceBase, payload }: Action
     // sync is still running, so DON'T claim it "Completed successfully". Progress is visible in the live
     // log and the active-sync indicator. Errors above are still surfaced.
     if (p.fireAndForget) return
+
+    // Only actions that DECLARE they change server data (refreshOnSuccess) ask dynamic-option controls to
+    // re-fetch — e.g. Genetec "Sync Doors" imports doors into XPE, so the doors MultiSelect refreshes;
+    // "Update RIO" (writes to the device, not XPE) does NOT, so it doesn't trigger a needless reload.
+    if (p.refreshOnSuccess)
+      window.dispatchEvent(new CustomEvent('dm:data-changed'))
 
     const msg = body?.message ?? body?.Error ?? body?.error ?? 'Completed successfully.'
     show({ success: true, title, message: oneLine(String(msg)) })
