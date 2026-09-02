@@ -7,8 +7,8 @@ import { sortRowsForDisplay } from '../../utils/tableRows'
 
 const selection = useTableSelection()
 
-// Master-detail buttons (detailOf): resolve the currently-selected row of that table so it can be POSTed
-// as the action body (e.g. Genetec Update RIO / Sync Doors act on the selected CloudLink device).
+// Payload buttons: resolve the currently-selected row of that table so it can be POSTed as the action
+// body (e.g. Genetec "Update RIO" acts on the selected CloudLink device).
 function selectedRow(tableId: string): Record<string, any> | undefined {
   const idx = selection[tableId]
   if (idx == null) return undefined
@@ -33,7 +33,11 @@ const props = defineProps<{
 const emit = defineEmits<{ action: [id: string, handler: string, payload?: unknown] }>()
 
 function isButtonEnabled(btn: Button): boolean {
-  return evaluateEnable(btn.enable, props.state ?? {})
+  if (!evaluateEnable(btn.enable, props.state ?? {})) return false
+  // A payload button acts on the selected row, so it needs one selected (e.g. Update RIO). A button with
+  // no payload is global (e.g. Sync Doors) and stays enabled.
+  if (btn.payload && selectedRow(btn.payload) === undefined) return false
+  return true
 }
 
 function isButtonLoading(btn: Button): boolean {
@@ -45,8 +49,8 @@ function isButtonLoading(btn: Button): boolean {
 function onButtonClick(btn: Button) {
   if (btn.onClick) { emit('action', btn.id, btn.onClick); return }
   if (btn.action) {
-    // A detail button POSTs the selected master row as its JSON body.
-    const body = btn.detailOf ? selectedRow(btn.detailOf) : undefined
+    // A payload button POSTs the selected master row as its JSON body.
+    const body = btn.payload ? selectedRow(btn.payload) : undefined
     emit('action', btn.id, 'dm_shared_runAction', {
       verb: btn.verb, action: btn.action, title: btn.title, fireAndForget: btn.fireAndForget, body,
       refreshOnSuccess: btn.refreshOnSuccess,

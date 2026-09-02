@@ -69,6 +69,7 @@ function isColumnVisible(col: Column): boolean {
 function isControlEnabled(control: Control, col: Column): boolean {
   if (!isColumnEnabled(col) || !evaluateEnable(control.enable, props.state)) return false
   // Master-detail: a control bound to a table's selected row is disabled until a row is selected.
+  // (A button_bar uses `payload`, not `detailOf`, and handles enabling PER BUTTON — so it's unaffected.)
   if (control.detailOf && detailRow(control.detailOf) === null) return false
   return true
 }
@@ -78,9 +79,9 @@ function isControlVisible(control: Control): boolean {
 }
 
 // ─── Master-detail helpers ───────────────────────────────────────────────────────
-// A control (or button_bar) with `detailOf` edits the SELECTED row of that table: its value lives on the
-// row under the control's own id, so plain generic controls (Boolean, MultiSelect, a button_bar) act as
-// the detail editor of a table's selected row.
+// A control with `detailOf` edits the SELECTED row of that table: its value lives on the row under the
+// control's own id, so plain generic controls (Boolean, MultiSelect) act as the detail editor of a
+// table's selected row. (Buttons use `payload` instead — the row is their request body, not an edit.)
 const selection = useTableSelection()
 
 // The master table's idField, so detail rows are ordered identically to the grid (indices stay in sync).
@@ -244,7 +245,7 @@ function updateControl(control: Control, value: any): void {
               :buttons="control.buttons ?? []"
               :state="state"
               :active-action-id="activeActionId"
-              :id-field="control.detailOf ? masterIdField(control.detailOf) : undefined"
+              :id-field="control.payload ? masterIdField(control.payload) : undefined"
               @action="(id, handler, payload) => emit('action', id, handler, payload)"
             />
 

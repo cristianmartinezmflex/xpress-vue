@@ -53,9 +53,10 @@ export interface Button {
   // REST button that only TRIGGERS a long-running async op (e.g. a sync): the request returns
   // immediately, so no "Completed successfully" dialog is shown — only an error if the trigger fails.
   fireAndForget?:   boolean
-  // Master-detail: id of a `selectable` table whose SELECTED row is POSTed as this button's request
-  // body (e.g. Genetec Update RIO / Sync Doors act on the selected CloudLink device).
-  detailOf?:        string
+  // Request body: id of a `selectable` table whose SELECTED row is POSTed as this button's JSON body
+  // (e.g. Genetec "Update RIO" acts on the selected CloudLink device). Also disables the button until a
+  // row is selected. Global buttons that need no body omit it.
+  payload?:         string
   // On success, tell dynamic-option controls (Select/MultiSelect) to re-fetch — for actions that CHANGE
   // the data those lists read (e.g. Genetec "Sync Doors" imports doors, so the doors list must refresh).
   refreshOnSuccess?: boolean
@@ -106,8 +107,11 @@ export interface Control {
   // fresh unique value and duplicates/missing ids are repaired, so rows can't collide server-side.
   idField?: string
   // Master-detail DETAIL binding: id of a `selectable` table whose SELECTED row this control edits (its
-  // own id names the row field). The control is disabled until a row is selected. Also valid on buttons.
+  // own id names the row field). The control is disabled until a row is selected.
   detailOf?: string
+  // button_bar only: the master table id its buttons send as payload — used to order rows by the table's
+  // idField when resolving the selected row (buttons carry their own `payload` too).
+  payload?: string
   key_title?: string
   key_header?: string
   value_title?: string
