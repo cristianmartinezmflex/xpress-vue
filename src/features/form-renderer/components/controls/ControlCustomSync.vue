@@ -8,7 +8,7 @@
  * base DataManagerSettings declares the full default set and each DM overrides it with its own subset
  * (DataManagerSettingCustomSyncEntities). Nothing here is hardcoded — a DM with no entities offers none.
  */
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { SelectOption } from '../../types/schema'
 
 interface Row { iDMTable: number; bPartial: boolean }
@@ -41,6 +41,34 @@ function addTable() {
 function removeTable(i: number) { emitRows(rows.value.filter((_, idx) => idx !== i)) }
 function setTable(i: number, value: number) { emitRows(rows.value.map((r, idx) => idx === i ? { ...r, iDMTable: value } : r)) }
 function setPartial(i: number, value: boolean) { emitRows(rows.value.map((r, idx) => idx === i ? { ...r, bPartial: value } : r)) }
+
+// ─── Drag-and-drop reorder (order matters — the sync runs the tables in this order) ───────────────
+const dragIndex = ref<number | null>(null)
+const overIndex = ref<number | null>(null)
+
+function onDragStart(i: number, e: DragEvent) {
+  dragIndex.value = i
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', String(i)) // required for Firefox to start the drag
+  }
+}
+function onDragOver(i: number, e: DragEvent) {
+  e.preventDefault()
+  if (e.dataTransfer) e.dataTransfer.dropEffect = 'move'
+  overIndex.value = i
+}
+function onDrop(i: number) {
+  const from = dragIndex.value
+  if (from != null && from !== i) {
+    const next = [...rows.value]
+    const [moved] = next.splice(from, 1)
+    next.splice(i, 0, moved)
+    emitRows(next)
+  }
+  resetDrag()
+}
+function resetDrag() { dragIndex.value = null; overIndex.value = null }
 </script>
 
 <template>
@@ -48,8 +76,31 @@ function setPartial(i: number, value: boolean) { emitRows(rows.value.map((r, idx
     <span v-if="title" class="text-sm font-semibold text-xp-label">{{ title }}</span>
 
     <div v-if="rows.length > 0" class="flex flex-col gap-2">
-      <div v-for="(row, i) in rows" :key="i" class="flex items-center gap-4">
-        <span class="text-sm text-gray-500 w-10 text-right">Table</span>
+      <div
+        v-for="(row, i) in rows"
+        :key="i"
+        class="flex items-center gap-3 rounded-lg px-1 py-0.5 transition"
+        :class="[
+          dragIndex === i ? 'opacity-40' : '',
+          overIndex === i && dragIndex !== null && dragIndex !== i ? 'ring-2 ring-xp-primary/40 bg-xp-primary/5' : ''
+        ]"
+        @dragover="onDragOver(i, $event)"
+        @drop="onDrop(i)"
+        @dragend="resetDrag"
+      >
+        <!-- Drag handle — reorder the sync tables (order matters; the sync runs them top-to-bottom). -->
+        <span
+          class="shrink-0 w-5 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing select-none"
+          draggable="true"
+          title="Drag to reorder"
+          @dragstart="onDragStart(i, $event)"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
+            <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
+            <circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" />
+          </svg>
+        </span>
         <select
           :value="row.iDMTable"
           class="flex-1 text-sm border border-gray-300 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary cursor-pointer"

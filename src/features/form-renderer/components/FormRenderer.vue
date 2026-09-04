@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import type { FormSchema, Control, Tab } from '../types/schema'
 import { useFormState } from '../composables/useFormState'
 import { evaluateEnable, evaluateDisplay } from '../composables/useDisabled'
@@ -37,15 +37,18 @@ const activeTab = ref(0)
 // the per-DM layout's tabs follow — so the effective order is General → Custom Sync → DM-specific.
 // (The live log + "run now" buttons are no longer schema controls — they live in the page-level
 // SyncActionFooter rendered by FormView, always visible at the bottom of the page.)
+// The synthesized diagnostics tab's title — used both to build it and to style its tab red/bold.
+const FORM_ERRORS_TITLE = 'Form Errors'
+
 const allTabs = computed<Tab[]>(() => {
   const ordered = [...props.schema.tabs]
-  // Diagnostic tab: present only on Debug builds (the schema carries a `diagnostics` key then), always
-  // the very last tab. Synthesized here — it holds a single `diagnostics` control fed from the schema.
-  if (props.schema.diagnostics) {
+  // "Form Errors" tab: only when the schema actually carries diagnostics (Debug builds that found issues).
+  // Hidden entirely when there are none. Always the very last tab; holds a single `diagnostics` control.
+  if ((props.schema.diagnostics?.length ?? 0) > 0) {
     ordered.push({
-      title: 'Diagnostic',
+      title: FORM_ERRORS_TITLE,
       sections: [{
-        title: 'Settings Diagnostics',
+        title: 'Form Errors',
         columns: [{ controls: [{ id: '_diagnostics', type: 'diagnostics', title: '' } as Control] }],
       }],
     })
@@ -102,6 +105,46 @@ function onUpdateState(id: string, value: any) {
 // actually running — when idle it renders nothing (no clutter). Saving anyway is allowed; the service
 // stops running operations first (see HandleSaveDataManager).
 const activeSyncTypes = ref<string[]>([])
+
+// ─── Connection status (persistent toolbar indicator + requiresConnection gating) ────────────────────
+// Save returns fast and NO LONGER tests the connection — we check it separately here (POST test-connection,
+// which uses a temp DM with the current settings) and surface the result in the toolbar: yellow while
+// checking, green on success, a strong red note on failure. Checked once on mount and after every save.
+type ConnStatus = 'unknown' | 'checking' | 'ok' | 'failed'
+const connectionStatus  = ref<ConnStatus>('unknown')
+const connectionMessage = ref('')
+// null (unknown/checking) never gates; only an explicit 'failed' disables requiresConnection controls.
+const connectionOk = computed<boolean | null>(() =>
+  connectionStatus.value === 'ok' ? true : connectionStatus.value === 'failed' ? false : null,
+)
+
+async function checkConnection(): Promise<void> {
+  if (!props.guid || !props.serviceBase) { connectionStatus.value = 'unknown'; return }
+  connectionStatus.value  = 'checking'
+  connectionMessage.value = ''
+  try {
+    // Send the current settings so the temp-DM test reflects what's on the form (== saved after a Save).
+    const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/test-connection`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state),
+    })
+    if (res.ok) {
+      connectionStatus.value  = 'ok'
+      connectionMessage.value = 'Connection OK'
+    } else {
+      const err = await res.json().catch(() => null)
+      connectionStatus.value  = 'failed'
+      connectionMessage.value = String(err?.Error ?? err?.error ?? `Connection failed (HTTP ${res.status})`)
+    }
+  } catch {
+    connectionStatus.value  = 'failed'
+    connectionMessage.value = 'Could not reach the service.'
+  }
+}
+
+// Re-check the connection whenever a Save finishes (isSaving true → false).
+watch(isSaving, (now, prev) => { if (prev && !now) checkConnection() })
 
 function prettySyncType(t: string): string {
   return t.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
@@ -162,6 +205,7 @@ function onVisibilityChange(): void {
 
 onMounted(() => {
   refreshSyncStatus()
+  checkConnection()
 
   // Push-driven refresh: only react to sync lifecycle events for THIS DM (ignore log/data noise).
   unsubscribeSync = useCentrifugo().subscribe(props.guid, (entry) => {
@@ -189,13 +233,18 @@ onBeforeUnmount(() => {
         v-for="(tab, idx) in visibleTabs"
         :key="tab.title"
         type="button"
-        class="flex-1 flex items-center justify-center px-5 py-2.5 text-sm text-center leading-tight transition border border-gray-300 rounded-t-lg"
+        class="flex-1 flex items-center justify-center px-5 py-2.5 text-sm text-center leading-tight transition border rounded-t-lg"
         :class="[
+          tab.title === FORM_ERRORS_TITLE ? 'border-red-300' : 'border-gray-300',
           !isTabEnabled(tab)
             ? 'font-medium text-gray-300 bg-gray-100 cursor-not-allowed'
             : activeTab === idx
-              ? '-mt-2 font-bold bg-white text-gray-900 border-b-white cursor-pointer'
-              : 'font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 cursor-pointer'
+              ? (tab.title === FORM_ERRORS_TITLE
+                  ? '-mt-2 font-bold bg-white text-red-600 border-b-white cursor-pointer'
+                  : '-mt-2 font-bold bg-white text-gray-900 border-b-white cursor-pointer')
+              : (tab.title === FORM_ERRORS_TITLE
+                  ? 'font-bold text-red-600 bg-red-50 hover:bg-red-100 cursor-pointer'
+                  : 'font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 cursor-pointer')
         ]"
         :disabled="!isTabEnabled(tab)"
         @click="isTabEnabled(tab) && (activeTab = idx)"
@@ -204,11 +253,31 @@ onBeforeUnmount(() => {
       </button>
     </div>
 
-    <!-- Sticky action bar: settings actions common to every DM (fixed here), centered.
-         Save is the single action (it saves + tests the connection); no Test Connect button.
-         Shown on every tab now that the Sync tab also holds savable settings. -->
+    <!-- Sticky action bar: connection status (left) + settings actions (right). Save no longer gates on
+         the connection — it returns fast and the status is checked separately and shown here. -->
     <div
       class="flex flex-wrap items-center justify-end gap-3 px-6 py-2 bg-white border-b border-gray-200 shadow-sm">
+
+      <!-- Persistent connection status indicator (left of the buttons). -->
+      <div v-if="connectionStatus !== 'unknown'" class="mr-auto flex items-center gap-2 text-sm">
+        <template v-if="connectionStatus === 'checking'">
+          <svg class="animate-spin w-4 h-4 text-amber-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <span class="text-amber-600">Checking connection…</span>
+        </template>
+        <template v-else-if="connectionStatus === 'ok'">
+          <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-green-500 text-white text-[10px]">✓</span>
+          <span class="text-green-600 font-medium">Connection OK</span>
+        </template>
+        <template v-else-if="connectionStatus === 'failed'">
+          <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-600 text-white text-xs font-bold">!</span>
+          <span class="text-red-600 font-bold" :title="connectionMessage">Connection failed</span>
+          <button type="button" class="text-xs text-red-500 hover:text-red-700 underline cursor-pointer" @click="checkConnection">retry</button>
+        </template>
+      </div>
+
       <button
         type="button"
         class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition cursor-pointer"
@@ -287,6 +356,7 @@ onBeforeUnmount(() => {
           :service-base="serviceBase"
           :active-action-id="activeActionId"
           :diagnostics="schema.diagnostics"
+          :connection-ok="connectionOk"
           @update:state="onUpdateState"
           @action="(id, handler, payload) => emit('action', id, handler, payload)"
         />

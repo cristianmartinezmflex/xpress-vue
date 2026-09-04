@@ -35,7 +35,17 @@ const props = defineProps<{
   serviceBase?: string
   activeActionId?: string | null
   diagnostics?: DiagnosticIssue[]
+  // Current DM connection state (null = unknown/not yet checked). Controls flagged requiresConnection are
+  // disabled when this is explicitly false.
+  connectionOk?: boolean | null
 }>()
+
+// Tooltip shown on a control disabled because the connection test is failing.
+const CONN_DISABLED_TOOLTIP = 'Disabled — could not connect to the external system. Fix the connection (Save to re-test) to enable this.'
+
+function isConnDisabled(control: Control): boolean {
+  return !!control.requiresConnection && props.connectionOk === false
+}
 
 const emit = defineEmits<{
   'update:state': [id: string, value: any]
@@ -182,8 +192,11 @@ function updateControl(control: Control, value: any): void {
         <template v-for="control in col.controls" :key="control.id">
           <div
             v-show="isControlVisible(control)"
-            class="transition-opacity"
-            :class="!isControlEnabled(control, col) && isColumnEnabled(col) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : ''"
+            class="relative transition-opacity"
+            :class="[
+              !isControlEnabled(control, col) && isColumnEnabled(col) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : '',
+              isConnDisabled(control) ? 'opacity-50' : ''
+            ]"
           >
             <ControlPassword
               v-if="control.type === 'password'"
@@ -252,6 +265,8 @@ function updateControl(control: Control, value: any): void {
               :guid="guid"
               :service-base="serviceBase"
               :error="errors[control.id]"
+              :show-refresh-button="control.dynOptionsShowRefreshButton"
+              :refresh-trigger="control.refreshOnControlChange ? state[control.refreshOnControlChange] : undefined"
               @update:model-value="emit('update:state', control.id, $event)"
             />
 
@@ -374,6 +389,14 @@ function updateControl(control: Control, value: any): void {
               :service-base="serviceBase"
               @update:model-value="control.detailOf ? updateControl(control, $event) : emit('update:state', control.id, $event)"
             />
+
+            <!-- requiresConnection: a transparent overlay blocks interaction and carries the tooltip that
+                 explains the control is disabled because the connection test is failing. -->
+            <div
+              v-if="isConnDisabled(control)"
+              class="absolute inset-0 cursor-not-allowed"
+              :title="CONN_DISABLED_TOOLTIP"
+            ></div>
           </div>
         </template>
       </div>

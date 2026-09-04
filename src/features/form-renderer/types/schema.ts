@@ -97,9 +97,10 @@ export interface Control {
   options?: SelectOption[]
   buttons?: Button[]
   fields?: Control[]   // table: column/field defs (each a control) that drive the grid + Add-row modal
-  // table: optional action button(s) in the Add/Edit row MODAL footer (between Cancel and Save), e.g.
-  // Genetec's "Ping". Each POSTs the draft row to dm-action?type=<action> and shows the result inline.
-  modalActions?: { label: string; action: string }[]
+  // table: action button(s) in the Add/Edit row MODAL footer (between Cancel and Save), e.g. Genetec's
+  // "Ping". Declared as DataManagerSettingButton on the row type; each POSTs the row being edited (the
+  // modal draft) to its action URL and shows the returned { success, message } inline.
+  modalActions?: Button[]
   // table: when true the grid is a master in a master-detail pair — clicking a row selects it (controls
   // with detailOf pointing at this table's id then edit that selected row) instead of opening the modal.
   selectable?: boolean
@@ -126,6 +127,9 @@ export interface Control {
                       //   "<type>"        → GET .../{guid}/dm-data?type=<type>  (DM-specific data)
   dynOptions?: string // select: when set, load options dynamically from this source key (same short-form
                       // convention as loadFrom). Absent ⇒ static `options`. Unifies select + select_dynamic.
+  refreshOnControlChange?: string   // dynamic-options: id of another control to watch — re-fetch when it changes
+  dynOptionsShowRefreshButton?: boolean // dynamic-options: show a small ↻ button to re-fetch options on demand
+  requiresConnection?: boolean      // disable the control while the DM connection test is failing (with a tooltip)
   separator?: string  // multiselect: token joining selected ids (default ","; "\b"/vbBack for AEOS)
   enable?: EnableProp
   display?: DisplayProp

@@ -10,7 +10,7 @@
  * Value round-trips as a JSON string holding an array of row objects (keyed by field id).
  */
 import { ref, computed } from 'vue'
-import type { Control } from '../../types/schema'
+import type { Control, Button } from '../../types/schema'
 import { useTableSelection } from '../../composables/useTableSelection'
 import { sortRowsForDisplay } from '../../utils/tableRows'
 import ControlText          from './ControlText.vue'
@@ -29,7 +29,7 @@ const props = defineProps<{
   guid?:         string
   serviceBase?:  string
   // Optional action button(s) in the modal footer (between Cancel and Save), e.g. Genetec "Ping".
-  modalActions?: { label: string; action: string }[]
+  modalActions?: Button[]
   // Master-detail: when true, clicking a row SELECTS it (a detail control keyed by controlId edits it)
   // instead of opening the modal — editing is via a per-row pencil button. Needs controlId.
   selectable?:   boolean
@@ -166,17 +166,18 @@ function closeModal() { modalOpen.value = false }
 
 // Run a modal action button (e.g. Ping): POST the current draft row to the DM's dm-action endpoint and
 // show the returned { success, message } inline. Purely a device check — never mutates the table rows.
-async function runModalAction(a: { label: string; action: string }) {
-  if (!props.guid || !props.serviceBase) {
+async function runModalAction(btn: Button) {
+  if (!props.guid || !props.serviceBase || !btn.action) {
     actionStatus.value = { ok: false, message: 'No service connection.' }
     return
   }
-  actionBusy.value = a.action
+  actionBusy.value = btn.id
   actionStatus.value = null
   try {
-    const url = `${props.serviceBase}/api/data-managers/${props.guid}/dm-action?type=${encodeURIComponent(a.action)}`
+    // btn.action is a full URL template (short-form already expanded by the generator); {dmId} → guid.
+    const url = `${props.serviceBase}${btn.action.replace(/\{dmId\}/g, props.guid)}`
     const res = await fetch(url, {
-      method: 'POST',
+      method: (btn.verb || 'POST').toUpperCase(),
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(draft.value),
     })
@@ -335,25 +336,26 @@ function saveRow() {
                 Cancel
               </button>
 
-              <!-- Schema-driven modal action button(s), e.g. Genetec "Ping" — sits between Cancel and Save. -->
+              <!-- Modal action button(s) declared on the row type (e.g. Genetec "Ping") — between Cancel and Save. -->
               <button
-                v-for="a in (modalActions ?? [])"
-                :key="a.action"
+                v-for="btn in (modalActions ?? [])"
+                :key="btn.id"
                 type="button"
-                :disabled="actionBusy === a.action"
+                :disabled="actionBusy === btn.id"
+                :title="btn.tooltip"
                 class="px-4 py-1.5 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 transition flex items-center gap-2"
-                :class="actionBusy === a.action ? 'cursor-wait opacity-80' : 'hover:bg-gray-50 cursor-pointer'"
-                @click="runModalAction(a)"
+                :class="actionBusy === btn.id ? 'cursor-wait opacity-80' : 'hover:bg-gray-50 cursor-pointer'"
+                @click="runModalAction(btn)"
               >
                 <svg
-                  v-if="actionBusy === a.action"
+                  v-if="actionBusy === btn.id"
                   class="animate-spin w-4 h-4 text-xp-primary"
                   xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                 >
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                {{ a.label }}
+                {{ btn.title }}
               </button>
 
               <button

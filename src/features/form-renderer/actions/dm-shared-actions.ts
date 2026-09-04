@@ -130,18 +130,9 @@ export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: Ac
     return
   }
 
-  // Settings are persisted. A dialog is ONLY shown when the connection test actually FAILED.
-  // - success  → no dialog (the top-right "Saved successfully" toast in FormView is enough).
-  // - pending  → no dialog either: the test just didn't finish within the service timeout and is still
-  //              running in the background (some DMs, e.g. OnGuard, take >60s on first apply). Not an error.
-  // - failed   → red error dialog with the detail.
-  const saved = await res.json().catch(() => null)
-  const cr = saved?.connection_result
-
-  if (cr && cr.success === false && !cr.pending) {
-    const detail = cr.message ? `\n\n${oneLine(String(cr.message))}` : ''
-    show({ success: false, title: 'Saved — Connection Failed', message: `Settings saved, but the connection test failed.${detail}` })
-  }
+  // Settings are persisted — Save no longer waits on / reports the connection test. It returns fast; the
+  // connection is checked separately (POST test-connection) and shown in the toolbar's persistent status
+  // indicator (FormRenderer re-checks it after each save). The "Saved successfully" toast is enough here.
 }
 
 // ─── Generic REST button ───────────────────────────────────────────────────────
