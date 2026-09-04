@@ -78,6 +78,30 @@ function isControlVisible(control: Control): boolean {
   return evaluateDisplay(control.display, props.state)
 }
 
+// ─── customFields format bridge ─────────────────────────────────────────────────
+// The DM/WinForm canonical format for a custom-field mapping is a JSON OBJECT { source: xpeField } (the
+// service's Convert*Hashtable helpers treat these keys as objects). ControlCustomFields edits them as a
+// KeyValuePair[] (key = source, value = xpe field), so convert at the boundary: object → pairs in, pairs
+// → object out. Also accepts a legacy array / array-string so previously Vue-saved data still loads.
+function customFieldsPairs(v: any): { key: string; value: string }[] {
+  const fromObj = (o: Record<string, any>) => Object.entries(o).map(([key, value]) => ({ key, value: String(value ?? '') }))
+  if (Array.isArray(v)) return v as { key: string; value: string }[]
+  if (v && typeof v === 'object') return fromObj(v)
+  if (typeof v === 'string' && v.trim()) {
+    try {
+      const p = JSON.parse(v)
+      if (Array.isArray(p)) return p
+      if (p && typeof p === 'object') return fromObj(p)
+    } catch { /* not JSON */ }
+  }
+  return []
+}
+function pairsToObject(pairs: { key: string; value: string }[]): Record<string, string> {
+  const o: Record<string, string> = {}
+  for (const p of pairs) if (p?.key) o[p.key] = p.value ?? ''
+  return o
+}
+
 // ─── Master-detail helpers ───────────────────────────────────────────────────────
 // A control with `detailOf` edits the SELECTED row of that table: its value lives on the row under the
 // control's own id, so plain generic controls (Boolean, MultiSelect) act as the detail editor of a
@@ -269,8 +293,8 @@ function updateControl(control: Control, value: any): void {
               :state="state"
               :guid="guid"
               :service-base="serviceBase"
-              :model-value="state[control.id] ?? []"
-              @update:model-value="emit('update:state', control.id, $event)"
+              :model-value="customFieldsPairs(state[control.id])"
+              @update:model-value="emit('update:state', control.id, pairsToObject($event))"
               @update:state-key="(key, value) => emit('update:state', key, value)"
             />
 
