@@ -127,7 +127,10 @@ export interface Control {
                       //   "<type>"        → GET .../{guid}/dm-data?type=<type>  (DM-specific data)
   dynOptions?: string // select: when set, load options dynamically from this source key (same short-form
                       // convention as loadFrom). Absent ⇒ static `options`. Unifies select + select_dynamic.
-  refreshOnControlChange?: string   // dynamic-options: id of another control to watch — re-fetch when it changes
+  dynOptionsParams?: string  // dynamic-options: ";"-separated sibling setting-keys whose CURRENT (unsaved) form
+                             // values are appended as query params to the dm-data request (backend uses them
+                             // instead of the persisted fields — e.g. OnGuard Directory against a just-typed host)
+  refreshOnControlChange?: string   // dynamic-options: comma-separated id(s) of other control(s) to watch — re-fetch when any changes
   dynOptionsShowRefreshButton?: boolean // dynamic-options: show a small ↻ button to re-fetch options on demand
   requiresConnection?: boolean      // disable the control while the DM connection test is failing (with a tooltip)
   separator?: string  // multiselect: token joining selected ids (default ","; "\b"/vbBack for AEOS)

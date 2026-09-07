@@ -47,6 +47,30 @@ function isConnDisabled(control: Control): boolean {
   return !!control.requiresConnection && props.connectionOk === false
 }
 
+// refreshOnControlChange may name one control key or a comma-separated list. Emit a single
+// scalar (the joined watched values) so ControlSelect re-fetches whenever ANY of them changes.
+function refreshTriggerFor(control: Control): unknown {
+  if (!control.refreshOnControlChange) return undefined
+  return control.refreshOnControlChange
+    .split(',')
+    .map((k) => String(props.state[k.trim()] ?? ''))
+    .join('|')
+}
+
+// dynOptionsParams: build { settingKey: liveValue } from the current form state so ControlSelect can send
+// the user's unsaved sibling-field values as query params on its dm-data fetch (e.g. OnGuard Directory).
+function dynParamsFor(control: Control): Record<string, string> | undefined {
+  if (!control.dynOptionsParams) return undefined
+  const out: Record<string, string> = {}
+  for (const raw of control.dynOptionsParams.split(';')) {
+    const key = raw.trim()
+    if (!key) continue
+    const v = props.state[key]
+    if (v !== undefined && v !== null && v !== '') out[key] = String(v)
+  }
+  return out
+}
+
 const emit = defineEmits<{
   'update:state': [id: string, value: any]
   action: [id: string, handler: string, payload?: unknown]
@@ -266,7 +290,8 @@ function updateControl(control: Control, value: any): void {
               :service-base="serviceBase"
               :error="errors[control.id]"
               :show-refresh-button="control.dynOptionsShowRefreshButton"
-              :refresh-trigger="control.refreshOnControlChange ? state[control.refreshOnControlChange] : undefined"
+              :refresh-trigger="refreshTriggerFor(control)"
+              :dyn-params="dynParamsFor(control)"
               @update:model-value="emit('update:state', control.id, $event)"
             />
 

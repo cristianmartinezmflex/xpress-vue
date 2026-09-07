@@ -26,6 +26,7 @@ const props = defineProps<{
   error?:       string
   showRefreshButton?: boolean    // dynOptionsShowRefreshButton: render a ↻ button to re-fetch on demand
   refreshTrigger?:    unknown     // refreshOnControlChange: the watched control's value — re-fetch on change
+  dynParams?:   Record<string, string>  // dynOptionsParams: live sibling-field values to send as query params
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string | number] }>()
 
@@ -39,8 +40,18 @@ const fetchErr = ref('')
 
 async function loadOptions() {
   if (!isDynamic.value) return
-  const url = resolveLoadFromUrl(source.value, props.serviceBase ?? '', props.guid)
+  let url = resolveLoadFromUrl(source.value, props.serviceBase ?? '', props.guid)
   if (!url) return
+  // dynOptionsParams: append the live sibling-field values so the backend builds the list against the
+  // user's unsaved input (e.g. OnGuard Directory against the just-typed host). Empty values are omitted
+  // (the backend treats absent and empty the same: it falls back to the persisted value).
+  if (props.dynParams) {
+    const qs = Object.entries(props.dynParams)
+      .filter(([, v]) => v !== undefined && v !== null && v !== '')
+      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
+      .join('&')
+    if (qs) url += (url.includes('?') ? '&' : '?') + qs
+  }
   loading.value = true
   fetchErr.value = ''
   try {
