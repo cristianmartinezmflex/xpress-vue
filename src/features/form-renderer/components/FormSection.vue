@@ -47,12 +47,13 @@ function isConnDisabled(control: Control): boolean {
   return !!control.requiresConnection && props.connectionOk === false
 }
 
-// refreshOnControlChange may name one control key or a comma-separated list. Emit a single
-// scalar (the joined watched values) so ControlSelect re-fetches whenever ANY of them changes.
+// refreshOnControlChange may name one control key or a list. Emit a single scalar (the joined watched
+// values) so ControlSelect re-fetches whenever ANY of them changes. Split on both "," and ";" so a
+// stale/embedded schema built with the older separator still parses (setting keys never contain either).
 function refreshTriggerFor(control: Control): unknown {
   if (!control.refreshOnControlChange) return undefined
   return control.refreshOnControlChange
-    .split(',')
+    .split(/[,;]/)
     .map((k) => String(props.state[k.trim()] ?? ''))
     .join('|')
 }
@@ -62,7 +63,7 @@ function refreshTriggerFor(control: Control): unknown {
 function dynParamsFor(control: Control): Record<string, string> | undefined {
   if (!control.dynOptionsParams) return undefined
   const out: Record<string, string> = {}
-  for (const raw of control.dynOptionsParams.split(';')) {
+  for (const raw of control.dynOptionsParams.split(/[,;]/)) {
     const key = raw.trim()
     if (!key) continue
     const v = props.state[key]
