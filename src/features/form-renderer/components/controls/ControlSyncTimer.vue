@@ -124,7 +124,7 @@ function save()          { emit('update:modelValue', draftRaw.value); modalOpen.
 
 <template>
   <div class="flex items-center gap-3">
-    <label class="text-sm text-xp-label text-right flex-1 min-w-0">{{ title }}</label>
+    <label class="text-sm text-xp-label w-60 shrink-0 whitespace-nowrap">{{ title }}</label>
     <input
       type="text"
       readonly
