@@ -10,7 +10,7 @@
  *
  * Any saved id not present in the loaded options is still shown, so a selection is never dropped.
  */
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import type { SelectOption } from '../../types/schema'
 import { resolveLoadFromUrl } from '../../utils/loadFrom'
 import { truncateLabel } from '../../utils/text'
@@ -70,9 +70,18 @@ async function loadOptions() {
 
 onMounted(loadOptions)
 
-// Re-fetch when the watched control (refreshOnControlChange) changes — e.g. segments depend on the
-// selected directory. Skip the initial run (onMounted already loaded once).
-watch(() => props.refreshTrigger, () => { if (isDynamic.value) loadOptions() })
+// Re-fetch when the watched control(s) (refreshOnControlChange) change — e.g. the directory list
+// depends on the typed host/port. DEBOUNCED: the trigger changes on every keystroke, so wait until the
+// user has stopped typing for REFRESH_DEBOUNCE_MS before hitting the API (the manual ↻ button and the
+// initial mount stay immediate — they don't go through here).
+const REFRESH_DEBOUNCE_MS = 3000
+let refreshTimer: ReturnType<typeof setTimeout> | null = null
+watch(() => props.refreshTrigger, () => {
+  if (!isDynamic.value) return
+  if (refreshTimer) clearTimeout(refreshTimer)
+  refreshTimer = setTimeout(() => { refreshTimer = null; loadOptions() }, REFRESH_DEBOUNCE_MS)
+})
+onBeforeUnmount(() => { if (refreshTimer) clearTimeout(refreshTimer) })
 
 const options = computed<SelectOption[]>(() => (isDynamic.value ? fetched.value : (props.options ?? [])))
 
