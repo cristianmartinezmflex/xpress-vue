@@ -110,7 +110,13 @@ async function loadInto(url: string | null, combo: Combo) {
     combo.options = Array.isArray(data)
       ? data.map((d: any) => (typeof d === 'string' ? d : (d?.name ?? d?.id ?? '')))
           .filter(Boolean)
-          .sort((a: string, b: string) => a.localeCompare(b))   // alphabetical (WinForm parity)
+          // Alphabetical, but UDF entries ("… (UDF12)") sink to the end — matching the WinForm's
+          // Destination Columns (reflected fields first, then UDFs). Source lists (no UDFs) stay fully sorted.
+          .sort((a: string, b: string) => {
+            const ua = /\(UDF\d+\)\s*$/i.test(a) ? 1 : 0
+            const ub = /\(UDF\d+\)\s*$/i.test(b) ? 1 : 0
+            return ua !== ub ? ua - ub : a.localeCompare(b)
+          })
       : []
   } catch {
     loadErr.msg = 'Could not load'

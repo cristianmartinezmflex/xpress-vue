@@ -62,7 +62,7 @@ async function loadSchema(key: string) {
   // GET /api/data-managers/{guid}/settings-schema. Every other DM keeps using its static
   // src/data/<key>.json for now. Falls back to the static schema if the endpoint is unavailable.
   // Compared case-insensitively because the route key is the ./data filename (e.g. "ONGUARD").
-  const SERVICE_SCHEMA_KEYS = new Set(['genetec', 'onguard', 'gallagher'])
+  const SERVICE_SCHEMA_KEYS = new Set(['genetec', 'onguard', 'gallagher', 'avigilon'])
 
   let schemaFromService = false
   if (guid && SERVICE_SCHEMA_KEYS.has(key.toLowerCase())) {
