@@ -52,6 +52,7 @@ onMounted(async () => {
       cardTypes.value = data
         .map((o: any) => ({ id: String(o?.id ?? ''), name: String(o?.name ?? o?.id ?? '') }))
         .filter((o) => o.id)
+        .sort((a, b) => a.name.localeCompare(b.name))   // alphabetical (WinForm parity)
     }
   } catch { /* leave empty — the id is still preserved */ }
 })

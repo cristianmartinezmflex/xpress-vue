@@ -21,8 +21,12 @@ const props = defineProps<{
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
 // Normalise the schema options into the shape the editor uses. ids are the LISTS enum integers.
+// Sorted alphabetically by label to match the WinForm's Custom Table Sync dropdown (the stored value is
+// the id, so ordering the display doesn't change what gets saved).
 const availableTables = computed(() =>
-  (props.options ?? []).map((o) => ({ value: Number(o.id), label: o.name })),
+  (props.options ?? [])
+    .map((o) => ({ value: Number(o.id), label: o.name }))
+    .sort((a, b) => a.label.localeCompare(b.label)),
 )
 
 const rows = computed<Row[]>(() => {
@@ -34,9 +38,9 @@ function emitRows(next: Row[]) {
   emit('update:modelValue', next.length ? JSON.stringify(next) : '')
 }
 function addTable() {
-  const first = availableTables.value[0]
-  if (!first) return   // no syncable entities declared for this DM
-  emitRows([...rows.value, { iDMTable: first.value, bPartial: false }])
+  // Start UNSELECTED (-1 sentinel) so the new row shows blank instead of a preselected entity — the user
+  // must pick one explicitly (matches the WinForm, whose new row opens with an empty combo).
+  emitRows([...rows.value, { iDMTable: -1, bPartial: false }])
 }
 function removeTable(i: number) { emitRows(rows.value.filter((_, idx) => idx !== i)) }
 function setTable(i: number, value: number) { emitRows(rows.value.map((r, idx) => idx === i ? { ...r, iDMTable: value } : r)) }
@@ -106,6 +110,7 @@ function resetDrag() { dragIndex.value = null; overIndex.value = null }
           class="flex-1 text-sm border border-gray-300 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-xp-primary cursor-pointer"
           @change="setTable(i, Number(($event.target as HTMLSelectElement).value))"
         >
+          <option v-if="row.iDMTable < 0" :value="-1" disabled hidden></option>
           <option v-for="t in availableTables" :key="t.value" :value="t.value">{{ t.label }}</option>
         </select>
         <label class="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer select-none whitespace-nowrap">

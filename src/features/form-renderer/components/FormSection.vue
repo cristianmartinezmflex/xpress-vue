@@ -207,18 +207,14 @@ function updateControl(control: Control, value: any): void {
         !sectionEnabled ? 'pointer-events-none select-none' : ''
       ]"
     >
-      <div
-        v-for="(col, colIdx) in columns"
-        v-show="isColumnVisible(col)"
-        :key="colIdx"
-        class="flex flex-col gap-4 transition-opacity"
-        :class="!isColumnEnabled(col) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : ''"
-      >
-        <template v-for="control in col.controls" :key="control.id">
+      <template v-for="(col, colIdx) in columns" :key="colIdx">
+        <template v-for="(control, rowIdx) in col.controls" :key="control.id">
           <div
-            v-show="isControlVisible(control)"
-            class="relative transition-opacity"
+            v-show="isColumnVisible(col) && isControlVisible(control)"
+            class="section-cell relative transition-opacity"
+            :style="{ '--col': String(colIdx + 1), '--row': String(rowIdx + 1) }"
             :class="[
+              !isColumnEnabled(col) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : '',
               !isControlEnabled(control, col) && isColumnEnabled(col) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : '',
               isConnDisabled(control) ? 'opacity-50' : ''
             ]"
@@ -425,7 +421,20 @@ function updateControl(control: Control, value: any): void {
             ></div>
           </div>
         </template>
-      </div>
+      </template>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Multi-column sections (all are 2-col) render as one grid with every control placed in its authored
+   column and row, so paired controls share a grid row — and thus the same height — matching the WinForm
+   grid alignment. Applied only at sm+ where the section is a real grid; on mobile the section collapses to
+   one column and the cells stack in DOM order. */
+@media (min-width: 640px) {
+  .section-cell {
+    grid-column: var(--col);
+    grid-row: var(--row);
+  }
+}
+</style>

@@ -108,7 +108,9 @@ async function loadInto(url: string | null, combo: Combo) {
     if (!res.ok) { loadErr.msg = `Error ${res.status}`; return }
     const data = await res.json()
     combo.options = Array.isArray(data)
-      ? data.map((d: any) => (typeof d === 'string' ? d : (d?.name ?? d?.id ?? ''))).filter(Boolean)
+      ? data.map((d: any) => (typeof d === 'string' ? d : (d?.name ?? d?.id ?? '')))
+          .filter(Boolean)
+          .sort((a: string, b: string) => a.localeCompare(b))   // alphabetical (WinForm parity)
       : []
   } catch {
     loadErr.msg = 'Could not load'

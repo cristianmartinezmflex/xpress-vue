@@ -83,7 +83,19 @@ watch(() => props.refreshTrigger, () => {
 })
 onBeforeUnmount(() => { if (refreshTimer) clearTimeout(refreshTimer) })
 
-const options = computed<SelectOption[]>(() => (isDynamic.value ? fetched.value : (props.options ?? [])))
+// Static options keep their declared (often semantic) order; dynamically-fetched data lists are sorted
+// alphabetically by label to match the WinForm.
+const options = computed<SelectOption[]>(() => {
+  if (!isDynamic.value) return props.options ?? []
+  return [...fetched.value].sort((a, b) => String(a.name).localeCompare(String(b.name)))
+})
+
+// Whether the current value matches one of the loaded options. When it does, we DON'T render the blank
+// "unset" row (it's just noise once something valid is selected). We keep the blank only when nothing
+// valid is selected yet, so the control can still show/represent an empty state.
+const hasSelection = computed(() =>
+  options.value.some((o) => String(o.id) === String(props.modelValue)),
+)
 
 // Coerce numeric ids to numbers (dynamic ids are usually numeric) so the saved value matches the option
 // type; leave the blank/unset and non-numeric values as-is.
@@ -106,8 +118,9 @@ function onChange(e: Event) {
           :disabled="loading"
           @change="onChange"
         >
-          <!-- Dynamic: a blank "unset" option first (mirrors the WinForm's empty combo). -->
-          <option v-if="isDynamic" :value="-1"></option>
+          <!-- Dynamic: a blank "unset" option, only while nothing valid is selected (hidden once the
+               current value matches a real option, so there's no dangling empty row). -->
+          <option v-if="isDynamic && !hasSelection" :value="-1"></option>
           <option v-if="loading" value="" disabled>Loading…</option>
           <option v-for="opt in options" :key="opt.id" :value="opt.id" :title="opt.name">{{ truncateLabel(opt.name) }}</option>
         </select>

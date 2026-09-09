@@ -10,7 +10,7 @@
  * NOT tied to any Data Manager. Any selected id not present in the option list is still shown, so a
  * saved selection is never silently dropped.
  */
-import { computed, ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import type { SelectOption } from '../../types/schema'
 import { resolveLoadFromUrl } from '../../utils/loadFrom'
 
@@ -75,7 +75,10 @@ const options = computed<Option[]>(() => {
   for (const o of src) byId.set(o.id, o)
   // Keep any saved-but-not-listed ids visible so a selection is never silently dropped.
   for (const id of selectedIds.value) if (!byId.has(id)) byId.set(id, { id, name: id })
-  return [...byId.values()]
+  const arr = [...byId.values()]
+  // Dynamic data lists are sorted alphabetically (WinForm parity); pure-static lists keep declared order.
+  if (props.dynOptions || props.loadFrom) arr.sort((a, b) => a.name.localeCompare(b.name))
+  return arr
 })
 
 function isChecked(id: string): boolean {
@@ -90,31 +93,15 @@ function toggle(id: string) {
 function selectAll() { emit('update:modelValue', options.value.map((o) => o.id).join(sep.value)) }
 function clearAll()  { emit('update:modelValue', '') }
 
-// ─── Search dialog (the WinForm's "..." button → "Search Panels" popup) ──────────
-// A modal with a "Type to filter…" box and an "N of M items" counter, checking items in place.
-const searchOpen  = ref(false)
-const query       = ref('')
-const searchInput = ref<HTMLInputElement | null>(null)
+// ─── Inline filter (replaces the old "…" button + modal): a "Type to filter…" box that narrows the
+// list in place. The value stays the full selection; filtering only affects what's shown.
+const query = ref('')
 
 const filteredOptions = computed<Option[]>(() => {
   const q = query.value.trim().toLowerCase()
   if (!q) return options.value
   return options.value.filter((o) => o.name.toLowerCase().includes(q))
 })
-
-async function openSearch() {
-  query.value = ''
-  searchOpen.value = true
-  await nextTick()
-  searchInput.value?.focus()
-}
-function closeSearch() { searchOpen.value = false }
-
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape' && searchOpen.value) closeSearch()
-}
-onMounted(() => document.addEventListener('keydown', onKeydown))
-onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
@@ -125,15 +112,13 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
       <button type="button" class="text-xs text-xp-primary hover:underline cursor-pointer" @click="selectAll">Select All</button>
       <span class="text-xs text-gray-300">|</span>
       <button type="button" class="text-xs text-xp-primary hover:underline cursor-pointer" @click="clearAll">Clear All</button>
-      <!-- "…" opens the search dialog (WinForm parity) -->
-      <button
-        type="button"
-        class="ml-auto flex items-center justify-center w-7 h-7 rounded-lg border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 cursor-pointer"
-        title="Search"
-        @click="openSearch"
-      >
-        <span class="text-base leading-none -mt-1">…</span>
-      </button>
+      <!-- Inline filter (replaces the old "…" search modal): narrows the list in place. -->
+      <input
+        v-model="query"
+        type="text"
+        placeholder="Type to filter…"
+        class="ml-auto w-48 border-0 border-b-2 border-xp-primary focus:outline-none text-sm py-1.5 bg-transparent"
+      />
     </div>
 
     <!-- While the option list is being fetched from the API, show a spinner instead of the empty box. -->
@@ -150,7 +135,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
     <div v-else class="border border-gray-200 rounded-lg overflow-hidden max-h-64 overflow-y-auto">
       <label
-        v-for="o in options"
+        v-for="o in filteredOptions"
         :key="o.id"
         class="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0"
       >
@@ -165,50 +150,14 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
       <div v-if="options.length === 0" class="px-3 py-4 text-center text-gray-400 text-sm">
         No options loaded yet.
       </div>
+      <div v-else-if="filteredOptions.length === 0" class="px-3 py-4 text-center text-gray-400 text-sm">
+        No items match “{{ query }}”.
+      </div>
     </div>
 
     <p v-if="loadErr" class="text-xs text-xp-orange">{{ loadErr }} — click “Update Panel List” to load from the system</p>
-    <p class="text-xs text-gray-400">{{ selectedIds.length }} selected</p>
+    <p class="text-xs text-gray-400">
+      {{ selectedIds.length }} selected<span v-if="query.trim()"> · {{ filteredOptions.length }} of {{ options.length }} shown</span>
+    </p>
   </div>
-
-  <!-- Search dialog: filter box + checkbox list, toggling selections in place (WinForm "Search" popup). -->
-  <Teleport to="body">
-    <div v-if="searchOpen" class="fixed inset-0 z-[80] flex items-center justify-center bg-black/40" @mousedown.self="closeSearch">
-      <div class="w-[440px] max-w-[92vw] max-h-[85vh] rounded-xl bg-white shadow-xl flex flex-col">
-        <div class="flex items-center justify-between px-5 pt-4">
-          <h3 class="text-base font-semibold text-gray-800">Search{{ title ? ' ' + title : '' }}</h3>
-          <button type="button" class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 cursor-pointer" title="Close" @click="closeSearch">✕</button>
-        </div>
-
-        <div class="px-5 pt-3">
-          <input
-            ref="searchInput"
-            v-model="query"
-            type="text"
-            placeholder="Type to filter…"
-            class="w-full border-0 border-b-2 border-xp-primary focus:outline-none text-sm py-1.5 bg-transparent"
-          />
-          <p class="text-xs text-gray-400 mt-2">{{ filteredOptions.length }} of {{ options.length }} items</p>
-        </div>
-
-        <div class="flex-1 overflow-y-auto px-5 py-3 mt-1">
-          <label
-            v-for="o in filteredOptions"
-            :key="o.id"
-            class="flex items-center gap-3 px-1 py-1.5 hover:bg-gray-50 cursor-pointer rounded"
-          >
-            <input type="checkbox" :checked="isChecked(o.id)" class="w-4 h-4 rounded accent-xp-primary" @change="toggle(o.id)" />
-            <span class="text-sm text-gray-800">{{ o.name }}</span>
-          </label>
-          <div v-if="filteredOptions.length === 0" class="px-1 py-6 text-center text-gray-400 text-sm">
-            No items match “{{ query }}”.
-          </div>
-        </div>
-
-        <div class="flex justify-end px-5 py-3 border-t border-gray-100">
-          <button type="button" class="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 cursor-pointer" @click="closeSearch">Close</button>
-        </div>
-      </div>
-    </div>
-  </Teleport>
 </template>
