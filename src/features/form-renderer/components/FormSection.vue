@@ -216,6 +216,7 @@ function updateControl(control: Control, value: any): void {
             :class="[
               !isColumnEnabled(col) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : '',
               !isControlEnabled(control, col) && isColumnEnabled(col) && sectionEnabled ? 'opacity-50 pointer-events-none select-none' : '',
+              control.disabled ? 'opacity-50 pointer-events-none select-none' : '',
               isConnDisabled(control) ? 'opacity-50' : ''
             ]"
           >

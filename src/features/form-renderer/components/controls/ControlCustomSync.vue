@@ -8,7 +8,7 @@
  * base DataManagerSettings declares the full default set and each DM overrides it with its own subset
  * (DataManagerSettingCustomSyncEntities). Nothing here is hardcoded — a DM with no entities offers none.
  */
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { SelectOption } from '../../types/schema'
 
 interface Row { iDMTable: number; bPartial: boolean }
@@ -29,22 +29,38 @@ const availableTables = computed(() =>
     .sort((a, b) => a.label.localeCompare(b.label)),
 )
 
-const rows = computed<Row[]>(() => {
-  if (!props.modelValue) return []
-  try { const p = JSON.parse(props.modelValue); return Array.isArray(p) ? p : [] } catch { return [] }
+function parseRows(v: string): Row[] {
+  if (!v) return []
+  try { const p = JSON.parse(v); return Array.isArray(p) ? p : [] } catch { return [] }
+}
+// Only rows with a real selection (iDMTable >= 0) become the emitted value — a "-1" placeholder row (just
+// added, not yet picked) is kept LOCALLY for rendering but never persisted, so an empty new row doesn't
+// count as a change (Save stays disabled) and can't be saved.
+function serializeValid(list: Row[]): string {
+  const valid = list.filter((r) => r.iDMTable >= 0)
+  return valid.length ? JSON.stringify(valid) : ''
+}
+
+// Local working copy (includes any in-progress empty row). Seeded from modelValue, and re-seeded only when
+// modelValue changes to something OTHER than what we last emitted (external load/reset) — our own emits
+// (which exclude the empty row) must not wipe that row.
+const rows = ref<Row[]>(parseRows(props.modelValue))
+watch(() => props.modelValue, (v) => {
+  if ((v || '') !== serializeValid(rows.value)) rows.value = parseRows(v)
 })
 
-function emitRows(next: Row[]) {
-  emit('update:modelValue', next.length ? JSON.stringify(next) : '')
-}
+function commit() { emit('update:modelValue', serializeValid(rows.value)) }
+
 function addTable() {
   // Start UNSELECTED (-1 sentinel) so the new row shows blank instead of a preselected entity — the user
-  // must pick one explicitly (matches the WinForm, whose new row opens with an empty combo).
-  emitRows([...rows.value, { iDMTable: -1, bPartial: false }])
+  // must pick one explicitly (matches the WinForm, whose new row opens with an empty combo). commit()
+  // emits only the valid rows, so this empty row does NOT dirty the form.
+  rows.value = [...rows.value, { iDMTable: -1, bPartial: false }]
+  commit()
 }
-function removeTable(i: number) { emitRows(rows.value.filter((_, idx) => idx !== i)) }
-function setTable(i: number, value: number) { emitRows(rows.value.map((r, idx) => idx === i ? { ...r, iDMTable: value } : r)) }
-function setPartial(i: number, value: boolean) { emitRows(rows.value.map((r, idx) => idx === i ? { ...r, bPartial: value } : r)) }
+function removeTable(i: number) { rows.value = rows.value.filter((_, idx) => idx !== i); commit() }
+function setTable(i: number, value: number) { rows.value = rows.value.map((r, idx) => idx === i ? { ...r, iDMTable: value } : r); commit() }
+function setPartial(i: number, value: boolean) { rows.value = rows.value.map((r, idx) => idx === i ? { ...r, bPartial: value } : r); commit() }
 
 // ─── Drag-and-drop reorder (order matters — the sync runs the tables in this order) ───────────────
 const dragIndex = ref<number | null>(null)
@@ -68,7 +84,8 @@ function onDrop(i: number) {
     const next = [...rows.value]
     const [moved] = next.splice(from, 1)
     next.splice(i, 0, moved)
-    emitRows(next)
+    rows.value = next
+    commit()
   }
   resetDrag()
 }
