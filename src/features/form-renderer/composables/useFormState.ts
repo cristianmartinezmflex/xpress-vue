@@ -91,6 +91,11 @@ export function useFormState(schema: FormSchema, initialValues?: Record<string, 
               state[control.id] = coerceValue(initialValues[control.id], control)
             } else if (control.default !== undefined) {
               state[control.id] = control.default
+            } else if (control.type === 'boolean') {
+              // Seed checkboxes to false so the key exists in the pristine baseline. Otherwise checking then
+              // unchecking one ADDS a key that wasn't in the baseline snapshot, leaving the form permanently
+              // "dirty" (Save stuck enabled) even though nothing effectively changed.
+              state[control.id] = false
             }
           })
         })
