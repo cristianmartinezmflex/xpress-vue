@@ -115,12 +115,11 @@ watch(() => route.params.schema, (key) => loadSchema(key as string), { immediate
 
 // The view stays generic: it only wires the runtime context (form state, guid, service base,
 // navigation, reset-to-defaults) and delegates every onClick to the prefix-based dispatcher.
-// All Data-Manager-specific behavior lives in actions/<dm>.ts.
+// The renderer is fully schema-driven — there is no Data-Manager-specific behavior wired here.
 const { dispatch } = useDmActions(() => ({
   guid:             route.query.guid as string | undefined,
   state:            formRenderer.value?.state ?? {},
   serviceBase:      DM_SERVICE_BASE,
-  schemaKey:        route.params.schema as string,
   navigate:         (path: string) => router.push(path),
   resetToDefaults:  () => formRenderer.value?.resetToDefaults(),
 }))

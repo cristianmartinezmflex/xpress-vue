@@ -14,44 +14,20 @@ export type { ActionContext, ActionFn } from './action-context'
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' }
 
-// Per-DM serialization of state → request body (keyvalue arrays → Hashtable objects, etc.).
-// Kept here because it is applied uniformly by the shared save / test-connection actions.
-function serializeState(schemaKey: string | undefined, state: Record<string, any>): Record<string, any> {
+// Serialize form state → request body. Fully DM-AGNOSTIC (no per-DM branches):
+//  • drop transient UI-only keys (prefixed with "_") so they are never persisted as DM settings;
+//  • customFields controls hold a KeyValuePair[] (until edited, then already an object) — persist any
+//    array-valued key as a { key: value } object, the shape the service expects. The ONLY array-valued
+//    keys in form state are customFields, so this is detected by SHAPE, not by DM/key name.
+// JSON-string fields (table / custom_sync / site_timezones) are sent as-is; the service/DM parses the
+// string itself (e.g. Genetec reads rio_list only "If TypeOf ... Is String").
+function serializeState(state: Record<string, any>): Record<string, any> {
   const body: Record<string, any> = { ...state }
-  // Drop transient UI-only keys (prefixed with "_", e.g. _onguard_panels, _rs2_sites_cache) so they
-  // are never persisted as DM settings.
-  for (const key of Object.keys(body)) if (key.startsWith('_')) delete body[key]
-  const kvToObject = (field: string) => {
-    if (Array.isArray(body[field])) {
-      body[field] = Object.fromEntries(
-        (body[field] as { key: string; value: string }[]).map((r) => [r.key, r.value]),
-      )
-    }
+  for (const key of Object.keys(body)) {
+    if (key.startsWith('_')) { delete body[key]; continue }
+    const v = body[key]
+    if (Array.isArray(v)) body[key] = Object.fromEntries(v.map((r: any) => [r?.key, r?.value]))
   }
-
-  if (schemaKey === 'avigilon') kvToObject('CustomFields')
-
-  if (schemaKey === 'aeos') {
-    for (const field of ['emp_fields', 'visitor_fields', 'contractor_fields']) kvToObject(field)
-  }
-
-  if (schemaKey === 'rs2-rest') {
-    kvToObject('custom_fields_users')
-    if (typeof body['site_timezones'] === 'string' && body['site_timezones']) {
-      try {
-        const arr = JSON.parse(body['site_timezones']) as { siteId: string; timezone: string }[]
-        if (Array.isArray(arr)) body['site_timezones'] = Object.fromEntries(arr.map((r) => [r.siteId, r.timezone]))
-      } catch { /* leave as-is */ }
-    }
-  }
-
-  if (schemaKey === 'genetec') {
-    kvToObject('customFields')
-    if (typeof body['rio_list'] === 'string' && body['rio_list']) {
-      try { body['rio_list'] = JSON.parse(body['rio_list']) } catch { /* leave as-is */ }
-    }
-  }
-
   return body
 }
 
@@ -67,14 +43,13 @@ function oneLine(raw: string): string {
 // async function checkConnection(
 //   guid: string,
 //   serviceBase: string | undefined,
-//   schemaKey: string | undefined,
 //   state: Record<string, any>,
 // ): Promise<{ ok: boolean; message: string }> {
 //   try {
 //     const res = await fetch(`${serviceBase}/api/data-managers/${guid}/test-connection`, {
 //       method:  'POST',
 //       headers: JSON_HEADERS,
-//       body:    JSON.stringify(serializeState(schemaKey, state)),
+//       body:    JSON.stringify(serializeState(state)),
 //     })
 //     if (res.ok) return { ok: true, message: '' }
 //     const result = await res.json().catch(() => null)
@@ -103,7 +78,7 @@ export function dm_shared_reloadCustomFields(): void {
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
 
-export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: ActionContext): Promise<void> {
+export async function dm_shared_save({ guid, state, serviceBase }: ActionContext): Promise<void> {
   if (!guid) { alert('No GUID provided — cannot save.'); return }
 
   const { show } = useDialog()
@@ -116,7 +91,7 @@ export async function dm_shared_save({ guid, state, serviceBase, schemaKey }: Ac
     res = await fetch(`${serviceBase}/api/data-managers/${guid}`, {
       method: 'PUT',
       headers: JSON_HEADERS,
-      body: JSON.stringify(serializeState(schemaKey, state)),
+      body: JSON.stringify(serializeState(state)),
     })
   } catch {
     show({ success: false, title: 'Save', message: 'Could not reach the service.' })
