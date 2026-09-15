@@ -46,7 +46,7 @@ function oneLine(raw: string): string {
 //   state: Record<string, any>,
 // ): Promise<{ ok: boolean; message: string }> {
 //   try {
-//     const res = await fetch(`${serviceBase}/api/data-managers/${guid}/test-connection`, {
+//     const res = await fetch(`${serviceBase}/dm/${guid}/test-connection`, {
 //       method:  'POST',
 //       headers: JSON_HEADERS,
 //       body:    JSON.stringify(serializeState(state)),
@@ -88,7 +88,7 @@ export async function dm_shared_save({ guid, state, serviceBase }: ActionContext
   // no separate Test Connect step anymore.
   let res: Response
   try {
-    res = await fetch(`${serviceBase}/api/data-managers/${guid}`, {
+    res = await fetch(`${serviceBase}/dm/${guid}`, {
       method: 'PUT',
       headers: JSON_HEADERS,
       body: JSON.stringify(serializeState(state)),

@@ -25,8 +25,8 @@ const meta: Meta<typeof ControlShowcase> = {
           '- `validations` — array de `{ type: "required" | "regex" | "min_max", pattern?, min?, max?, error }`.',
           '',
           '**Acciones (2 formas):**',
-          '- **REST (recomendada)** — el botón declara `{ verb, action }`: al clickearlo se hace `verb <serviceBase><action>` (con `{dmId}` reemplazado por el guid del DM). No requiere código front. Es la forma que usan OnGuard y Genetec (ej. `check-subscriptions`, `update-panels`, `clear-external-data`).',
-          '- **Handler front (`onClick`)** — nombre de una función resuelta **por prefijo**: `dm_shared_*` (compartidas, en `actions/dm-shared-actions.ts`). Los handlers específicos por DM (`aeos_*`, `avigilon_*`, `genetec_*`, `rs2_*`, `on-guard`) fueron eliminados: la carga de campos ahora la hace el propio control (`customFields` con `loadFrom`), no un botón.',
+          '- **REST (recomendada)** — el botón declara `{ verb, action }`: al clickearlo se hace `verb <serviceBase><action>` (con `{dmId}` reemplazado por el guid del DM). No requiere código front (ej. `check-subscriptions`, `update-panels`, `clear-external-data`).',
+          '- **Handler front (`onClick`)** — nombre de una función resuelta **por prefijo**: `dm_shared_*` (compartidas, en `actions/dm-shared-actions.ts`). No hay handlers específicos por DM: la carga de campos la hace el propio control (`customFields` con `loadFrom`), no un botón.',
           '',
           '**Loading:** mientras una acción está en vuelo, el botón que la disparó muestra un spinner y queda deshabilitado (igual que Save). Los dropdowns que cargan de la API (`select_dynamic`, `multiselect`, `customFields`) muestran un spinner mientras traen sus opciones.',
         ].join('\n'),
@@ -114,7 +114,7 @@ export const SelectDynamic = story(
       '**Uso:** elegir **una** opción de una lista que se **carga de la API** en runtime. (Para valores estáticos usá `select`.)',
       '',
       '**Props soportadas:** `loadFrom`, `default`. Requiere un `guid` de DM en runtime.',
-      '- `"<type>"` → `GET /api/data-managers/{guid}/dm-data?type=<type>` (data específica del DM, ej. `sites`, `zones`, `directories`).',
+      '- `"<type>"` → `GET /dm/{guid}/dm-data?type=<type>` (data específica del DM, ej. `sites`, `zones`, `directories`).',
       '- `"shared/<type>"` → `GET /api/shared/<type>` (data local agnóstica de DM, ej. `shared/zones`, `shared/badge_types`, `shared/user_profiles`; no requiere guid).',
       'La API devuelve `[{ id, name }]`. Mientras carga, el select muestra un spinner y queda deshabilitado.',
     ].join('\n'),
@@ -124,14 +124,14 @@ export const SelectDynamic = story(
 export const MultiselectDynamic = story(
   { id: 'panel_filter', type: 'multiselect', title: 'Panels', loadFrom: 'panels' },
   {
-    note: 'Las opciones se auto-cargan de la API vía `loadFrom` al montar (como en OnGuard). En el catálogo no hay DM vivo, así que la lista queda vacía (spinner y luego vacío). El valor es una lista de ids separados por el `separator`.',
+    note: 'Las opciones se auto-cargan de la API vía `loadFrom` al montar. En el catálogo no hay DM vivo, así que la lista queda vacía (spinner y luego vacío). El valor es una lista de ids separados por el `separator`.',
     initial: { panel_filter: '5' },
     docs: [
-      '**Uso:** multi-select de checkboxes **genérico** (no atado a ningún DM), con Select All / Clear All. Ej.: los filtros de "Panels" / "Segments" / "Badge Types" de OnGuard.',
+      '**Uso:** multi-select de checkboxes **genérico** (no atado a ningún DM), con Select All / Clear All. Ej.: filtros de listas como "Panels" / "Segments" / "Badge Types".',
       '',
       '**Props soportadas:**',
       '- `loadFrom` — URL para **auto-cargar** la lista al montar (misma convención que `select_dynamic`: `"<type>"` → `dm-data?type=`, `"shared/<type>"` → `/api/shared/`). Muestra un spinner mientras carga.',
-      '- `separator` (opcional) — token que une los ids seleccionados (default `","`; `"\\b"`/vbBack para AEOS).',
+      '- `separator` (opcional) — token que une los ids seleccionados (default `","`; algunos DMs lo configuran a `"\\b"`/vbBack).',
       '- **Valor**: string de ids separados por el separador (ej. `"1,5,9"`). Los ids seleccionados que aún no están en las opciones se muestran igual (labeleados por id) para no perder la selección guardada.',
     ].join('\n'),
   },
@@ -155,8 +155,8 @@ export const ButtonBar = story(
     id: 'ops_buttons',
     type: 'button_bar',
     buttons: [
-      { id: 'btn_update_panels', title: 'Update Panel List', verb: 'POST', action: '/api/data-managers/{dmId}/update-panels', tooltip: 'Botón REST: pega a la URL de `action` (con {dmId} reemplazado).' },
-      { id: 'btn_full_sync',     title: 'Full Sync Now',      verb: 'POST', action: '/api/data-managers/{dmId}/run-sync?syncType=FULL_SYNC', tooltip: 'Otro botón REST: dispara un sync vía run-sync.' },
+      { id: 'btn_update_panels', title: 'Update Panel List', verb: 'POST', action: '/dm/{dmId}/update-panels', tooltip: 'Botón REST: pega a la URL de `action` (con {dmId} reemplazado).' },
+      { id: 'btn_full_sync',     title: 'Full Sync Now',      verb: 'POST', action: '/dm/{dmId}/run-sync?syncType=FULL_SYNC', tooltip: 'Otro botón REST: dispara un sync vía run-sync.' },
     ],
   },
   {
@@ -190,12 +190,12 @@ export const CustomFields = story(
       '',
       '**Props soportadas:**',
       '- `entity` — entidad local a la que apunta el mapeo (`Users` / `Badges`). De acá se **deriva** el destino (`Destination Columns` = `shared/entity-fields-<entity>`) y, si no se declara `loadFrom`, también el origen (`custom-fields-<entity>`). Además da el título por defecto ("Users Custom Mapping").',
-      '- `loadFrom` (opcional) — override del origen (**Source Columns**) cuando NO es el genérico del entity. Ej. AEOS usa `employee-fields`/`visitor-fields`/`contractor-fields` (3 fuentes distintas, todas hacia la entidad Users).',
+      '- `loadFrom` (opcional) — override del origen (**Source Columns**) cuando NO es el genérico del entity. Ej. un DM con varias fuentes distintas (`employee-fields`/`visitor-fields`/`contractor-fields`), todas hacia la entidad Users.',
       '- `destinationLoadFrom` (opcional) — override del destino; normalmente se omite y se deriva del `entity`.',
       '- `key_header` / `value_header` — encabezados de columna; `key_title` / `value_title` — labels de los dropdowns de "agregar".',
       '- **Valor**: array `[{ key, value }]` (source → destination).',
       '',
-      '**Ejemplo real (AEOS Employee):** `entity: "Users"`, `loadFrom: "employee-fields"` (el destino se deriva del entity).',
+      '**Ejemplo:** `entity: "Users"`, `loadFrom: "employee-fields"` (el destino se deriva del entity).',
     ].join('\n'),
   },
 )
@@ -220,14 +220,14 @@ export const IpBadgeMappings = story(
 
 export const Table = story(
   {
-    id: 'rio_list',
+    id: 'device_list',
     type: 'table',
-    title: 'CloudLink Devices',
+    title: 'Devices',
     fields: [
       { id: 'Name', type: 'text', title: 'Device Name' },
       { id: 'Server', type: 'text', title: 'Device IP' },
-      { id: 'Username', type: 'text', title: 'RIO User' },
-      { id: 'Password', type: 'password', title: 'RIO Password' },
+      { id: 'Username', type: 'text', title: 'User' },
+      { id: 'Password', type: 'password', title: 'Password' },
       { id: 'AcceptUntrustedCert', type: 'boolean', title: 'Accept Untrusted Certificate' },
     ],
     default: '[]',
@@ -235,7 +235,7 @@ export const Table = story(
   {
     note: 'Tabla genérica: columnas y el modal de "Add / Edit" se generan a partir de `fields`. Al clickear una fila se abre el modal para editar; la X al final la elimina. Los campos `password` no se muestran como columna.',
     docs: [
-      '**Uso:** lista/grilla editable **genérica** de filas tipadas (ej. dispositivos CloudLink de Genetec). Nada hardcodeado: la tabla y el formulario de alta/edición se derivan de `fields`.',
+      '**Uso:** lista/grilla editable **genérica** de filas tipadas (ej. una lista de dispositivos). Nada hardcodeado: la tabla y el formulario de alta/edición se derivan de `fields`.',
       '',
       '**Props soportadas:**',
       '- `fields` — array de controls (cada uno una columna + un campo del modal): `{ id, type, title }`. `type` reutiliza los controles base (`text`, `password`, `boolean`, `number`, `number_spinner`, `select`).',

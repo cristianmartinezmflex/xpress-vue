@@ -29,32 +29,32 @@ const emit = defineEmits<{ action: [id: string, handler: string, payload?: unkno
 const SYNC_NOW_BUTTONS: Button[] = [
   {
     id: 'btn_send_activities', title: 'Send XPressEntry Activities Now', verb: 'POST',
-    action: '/api/data-managers/send-activity-sync', fireAndForget: true,
+    action: '/dm/send-activity-sync', fireAndForget: true,
     tooltip: 'Push all XPressEntry scans to the external system',
   },
   {
     id: 'btn_activity_now', title: 'Download Activity Now', verb: 'POST',
-    action: '/api/data-managers/{dmId}/run-sync?syncType=PULL_ACTIVITY_SYNC', fireAndForget: true,
+    action: '/dm/{dmId}/run-sync?syncType=PULL_ACTIVITY_SYNC', fireAndForget: true,
     tooltip: 'Update XPressEntry Occupancy by pulling and saving the latest scan activity records from the external system. "Pull Data Manager Activities into XPressEntry" must be enabled under "Sync Options"',
   },
   {
     id: 'btn_occupancy_now', title: 'Occupancy Sync Now', verb: 'POST',
-    action: '/api/data-managers/{dmId}/run-sync?syncType=OCCUPANCY_SYNC', fireAndForget: true,
+    action: '/dm/{dmId}/run-sync?syncType=OCCUPANCY_SYNC', fireAndForget: true,
     tooltip: 'Update XPressEntry Occupancy by pulling only the latest zone where each user has been. "Pull DataManager Occupancy" must be enabled under "Sync Options"',
   },
   {
     id: 'btn_partial_now', title: 'Partial Sync Now', verb: 'POST',
-    action: '/api/data-managers/{dmId}/run-sync?syncType=PARTIAL_SYNC', fireAndForget: true,
+    action: '/dm/{dmId}/run-sync?syncType=PARTIAL_SYNC', fireAndForget: true,
     tooltip: "Pull the latest table changes from the external system. Partial syncs are incremental changes to Users and Badges, if allowed by the external system's API",
   },
   {
     id: 'btn_full_now', title: 'Full Sync Now', verb: 'POST',
-    action: '/api/data-managers/{dmId}/run-sync?syncType=FULL_SYNC', fireAndForget: true,
+    action: '/dm/{dmId}/run-sync?syncType=FULL_SYNC', fireAndForget: true,
     tooltip: "Pull all relevant data from the external system to compare against XPressEntry's current data. Any changes made on the external system will be applied in XPressEntry",
   },
   {
     id: 'btn_custom_now', title: 'Custom Sync Now', verb: 'POST',
-    action: '/api/data-managers/{dmId}/run-sync?syncType=CUSTOM_SYNC', fireAndForget: true,
+    action: '/dm/{dmId}/run-sync?syncType=CUSTOM_SYNC', fireAndForget: true,
     tooltip: 'Set the tables to pull from the external system in the "Custom Sync" tab',
   },
 ]

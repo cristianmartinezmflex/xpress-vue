@@ -124,7 +124,7 @@ async function checkConnection(): Promise<void> {
   connectionMessage.value = ''
   try {
     // Send the current settings so the temp-DM test reflects what's on the form (== saved after a Save).
-    const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/test-connection`, {
+    const res = await fetch(`${props.serviceBase}/dm/${props.guid}/test-connection`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(state),
@@ -156,7 +156,7 @@ const syncLabel = computed(() => `Sync running: ${activeSyncTypes.value.map(pret
 async function refreshSyncStatus(): Promise<void> {
   if (!props.guid || !props.serviceBase) { activeSyncTypes.value = []; return }
   try {
-    const res = await fetch(`${props.serviceBase}/api/data-managers/${props.guid}/sync-status`)
+    const res = await fetch(`${props.serviceBase}/dm/${props.guid}/sync-status`)
     if (!res.ok) { activeSyncTypes.value = []; return }
     const status = await res.json() as Record<string, boolean> | null
     activeSyncTypes.value = status ? Object.keys(status).filter((k) => status[k]) : []

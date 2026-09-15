@@ -178,7 +178,7 @@
                   "type": "customFields",
                   "title": "",
                   "entity": "Users",
-                  "loadFrom": "/api/data-managers/{dmId}/dm-data?type=custom-fields-users",
+                  "loadFrom": "/dm/{dmId}/dm-data?type=custom-fields-users",
                   "destinationLoadFrom": "/api/shared/entity-fields-users"
                 }
               ]

@@ -228,7 +228,7 @@ A single-choice dropdown whose options are **loaded from the API** at runtime (s
 
 | Field | Description |
 |---|---|
-| `loadFrom` | Options source. `"<type>"` → `GET /api/data-managers/{guid}/dm-data?type=<type>` (DM-specific data, e.g. `sites`, `zones`, `directories`). `"shared/<type>"` → `GET /api/shared/<type>` (DM-agnostic local data, e.g. `shared/zones`, `shared/badge_types`, `shared/user_profiles`; no guid needed). The API returns `[{ id, name }]`. |
+| `loadFrom` | Options source. `"<type>"` → `GET /dm/{guid}/dm-data?type=<type>` (DM-specific data, e.g. `sites`, `zones`, `directories`). `"shared/<type>"` → `GET /api/shared/<type>` (DM-agnostic local data, e.g. `shared/zones`, `shared/badge_types`, `shared/user_profiles`; no guid needed). The API returns `[{ id, name }]`. |
 
 ---
 

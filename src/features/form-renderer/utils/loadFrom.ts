@@ -6,7 +6,7 @@
  *  1. Full path / template — emitted by the .NET schema generator (service-driven schemas, e.g. Genetec):
  *       "/api/shared/zones"
  *       "/api/shared/user_profiles"
- *       "/api/data-managers/{dmId}/dm-data?type=custom-fields-users"
+ *       "/dm/{dmId}/dm-data?type=custom-fields-users"
  *     `{dmId}` is substituted with the DM guid; a relative path gets `serviceBase` prepended.
  *
  *  2. Legacy short form — used by the static src/data/<dm>.json schemas:
@@ -31,5 +31,5 @@ export function resolveLoadFromUrl(loadFrom: string | undefined, serviceBase: st
   // Legacy short form.
   if (loadFrom.startsWith('shared/')) return `${serviceBase}/api/shared/${loadFrom.slice(7)}`
   if (!guid) return null
-  return `${serviceBase}/api/data-managers/${guid}/dm-data?type=${encodeURIComponent(loadFrom)}`
+  return `${serviceBase}/dm/${guid}/dm-data?type=${encodeURIComponent(loadFrom)}`
 }

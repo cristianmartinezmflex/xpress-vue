@@ -215,7 +215,7 @@
                   "id": "open_access_directory_id",
                   "type": "select_dynamic",
                   "title": "Directory",
-                  "loadFrom": "/api/data-managers/{dmId}/dm-data?type=directories"
+                  "loadFrom": "/dm/{dmId}/dm-data?type=directories"
                 },
                 {
                   "id": "legacy_api",
@@ -619,7 +619,7 @@
                   "type": "checkbox_multiselect",
                   "title": "Segments",
                   "optionsKey": "_onguard_segments",
-                  "loadFrom": "/api/data-managers/{dmId}/dm-data?type=segments"
+                  "loadFrom": "/dm/{dmId}/dm-data?type=segments"
                 },
                 {
                   "id": "btn_bar_segments",
@@ -760,7 +760,7 @@
                   "id": "badge_types_filter",
                   "type": "checkbox_multiselect",
                   "title": "Badge Types",
-                  "loadFrom": "/api/data-managers/{dmId}/dm-data?type=badge-types"
+                  "loadFrom": "/dm/{dmId}/dm-data?type=badge-types"
                 },
                 {
                   "id": "exclude_badge_types",
@@ -909,7 +909,7 @@
                   "id": "vehicle_types_filter",
                   "type": "checkbox_multiselect",
                   "title": "Vehicle Badge Types",
-                  "loadFrom": "/api/data-managers/{dmId}/dm-data?type=badge-types",
+                  "loadFrom": "/dm/{dmId}/dm-data?type=badge-types",
                   "enable": "enable_vehicle_mappings == true"
                 }
               ]
