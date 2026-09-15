@@ -13,7 +13,7 @@
  */
 
 import { ref, computed, onMounted } from 'vue'
-import { resolveLoadFromUrl } from '../../utils/loadFrom'
+import { dmFetch } from '../../utils/loadFrom'
 
 interface SocketRow {
   AEPUIp:               string
@@ -42,11 +42,9 @@ const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 const cardTypes = ref<CardTypeOption[]>([])
 
 onMounted(async () => {
-  const url = resolveLoadFromUrl(props.loadFrom, props.serviceBase ?? '', props.guid)
-  if (!url) return
   try {
-    const res = await fetch(url)
-    if (!res.ok) return
+    const res = await dmFetch(props.loadFrom, props.serviceBase ?? '', props.guid)
+    if (!res || !res.ok) return
     const data = await res.json()
     if (Array.isArray(data)) {
       cardTypes.value = data

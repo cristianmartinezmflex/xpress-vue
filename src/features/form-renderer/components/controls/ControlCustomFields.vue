@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import type { KeyValuePair } from '../../types/schema'
-import { resolveLoadFromUrl } from '../../utils/loadFrom'
+import { dmFetch } from '../../utils/loadFrom'
 
 // Maps an external system field -> an XPressEntry field. Mirrors the WinForm ctlCustomFields:
 //   - Source Columns / Destination Columns are EDITABLE combos: pick from the loaded list OR type a
@@ -63,7 +63,7 @@ const displayTitle = computed(() => {
 // own `loadFrom`; the destination is almost always derivable from the entity, so it can be omitted.
 const entityLower = computed(() => (props.entity ?? '').trim().toLowerCase())
 const effectiveLoadFrom = computed(() =>
-  props.loadFrom || (entityLower.value ? `custom-fields-${entityLower.value}` : undefined),
+  props.loadFrom || (entityLower.value ? `get-custom-fields-${entityLower.value}` : undefined),
 )
 const effectiveDestinationLoadFrom = computed(() =>
   props.destinationLoadFrom || (entityLower.value ? `shared/entity-fields-${entityLower.value}` : undefined),
@@ -100,11 +100,12 @@ function reposition() {
   if (dest.open)   place(dest, destInputRef.value)
 }
 
-async function loadInto(url: string | null, combo: Combo) {
-  if (!url) return
+async function loadInto(source: string | undefined, combo: Combo) {
+  if (!source) return
   combo.loading = true
   try {
-    const res = await fetch(url)
+    const res = await dmFetch(source, props.serviceBase ?? '', props.guid)
+    if (!res) return
     if (!res.ok) { loadErr.msg = `Error ${res.status}`; return }
     const data = await res.json()
     combo.options = Array.isArray(data)
@@ -129,8 +130,8 @@ async function loadInto(url: string | null, combo: Combo) {
 // (the "Load Genetec Custom Fields" button re-fetches the live source fields, mirroring the WinForm).
 function loadCombos() {
   loadErr.msg = ''
-  loadInto(resolveLoadFromUrl(effectiveLoadFrom.value, props.serviceBase ?? '', props.guid), source)
-  loadInto(resolveLoadFromUrl(effectiveDestinationLoadFrom.value, props.serviceBase ?? '', props.guid), dest)
+  loadInto(effectiveLoadFrom.value, source)
+  loadInto(effectiveDestinationLoadFrom.value, dest)
 }
 
 onMounted(() => {

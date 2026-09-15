@@ -1,35 +1,52 @@
 /**
- * Resolves a control's `loadFrom` / `destinationLoadFrom` to an absolute request URL.
+ * dmFetch — the single way the form renderer fetches option lists / field lists from the service.
  *
- * Two formats are supported:
+ * A control's `loadFrom` / `dynOptions` / `destinationLoadFrom` is one of:
  *
- *  1. Full path / template — emitted by the .NET schema generator (service-driven schemas, e.g. Genetec):
- *       "/api/shared/zones"
- *       "/api/shared/user_profiles"
- *       "/dm/{dmId}/dm-data?type=custom-fields-users"
- *     `{dmId}` is substituted with the DM guid; a relative path gets `serviceBase` prepended.
+ *  1. A DM custom-action read — a bare "get-*" token (e.g. "get-directories", "get-custom-fields-users").
+ *     Sent as POST /dm/{guid}/custom with body { action, ...params }. This is the unified endpoint; the
+ *     plugin's ExecuteCustomAction handles it. `params` (DynOptionsParams) ride in the same body — e.g.
+ *     OnGuard "Directory" against the just-typed host/port — so the list reflects unsaved input.
  *
- *  2. Legacy short form — used by the static src/data/<dm>.json schemas:
- *       "shared/<type>" → GET /api/shared/<type>              (DM-agnostic local data, no guid)
- *       "<type>"        → GET .../{guid}/dm-data?type=<type>  (DM-specific data)
+ *  2. A DM-agnostic shared GET URL — "/api/shared/zones", "/api/shared/entity-fields-users", or the
+ *     legacy short form "shared/<type>". Fetched with GET; no guid required for the absolute form.
  *
- * Returns null when the URL requires a guid that isn't available.
+ * Full paths may be templated with {dmId} (substituted with the guid). Returns the raw Response so callers
+ * keep their own res.ok / res.json() handling; returns null when the request can't be built (missing
+ * source/serviceBase, or a guid-requiring source with no guid).
  */
-export function resolveLoadFromUrl(loadFrom: string | undefined, serviceBase: string, guid?: string): string | null {
-  if (!loadFrom || !serviceBase) return null
+export async function dmFetch(
+  source: string | undefined,
+  serviceBase: string,
+  guid?: string,
+  params?: Record<string, string | number | boolean | null | undefined>,
+): Promise<Response | null> {
+  if (!source || !serviceBase) return null
 
-  // New format: absolute path or full URL, optionally templated with {dmId}.
-  if (loadFrom.startsWith('/') || loadFrom.startsWith('http')) {
-    let path = loadFrom
+  // Shared / absolute GET URL, optionally templated with {dmId}.
+  if (source.startsWith('/') || source.startsWith('http')) {
+    let path = source
     if (path.includes('{dmId}')) {
       if (!guid) return null
       path = path.replace(/\{dmId\}/g, guid)
     }
-    return path.startsWith('http') ? path : `${serviceBase}${path}`
+    return fetch(path.startsWith('http') ? path : `${serviceBase}${path}`)
   }
 
-  // Legacy short form.
-  if (loadFrom.startsWith('shared/')) return `${serviceBase}/api/shared/${loadFrom.slice(7)}`
+  // Legacy short form "shared/<type>" (static JSON schemas) → GET /api/shared/<type>.
+  if (source.startsWith('shared/')) return fetch(`${serviceBase}/api/${source}`)
+
+  // DM custom read/action: POST { action, ...params } to the unified endpoint.
   if (!guid) return null
-  return `${serviceBase}/dm/${guid}/dm-data?type=${encodeURIComponent(loadFrom)}`
+  const body: Record<string, unknown> = { action: source }
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined && v !== null && v !== '') body[k] = v
+    }
+  }
+  return fetch(`${serviceBase}/dm/${guid}/custom`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
 }

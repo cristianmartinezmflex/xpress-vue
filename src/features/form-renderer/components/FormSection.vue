@@ -59,7 +59,7 @@ function refreshTriggerFor(control: Control): unknown {
 }
 
 // dynOptionsParams: build { settingKey: liveValue } from the current form state so ControlSelect can send
-// the user's unsaved sibling-field values as query params on its dm-data fetch (e.g. OnGuard Directory).
+// the user's unsaved sibling-field values in its custom-action read body (e.g. OnGuard Directory).
 function dynParamsFor(control: Control): Record<string, string> | undefined {
   if (!control.dynOptionsParams) return undefined
   const out: Record<string, string> = {}

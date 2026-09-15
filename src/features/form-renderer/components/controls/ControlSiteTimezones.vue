@@ -8,11 +8,12 @@
  *   [{ siteId: string, siteName: string, timezone: string }]
  * On save, dm-shared-actions converts the array back to the flat object format.
  *
- * Sites are loaded on demand by this control itself (the "Load Sites from RS2" button hits
- * dm-data?type=sites) — it does not depend on any external DM action handler.
+ * Sites are loaded on demand by this control itself (the "Load Sites from RS2" button POSTs the
+ * get-sites custom action) — it does not depend on any external DM action handler.
  */
 
 import { ref, computed } from 'vue'
+import { dmFetch } from '../../utils/loadFrom'
 
 interface SiteRow {
   siteId:   string
@@ -109,7 +110,8 @@ async function loadSites() {
   }
   loading.value = true
   try {
-    const res = await fetch(`${props.serviceBase}/dm/${props.guid}/dm-data?type=sites`)
+    const res = await dmFetch('get-sites', props.serviceBase ?? '', props.guid)
+    if (!res) { alert('Save the form first and provide a GUID to load sites.'); return }
     if (!res.ok) { alert(`Error loading sites: HTTP ${res.status}`); return }
     const data: { id: string; name: string }[] = await res.json()
     loadedSites.value = [{ id: '-1', name: 'All Sites' }, ...data]

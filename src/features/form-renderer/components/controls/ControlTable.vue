@@ -164,7 +164,7 @@ function openEdit(idx: number) {
 
 function closeModal() { modalOpen.value = false }
 
-// Run a modal action button (e.g. Ping): POST the current draft row to the DM's dm-action endpoint and
+// Run a modal action button (e.g. Ping): POST the current draft row to the DM's custom endpoint and
 // show the returned { success, message } inline. Purely a device check — never mutates the table rows.
 async function runModalAction(btn: Button) {
   if (!props.guid || !props.serviceBase || !btn.action) {
@@ -174,12 +174,16 @@ async function runModalAction(btn: Button) {
   actionBusy.value = btn.id
   actionStatus.value = null
   try {
-    // btn.action is a full URL template (short-form already expanded by the generator); {dmId} → guid.
-    const url = `${props.serviceBase}${btn.action.replace(/\{dmId\}/g, props.guid)}`
+    // btn.action is either a bare "post-*" DM action or a full URL template ({dmId} → guid). For a custom
+    // action the draft row is POSTed to /dm/{guid}/custom with the action folded in ({ action, ...draft });
+    // a dedicated-URL button POSTs the draft row as-is.
+    const isCustom = !btn.action.startsWith('/') && !btn.action.startsWith('http')
+    const url = isCustom ? `${props.serviceBase}/dm/${props.guid}/custom` : `${props.serviceBase}${btn.action.replace(/\{dmId\}/g, props.guid)}`
+    const reqBody = isCustom ? { action: btn.action, ...draft.value } : draft.value
     const res = await fetch(url, {
       method: (btn.verb || 'POST').toUpperCase(),
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(draft.value),
+      body: JSON.stringify(reqBody),
     })
     const body = await res.json().catch(() => null)
     const ok = res.ok && body?.success !== false

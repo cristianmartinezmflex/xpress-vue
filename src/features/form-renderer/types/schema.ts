@@ -46,7 +46,9 @@ export interface Button {
   title:            string
   onClick?:         string   // frontend handler name (dispatched via useDmActions)
   verb?:            string   // REST button: HTTP verb (default POST) — used when there's no onClick
-  action?:          string   // REST button: URL template (may contain {dmId}); clicking hits this URL
+  // REST button target. Either a bare "post-*" DM action (sent in the body to POST /dm/{guid}/custom, same
+  // convention as get-* reads) OR a full URL template (may contain {dmId}) for a dedicated route (maintenance).
+  action?:          string
   tooltip?:         string
   rightClickMenu?:  ContextMenuItem[]
   enable?:          EnableProp
@@ -123,13 +125,13 @@ export interface Control {
   entity?: string              // customFields: which local entity the mapping targets (Users/Badges/...)
   destinationLoadFrom?: string // customFields: source for the "Destination Columns" (XPressEntry fields)
   loadFrom?: string   // multiselect / customFields / legacy static-JSON select_dynamic source:
-                      //   "shared/<type>" → GET /api/shared/<type>              (DM-agnostic local data)
-                      //   "<type>"        → GET .../{guid}/dm-data?type=<type>  (DM-specific data)
+                      //   "shared/<type>" → GET /api/shared/<type>                 (DM-agnostic local data)
+                      //   "get-<type>"    → POST /dm/{guid}/custom { action }       (DM-specific read)
   dynOptions?: string // select: when set, load options dynamically from this source key (same short-form
                       // convention as loadFrom). Absent ⇒ static `options`. Unifies select + select_dynamic.
   dynOptionsParams?: string  // dynamic-options: ","-separated sibling setting-keys whose CURRENT (unsaved) form
-                             // values are appended as query params to the dm-data request (backend uses them
-                             // instead of the persisted fields — e.g. OnGuard Directory against a just-typed host)
+                             // values are sent in the custom-action read body (backend uses them instead of the
+                             // persisted fields — e.g. OnGuard Directory against a just-typed host)
   refreshOnControlChange?: string   // dynamic-options: ","-separated id(s) of other control(s) to watch — re-fetch when any changes
   dynOptionsShowRefreshButton?: boolean // dynamic-options: show a small ↻ button to re-fetch options on demand
   requiresConnection?: boolean      // disable the control while the DM connection test is failing (with a tooltip)

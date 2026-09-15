@@ -14,7 +14,7 @@
  */
 
 import { ref, computed, onMounted } from 'vue'
-import { resolveLoadFromUrl } from '../../utils/loadFrom'
+import { dmFetch } from '../../utils/loadFrom'
 
 interface IPBadgeRow {
   IPBadgeType:          string   // ENTRY | EXIT | MUSTER
@@ -46,11 +46,9 @@ const doors     = ref<Option[]>([])
 const readers   = ref<Option[]>([])
 
 async function loadInto(shortForm: string, target: typeof cardTypes) {
-  const url = resolveLoadFromUrl(shortForm, props.serviceBase ?? '', props.guid)
-  if (!url) return
   try {
-    const res = await fetch(url)
-    if (!res.ok) return
+    const res = await dmFetch(shortForm, props.serviceBase ?? '', props.guid)
+    if (!res || !res.ok) return
     const data = await res.json()
     if (Array.isArray(data)) {
       target.value = data

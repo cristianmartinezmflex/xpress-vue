@@ -4,15 +4,15 @@
  * select_dynamic):
  *
  *  - STATIC: pass `options` ([{ id, name }], known at schema time).
- *  - DYNAMIC: pass `dynOptions` (a source key, e.g. "users" → dm-data?type=users, "shared/zones" →
- *    /api/shared/zones) OR a legacy full-URL `loadFrom`. When either is present the list is fetched from
- *    the API on mount (blank "unset" option first, spinner while loading).
+ *  - DYNAMIC: pass `dynOptions` (a source key, e.g. "get-directories" → POST /dm/{guid}/custom
+ *    { action: "get-directories" }, "shared/zones" → GET /api/shared/zones) OR a legacy `loadFrom`. When
+ *    either is present the list is fetched from the API on mount (blank "unset" option first, spinner while loading).
  *
  * Any saved id not present in the loaded options is still shown, so a selection is never dropped.
  */
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import type { SelectOption } from '../../types/schema'
-import { resolveLoadFromUrl } from '../../utils/loadFrom'
+import { dmFetch } from '../../utils/loadFrom'
 import { truncateLabel } from '../../utils/text'
 
 const props = defineProps<{
@@ -40,22 +40,14 @@ const fetchErr = ref('')
 
 async function loadOptions() {
   if (!isDynamic.value) return
-  let url = resolveLoadFromUrl(source.value, props.serviceBase ?? '', props.guid)
-  if (!url) return
-  // dynOptionsParams: append the live sibling-field values so the backend builds the list against the
-  // user's unsaved input (e.g. OnGuard Directory against the just-typed host). Empty values are omitted
-  // (the backend treats absent and empty the same: it falls back to the persisted value).
-  if (props.dynParams) {
-    const qs = Object.entries(props.dynParams)
-      .filter(([, v]) => v !== undefined && v !== null && v !== '')
-      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
-      .join('&')
-    if (qs) url += (url.includes('?') ? '&' : '?') + qs
-  }
+  // dynOptionsParams: the live sibling-field values ride in the custom-action body so the backend builds
+  // the list against the user's unsaved input (e.g. OnGuard Directory against the just-typed host). Empty
+  // values are omitted (the backend treats absent and empty the same: it falls back to the persisted value).
   loading.value = true
   fetchErr.value = ''
   try {
-    const res = await fetch(url)
+    const res = await dmFetch(source.value, props.serviceBase ?? '', props.guid, props.dynParams)
+    if (!res) return
     if (!res.ok) { fetchErr.value = `Error ${res.status}`; return }
     const data = await res.json()
     fetched.value = Array.isArray(data)

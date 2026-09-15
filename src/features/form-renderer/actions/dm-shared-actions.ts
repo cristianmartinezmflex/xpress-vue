@@ -88,7 +88,7 @@ export async function dm_shared_save({ guid, state, serviceBase }: ActionContext
   // no separate Test Connect step anymore.
   let res: Response
   try {
-    res = await fetch(`${serviceBase}/dm/${guid}`, {
+    res = await fetch(`${serviceBase}/dm/${guid}/settings`, {
       method: 'PUT',
       headers: JSON_HEADERS,
       body: JSON.stringify(serializeState(state)),
@@ -122,14 +122,19 @@ export async function dm_shared_runAction({ guid, serviceBase, payload }: Action
   if (!p?.action) return
   if (!guid) { show({ success: false, title, message: 'No GUID provided.' }); return }
 
-  const url  = `${serviceBase}${p.action.replace(/\{dmId\}/g, guid)}`
+  // A bare "post-*" token is a DM action → POST /dm/{guid}/custom with { action, ...selectedRow }. A full URL
+  // (dedicated maintenance route) is hit verbatim, POSTing the selected row (if any) as-is.
+  const isCustom = !p.action.startsWith('/') && !p.action.startsWith('http')
+  const url  = isCustom ? `${serviceBase}/dm/${guid}/custom` : `${serviceBase}${p.action.replace(/\{dmId\}/g, guid)}`
   const verb = (p.verb || 'POST').toUpperCase()
   try {
-    // Master-detail buttons carry a `body` (the selected row) → POST it as JSON.
+    // Master-detail buttons carry a `body` (the selected row). For custom actions the action name is folded
+    // into that body ({ action, ...row }); dedicated-URL buttons POST the row as-is (or no body).
     const init: RequestInit = { method: verb }
-    if (p.body !== undefined) {
+    const rowBody = (p.body && typeof p.body === 'object') ? p.body as Record<string, unknown> : undefined
+    if (isCustom || rowBody !== undefined) {
       init.headers = { 'Content-Type': 'application/json' }
-      init.body = JSON.stringify(p.body)
+      init.body = JSON.stringify(isCustom ? { action: p.action, ...(rowBody ?? {}) } : rowBody)
     }
     const res  = await fetch(url, init)
     const body = await res.json().catch(() => null)

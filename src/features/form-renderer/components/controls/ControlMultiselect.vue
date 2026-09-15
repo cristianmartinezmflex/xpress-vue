@@ -12,7 +12,7 @@
  */
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import type { SelectOption } from '../../types/schema'
-import { resolveLoadFromUrl } from '../../utils/loadFrom'
+import { dmFetch } from '../../utils/loadFrom'
 
 interface Option { id: string; name: string }
 
@@ -41,11 +41,11 @@ const loading        = ref(false)
 
 async function loadOptions() {
   const source = props.dynOptions || props.loadFrom
-  const url = resolveLoadFromUrl(source, props.serviceBase ?? '', props.guid)
-  if (!url) return
+  if (!source) return
   loading.value = true
   try {
-    const res = await fetch(url)
+    const res = await dmFetch(source, props.serviceBase ?? '', props.guid)
+    if (!res) return
     if (!res.ok) { loadErr.value = `Error ${res.status}`; return }
     const data = await res.json()
     fetchedOptions.value = Array.isArray(data)

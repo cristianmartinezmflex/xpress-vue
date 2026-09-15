@@ -90,7 +90,7 @@ async function loadSchema(key: string) {
   // URL format: /form/on-guard?guid=<dm-guid>
   if (guid) {
     try {
-      const res = await fetch(`${DM_SERVICE_BASE}/dm/${guid}`)
+      const res = await fetch(`${DM_SERVICE_BASE}/dm/${guid}/settings`)
       if (res.ok) {
         dmValues.value = await res.json()
       } else {
