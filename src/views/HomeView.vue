@@ -51,7 +51,7 @@ function openSchema(key: string, guid?: string) {
 
 async function reloadDataManagers() {
   try {
-    const res = await fetch(`${DM_SERVICE_BASE}/dm`)
+    const res = await fetch(`${DM_SERVICE_BASE}/dm/`)
     if (!res.ok) { error.value = `The service responded ${res.status}`; return }
     const data: DataManagerItem[] = await res.json()
     dataManagers.value = data.sort((a, b) => a.data_manager_name.localeCompare(b.data_manager_name))
