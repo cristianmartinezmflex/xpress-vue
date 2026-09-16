@@ -122,8 +122,8 @@ export async function dm_shared_runAction({ guid, serviceBase, payload }: Action
   if (!p?.action) return
   if (!guid) { show({ success: false, title, message: 'No GUID provided.' }); return }
 
-  // A bare "post-*" token is a DM action → POST /dm/{guid}/custom with { action, ...selectedRow }. A full URL
-  // (dedicated maintenance route) is hit verbatim, POSTing the selected row (if any) as-is.
+  // A bare action name (e.g. "ping-rio") is a DM action → POST /dm/{guid}/custom with { action, ...selectedRow }.
+  // A full URL (dedicated maintenance route) is hit verbatim, POSTing the selected row (if any) as-is.
   const isCustom = !p.action.startsWith('/') && !p.action.startsWith('http')
   const url  = isCustom ? `${serviceBase}/dm/${guid}/custom` : `${serviceBase}${p.action.replace(/\{dmId\}/g, guid)}`
   const verb = (p.verb || 'POST').toUpperCase()

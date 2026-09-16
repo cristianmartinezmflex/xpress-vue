@@ -174,7 +174,7 @@ async function runModalAction(btn: Button) {
   actionBusy.value = btn.id
   actionStatus.value = null
   try {
-    // btn.action is either a bare "post-*" DM action or a full URL template ({dmId} → guid). For a custom
+    // btn.action is either a bare DM action name (e.g. "ping-rio") or a full URL template ({dmId} → guid). For a custom
     // action the draft row is POSTed to /dm/{guid}/custom with the action folded in ({ action, ...draft });
     // a dedicated-URL button POSTs the draft row as-is.
     const isCustom = !btn.action.startsWith('/') && !btn.action.startsWith('http')

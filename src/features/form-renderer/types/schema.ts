@@ -46,8 +46,8 @@ export interface Button {
   title:            string
   onClick?:         string   // frontend handler name (dispatched via useDmActions)
   verb?:            string   // REST button: HTTP verb (default POST) — used when there's no onClick
-  // REST button target. Either a bare "post-*" DM action (sent in the body to POST /dm/{guid}/custom, same
-  // convention as get-* reads) OR a full URL template (may contain {dmId}) for a dedicated route (maintenance).
+  // REST button target. Either a bare DM action name (e.g. "ping-rio", sent in the body to POST
+  // /dm/{guid}/custom) OR a full URL template (may contain {dmId}) for a dedicated route (maintenance).
   action?:          string
   tooltip?:         string
   rightClickMenu?:  ContextMenuItem[]
