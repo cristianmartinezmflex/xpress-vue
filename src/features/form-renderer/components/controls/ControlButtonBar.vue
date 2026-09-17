@@ -52,8 +52,7 @@ function onButtonClick(btn: Button) {
     // A payload button POSTs the selected master row as its JSON body.
     const body = btn.payload ? selectedRow(btn.payload) : undefined
     emit('action', btn.id, 'dm_shared_runAction', {
-      verb: btn.verb, action: btn.action, title: btn.title, fireAndForget: btn.fireAndForget, body,
-      refreshOnSuccess: btn.refreshOnSuccess,
+      id: btn.id, verb: btn.verb, action: btn.action, title: btn.title, fireAndForget: btn.fireAndForget, body,
     })
   }
 }

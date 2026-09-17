@@ -117,7 +117,7 @@ export async function dm_shared_save({ guid, state, serviceBase }: ActionContext
 // maintenance buttons, etc.). ControlButtonBar passes { verb, action, title } as the payload.
 export async function dm_shared_runAction({ guid, serviceBase, payload }: ActionContext): Promise<void> {
   const { show } = useDialog()
-  const p = payload as { verb?: string; action?: string; title?: string; fireAndForget?: boolean; body?: unknown; refreshOnSuccess?: boolean } | undefined
+  const p = payload as { id?: string; verb?: string; action?: string; title?: string; fireAndForget?: boolean; body?: unknown } | undefined
   const title = p?.title ?? 'Action'
   if (!p?.action) return
   if (!guid) { show({ success: false, title, message: 'No GUID provided.' }); return }
@@ -150,11 +150,12 @@ export async function dm_shared_runAction({ guid, serviceBase, payload }: Action
     // log and the active-sync indicator. Errors above are still surfaced.
     if (p.fireAndForget) return
 
-    // Only actions that DECLARE they change server data (refreshOnSuccess) ask dynamic-option controls to
-    // re-fetch — e.g. Genetec "Sync Doors" imports doors into XPE, so the doors MultiSelect refreshes;
-    // "Update RIO" (writes to the device, not XPE) does NOT, so it doesn't trigger a needless reload.
-    if (p.refreshOnSuccess)
-      window.dispatchEvent(new CustomEvent('dm:data-changed'))
+    // Broadcast that this button's action finished, tagged with its id. Any dynamic-option control that
+    // declares this button id in refreshOnControlChange re-fetches (e.g. Genetec "Sync Doors" imports doors
+    // → the Doors MultiSelect refreshes). Controls decide whether they care, so "Update RIO" (which writes
+    // to the device, not XPE) triggers no reload simply because no control lists its id.
+    if (p.id)
+      window.dispatchEvent(new CustomEvent('dm:action-done', { detail: { id: p.id } }))
 
     const msg = body?.message ?? body?.Error ?? body?.error ?? 'Completed successfully.'
     show({ success: true, title, message: oneLine(String(msg)) })

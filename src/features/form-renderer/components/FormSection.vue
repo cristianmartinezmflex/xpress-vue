@@ -289,6 +289,7 @@ function updateControl(control: Control, value: any): void {
               :error="errors[control.id]"
               :show-refresh-button="control.dynOptionsShowRefreshButton"
               :refresh-trigger="refreshTriggerFor(control)"
+              :refresh-on-control-change="control.refreshOnControlChange"
               :dyn-params="dynParamsFor(control)"
               @update:model-value="emit('update:state', control.id, $event)"
             />
@@ -410,6 +411,8 @@ function updateControl(control: Control, value: any): void {
               :separator="control.separator"
               :guid="guid"
               :service-base="serviceBase"
+              :refresh-trigger="refreshTriggerFor(control)"
+              :refresh-on-control-change="control.refreshOnControlChange"
               @update:model-value="control.detailOf ? updateControl(control, $event) : emit('update:state', control.id, $event)"
             />
 

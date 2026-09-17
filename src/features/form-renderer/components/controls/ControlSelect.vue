@@ -14,6 +14,7 @@ import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import type { SelectOption } from '../../types/schema'
 import { dmFetch } from '../../utils/loadFrom'
 import { truncateLabel } from '../../utils/text'
+import { useRefreshOnAction } from '../../composables/useRefreshOnAction'
 
 const props = defineProps<{
   title?:       string
@@ -26,6 +27,7 @@ const props = defineProps<{
   error?:       string
   showRefreshButton?: boolean    // dynOptionsShowRefreshButton: render a ↻ button to re-fetch on demand
   refreshTrigger?:    unknown     // refreshOnControlChange: the watched control's value — re-fetch on change
+  refreshOnControlChange?: string // raw id list; a BUTTON id here means "re-fetch when its action completes"
   dynParams?:   Record<string, string>  // dynOptionsParams: live sibling-field values to send as query params
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string | number] }>()
@@ -74,6 +76,9 @@ watch(() => props.refreshTrigger, () => {
   refreshTimer = setTimeout(() => { refreshTimer = null; loadOptions() }, REFRESH_DEBOUNCE_MS)
 })
 onBeforeUnmount(() => { if (refreshTimer) clearTimeout(refreshTimer) })
+
+// The other half of refreshOnControlChange: re-fetch immediately when a listed BUTTON's action finishes.
+useRefreshOnAction(() => props.refreshOnControlChange, () => { if (isDynamic.value) loadOptions() })
 
 // Static options keep their declared (often semantic) order; dynamically-fetched data lists are sorted
 // alphabetically by label to match the WinForm.

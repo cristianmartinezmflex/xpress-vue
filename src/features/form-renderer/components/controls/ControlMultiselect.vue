@@ -10,9 +10,10 @@
  * NOT tied to any Data Manager. Any selected id not present in the option list is still shown, so a
  * saved selection is never silently dropped.
  */
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import type { SelectOption } from '../../types/schema'
 import { dmFetch } from '../../utils/loadFrom'
+import { useRefreshOnAction } from '../../composables/useRefreshOnAction'
 
 interface Option { id: string; name: string }
 
@@ -25,6 +26,8 @@ const props = defineProps<{
   guid?:       string
   serviceBase?: string
   separator?:  string           // token joining the selected ids (default ","; e.g. "\b"/vbBack for AEOS)
+  refreshTrigger?:    unknown     // refreshOnControlChange: watched sibling controls' values — re-fetch on change
+  refreshOnControlChange?: string // raw id list; a BUTTON id here means "re-fetch when its action completes"
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
@@ -59,15 +62,22 @@ async function loadOptions() {
   }
 }
 
-// A DM action that mutates server data (e.g. Genetec "Sync Doors" importing doors into XPressEntry)
-// fires "dm:data-changed" on success — re-fetch so the list reflects the new data without a reload.
-function onDataChanged() { if (props.dynOptions || props.loadFrom) loadOptions() }
+onMounted(loadOptions)
 
-onMounted(() => {
-  loadOptions()
-  window.addEventListener('dm:data-changed', onDataChanged)
+// refreshOnControlChange (unified). Two halves:
+//  • a listed BUTTON's action finishing → re-fetch immediately (e.g. Genetec "Sync Doors" imports doors,
+//    so the Doors list refreshes). Replaces the old RefreshOnSuccess broadcast.
+//  • a listed sibling CONTROL's value changing → re-fetch (debounced), same as ControlSelect.
+useRefreshOnAction(() => props.refreshOnControlChange, () => { if (props.dynOptions || props.loadFrom) loadOptions() })
+
+const REFRESH_DEBOUNCE_MS = 3000
+let refreshTimer: ReturnType<typeof setTimeout> | null = null
+watch(() => props.refreshTrigger, () => {
+  if (!(props.dynOptions || props.loadFrom)) return
+  if (refreshTimer) clearTimeout(refreshTimer)
+  refreshTimer = setTimeout(() => { refreshTimer = null; loadOptions() }, REFRESH_DEBOUNCE_MS)
 })
-onBeforeUnmount(() => window.removeEventListener('dm:data-changed', onDataChanged))
+onBeforeUnmount(() => { if (refreshTimer) clearTimeout(refreshTimer) })
 
 const options = computed<Option[]>(() => {
   const src = fetchedOptions.value ?? (props.options ?? []).map((o) => ({ id: String(o.id), name: o.name }))
