@@ -79,6 +79,11 @@ const sections = computed(() =>
 
 const { state, errors, validate, resetToDefaults, revertChanges, isDirty, markPristine } = useFormState(props.schema, props.initialValues)
 
+// Fallback guard: never let Save persist a value that failed validation (e.g. a number outside its
+// min/max range). Controls like the number spinner already clamp to prevent out-of-range input, so this
+// should rarely trigger — but if any control still surfaces a validation error, Save stays disabled.
+const hasErrors = computed(() => Object.values(errors).some((e) => !!e))
+
 defineExpose({ state, resetToDefaults, revertChanges, markPristine })
 
 const controlMap = computed<Record<string, Control>>(() => {
@@ -287,14 +292,14 @@ onBeforeUnmount(() => {
       </button>
       <button
         type="button"
-        :disabled="!isDirty || isSaving"
+        :disabled="!isDirty || isSaving || hasErrors"
         class="px-4 py-2 text-sm font-medium rounded-lg border transition flex items-center gap-2"
-        :class="(isDirty && !isSaving)
+        :class="(isDirty && !isSaving && !hasErrors)
           ? 'border-xp-primary bg-xp-primary text-white hover:bg-xp-primary-hover cursor-pointer'
           : isSaving
             ? 'border-xp-primary bg-xp-primary text-white cursor-wait'
             : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'"
-        :title="isSaving ? 'Saving…' : isDirty ? 'Save settings (also tests the connection)' : 'No changes to save'"
+        :title="isSaving ? 'Saving…' : hasErrors ? 'Fix the highlighted validation errors before saving' : isDirty ? 'Save settings (also tests the connection)' : 'No changes to save'"
         @click="emit('action', 'btn_save', 'dm_shared_save')"
       >
         <svg

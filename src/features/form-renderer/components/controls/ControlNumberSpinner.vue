@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Validation } from '../../types/schema'
 
 const props = defineProps<{
@@ -9,8 +10,34 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: number] }>()
 
+// Min/max bounds come from the min_max validation (when the control declares one). null = unbounded.
+const bounds = computed(() => {
+  const v = props.validations?.find((x) => x.type === 'min_max')
+  return { min: v?.min ?? null, max: v?.max ?? null }
+})
+
+function clamp(v: number): number {
+  let out = v
+  if (bounds.value.min != null && out < bounds.value.min) out = bounds.value.min
+  if (bounds.value.max != null && out > bounds.value.max) out = bounds.value.max
+  return out
+}
+
+// Arrows: step, then keep the result inside the range.
 function step(delta: number) {
-  emit('update:modelValue', props.modelValue + delta)
+  const base = Number.isFinite(props.modelValue) ? props.modelValue : (bounds.value.min ?? 0)
+  emit('update:modelValue', clamp(base + delta))
+}
+
+// Typing: never let the value exceed the max (upper bound is clamped live, so a value past the top of the
+// range can't even be entered). Empty / below-min are NOT auto-corrected — they're left as-is so the
+// validation message shows and Save stays disabled (WinForm parity: it won't persist an empty value).
+function onInput(e: Event) {
+  const raw = (e.target as HTMLInputElement).value
+  if (raw === '') { emit('update:modelValue', NaN); return }
+  const n = Number(raw)
+  if (Number.isNaN(n)) { emit('update:modelValue', NaN); return }
+  emit('update:modelValue', bounds.value.max != null && n > bounds.value.max ? bounds.value.max : n)
 }
 </script>
 
@@ -21,8 +48,10 @@ function step(delta: number) {
       <input
         type="number"
         :value="modelValue"
+        :min="bounds.min ?? undefined"
+        :max="bounds.max ?? undefined"
         class="w-full px-3 py-2 text-sm focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-        @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value === '' ? NaN : Number(($event.target as HTMLInputElement).value))"
+        @input="onInput"
       />
       <div class="flex flex-col border-l border-gray-300 bg-gray-50 shrink-0">
         <button

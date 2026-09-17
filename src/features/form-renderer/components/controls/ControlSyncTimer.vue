@@ -57,8 +57,12 @@ const modalOpen = ref(false)
 const entries   = ref<Entry[]>([])
 const preview   = ref('')
 
+// A new/empty entry starts with NO frequency selected: the Frequency combo shows blank and the user
+// must explicitly pick a value (same criterion as Custom Sync's Add Table). The other fields keep sane
+// defaults that only surface once a frequency is chosen. An entry with an empty freq contributes nothing
+// to the raw string (entryToRaw returns '') so an unconfigured row never persists.
 function newEntry(): Entry {
-  return { freq: 'ByMinute', n: 5, time: '08:00', day: 'Monday', dom: 1 }
+  return { freq: '', n: 5, time: '08:00', day: 'Monday', dom: 1 }
 }
 
 // Parse the raw interval string back into editable entries.
@@ -153,28 +157,43 @@ function save()          { emit('update:modelValue', draftRaw.value); modalOpen.
         <h3 class="text-base font-semibold text-gray-800">Schedule — {{ title }}</h3>
 
         <div class="flex flex-col gap-2">
-          <div v-for="(e, i) in entries" :key="i" class="flex items-center gap-2 border border-gray-200 rounded-lg p-2">
-            <select v-model="e.freq" class="rounded-lg border border-gray-300 px-2 py-1.5 text-sm bg-white">
-              <option v-for="f in FREQS" :key="f.id" :value="f.id">{{ f.label }}</option>
-            </select>
-
-            <template v-if="INTERVAL_FREQS.has(e.freq)">
-              <span class="text-sm text-gray-500">every</span>
-              <input type="number" min="1" v-model.number="e.n" class="w-20 rounded-lg border border-gray-300 px-2 py-1.5 text-sm" />
-            </template>
-            <template v-else>
-              <select v-if="e.freq === 'Weekly'" v-model="e.day" class="rounded-lg border border-gray-300 px-2 py-1.5 text-sm bg-white">
-                <option v-for="d in DAYS" :key="d" :value="d">{{ d }}</option>
+          <div v-for="(e, i) in entries" :key="i" class="flex items-end gap-3 border border-gray-200 rounded-lg p-3">
+            <!-- Frequency: always shown. Labelled above the combo (WinForm parity). Starts blank; the
+                 dependent fields only appear once a frequency is chosen. -->
+            <div class="flex flex-col gap-1">
+              <label class="text-xs text-gray-500">Frequency</label>
+              <select v-model="e.freq" class="rounded-lg border border-gray-300 px-2 py-1.5 text-sm bg-white">
+                <!-- Blank option, only while nothing is selected (hidden once a real value is chosen). -->
+                <option v-if="!e.freq" value=""></option>
+                <option v-for="f in FREQS" :key="f.id" :value="f.id">{{ f.label }}</option>
               </select>
-              <template v-if="e.freq === 'Monthly'">
-                <span class="text-sm text-gray-500">day</span>
-                <input type="number" min="1" max="31" v-model.number="e.dom" class="w-16 rounded-lg border border-gray-300 px-2 py-1.5 text-sm" />
+            </div>
+
+            <!-- The rest of the fields depend on the chosen frequency and stay hidden until one is picked. -->
+            <template v-if="e.freq">
+              <div v-if="INTERVAL_FREQS.has(e.freq)" class="flex flex-col gap-1">
+                <label class="text-xs text-gray-500">Every</label>
+                <input type="number" min="1" v-model.number="e.n" class="w-24 rounded-lg border border-gray-300 px-2 py-1.5 text-sm" />
+              </div>
+              <template v-else>
+                <div v-if="e.freq === 'Weekly'" class="flex flex-col gap-1">
+                  <label class="text-xs text-gray-500">Day of Week</label>
+                  <select v-model="e.day" class="rounded-lg border border-gray-300 px-2 py-1.5 text-sm bg-white">
+                    <option v-for="d in DAYS" :key="d" :value="d">{{ d }}</option>
+                  </select>
+                </div>
+                <div v-if="e.freq === 'Monthly'" class="flex flex-col gap-1">
+                  <label class="text-xs text-gray-500">Day of Month</label>
+                  <input type="number" min="1" max="31" v-model.number="e.dom" class="w-20 rounded-lg border border-gray-300 px-2 py-1.5 text-sm" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs text-gray-500">Time</label>
+                  <input type="time" step="1" v-model="e.time" class="rounded-lg border border-gray-300 px-2 py-1.5 text-sm" />
+                </div>
               </template>
-              <span class="text-sm text-gray-500">at</span>
-              <input type="time" step="1" v-model="e.time" class="rounded-lg border border-gray-300 px-2 py-1.5 text-sm" />
             </template>
 
-            <button type="button" class="ml-auto text-xp-red hover:text-xp-red-hover text-sm px-2" @click="removeEntry(i)">✕</button>
+            <button type="button" class="ml-auto self-end mb-1.5 text-xp-red hover:text-xp-red-hover text-sm px-2" @click="removeEntry(i)">✕</button>
           </div>
         </div>
 

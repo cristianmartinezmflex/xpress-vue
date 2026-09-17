@@ -87,6 +87,13 @@ export function useFormState(schema: FormSchema, initialValues?: Record<string, 
           col.controls?.forEach((control) => {
             if (!control.id) return
 
+            // Detail controls (detailOf) edit the SELECTED row of a master table (e.g. Genetec's
+            // rio_list): their value lives INSIDE that table's row under the control's id, never as a
+            // top-level setting. Seeding a top-level key here (esp. the boolean-seed below) would persist
+            // a spurious standalone row on save — e.g. AllDoorsOnline showing up next to rio_list instead
+            // of on each CloudLink device row.
+            if (control.detailOf) return
+
             if (initialValues && control.id in initialValues) {
               state[control.id] = coerceValue(initialValues[control.id], control)
             } else if (control.default !== undefined) {
@@ -138,6 +145,8 @@ export function useFormState(schema: FormSchema, initialValues?: Record<string, 
         section.columns?.forEach((col) => {
           col.controls?.forEach((control) => {
             if (!control.id) return
+            // Detail controls live inside the master table's rows, not as a top-level setting (see initState).
+            if (control.detailOf) return
             if (control.default !== undefined) {
               state[control.id] = control.default
             }

@@ -82,13 +82,6 @@ const options = computed<SelectOption[]>(() => {
   return [...fetched.value].sort((a, b) => String(a.name).localeCompare(String(b.name)))
 })
 
-// Whether the current value matches one of the loaded options. When it does, we DON'T render the blank
-// "unset" row (it's just noise once something valid is selected). We keep the blank only when nothing
-// valid is selected yet, so the control can still show/represent an empty state.
-const hasSelection = computed(() =>
-  options.value.some((o) => String(o.id) === String(props.modelValue)),
-)
-
 // Coerce numeric ids to numbers (dynamic ids are usually numeric) so the saved value matches the option
 // type; leave the blank/unset and non-numeric values as-is.
 function onChange(e: Event) {
@@ -110,9 +103,10 @@ function onChange(e: Event) {
           :disabled="loading"
           @change="onChange"
         >
-          <!-- Dynamic: a blank "unset" option, only while nothing valid is selected (hidden once the
-               current value matches a real option, so there's no dangling empty row). -->
-          <option v-if="isDynamic && !hasSelection" :value="-1"></option>
+          <!-- The blank/-1 "unset" option is NOT injected here: it comes from the data itself (the
+               backend query adds `UNION ALL SELECT -1, ''` for the sources whose WinForm combo has a
+               blank row — zones, zones_external, user_profiles). Selects whose source has no blank
+               (e.g. OnGuard directory) therefore correctly show no empty option. -->
           <option v-if="loading" value="" disabled>Loading…</option>
           <option v-for="opt in options" :key="opt.id" :value="opt.id" :title="opt.name">{{ truncateLabel(opt.name) }}</option>
         </select>
